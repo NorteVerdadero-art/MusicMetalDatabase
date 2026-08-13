@@ -26,9 +26,14 @@ real chart performance, real contracts, or real financials.
 La carpeta [`csv/`](csv/) trae las 19 tablas ya exportadas en formato CSV
 (~19MB, o `musicworks_csv.zip` de 6.3MB comprimido). Sirve para abrir
 directo en Excel, Google Sheets, o cargar con pandas — sin instalar nada.
-Ojo: son solo los datos, sin relaciones activas ni las vistas
-(`vw_track_performance`, etc.) — para practicar JOINs de verdad conviene
-la base MySQL real.
+
+Si el alumno YA tiene MySQL pero quiere los mismos datos que el resto de
+la clase (en vez de datos random de `install_musicworks.sql`), usa
+[`load_from_csv.sql`](load_from_csv.sql):
+```
+mysql -u root -h 127.0.0.1 -P 3306 --local-infile=1 < load_from_csv.sql
+```
+(correr desde la raíz del repo, para que encuentre `csv/`).
 
 ## Install
 
