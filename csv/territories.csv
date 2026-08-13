@@ -1,0 +1,21 @@
+territory_id,country_code,country_name,region
+1,MX,Mexico,LATAM
+2,US,United States,NA
+3,CO,Colombia,LATAM
+4,AR,Argentina,LATAM
+5,ES,Spain,EU
+6,BR,Brazil,LATAM
+7,CL,Chile,LATAM
+8,PE,Peru,LATAM
+9,GB,United Kingdom,EU
+10,DE,Germany,EU
+11,FR,France,EU
+12,CA,Canada,NA
+13,PR,Puerto Rico,LATAM
+14,DO,Dominican Republic,LATAM
+15,IT,Italy,EU
+16,NL,Netherlands,EU
+17,JP,Japan,APAC
+18,KR,South Korea,APAC
+19,AU,Australia,APAC
+20,IN,India,APAC

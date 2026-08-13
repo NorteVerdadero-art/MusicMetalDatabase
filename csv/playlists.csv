@@ -1,0 +1,31 @@
+playlist_id,playlist_name,dsp_id,playlist_type,follower_count
+1,New Music Friday,1,editorial,4200000
+2,Kickass Metal,1,editorial,1580000
+3,Digging Deeper,1,editorial,1230000
+4,Century Break,1,editorial,345000
+5,mint,1,editorial,620000
+6,Rock This,1,editorial,3100000
+7,Discover Weekly,1,algorithmic,0
+8,Release Radar,1,algorithmic,0
+9,New Noise,1,editorial,540000
+10,Descargas Pesadas,1,editorial,89000
+11,A-List Rock,2,editorial,510000
+12,Encore,2,editorial,380000
+13,Best of the Week,2,algorithmic,0
+14,New Music Daily,2,editorial,720000
+15,Trending Now,3,algorithmic,0
+16,Music Discovery,3,editorial,210000
+17,Fresh Finds,4,editorial,98000
+18,Amazon Music Breakthrough,4,editorial,74000
+19,Deezer Editorial Picks,5,editorial,61000
+20,Tidal Rising,6,editorial,42000
+21,SoundCloud Go,7,editorial,35000
+22,Bedroom Riffs,5,user,29000
+23,Riffs & Chains,1,editorial,390000
+24,Blackened Nights,1,editorial,270000
+25,Groove Foundry,1,editorial,160000
+26,Djent Lab,1,editorial,220000
+27,Symphonic Realms,1,editorial,110000
+28,Electro Industrial Nights,5,editorial,53000
+29,Alt Rock Radar,6,editorial,28000
+30,Doom & Gloom,2,editorial,61000

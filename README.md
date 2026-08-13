@@ -21,6 +21,15 @@ real chart performance, real contracts, or real financials.
 
 - MySQL 8.0+ (uses recursive CTEs and window functions)
 
+## No quieres instalar MySQL?
+
+La carpeta [`csv/`](csv/) trae las 19 tablas ya exportadas en formato CSV
+(~19MB, o `musicworks_csv.zip` de 6.3MB comprimido). Sirve para abrir
+directo en Excel, Google Sheets, o cargar con pandas — sin instalar nada.
+Ojo: son solo los datos, sin relaciones activas ni las vistas
+(`vw_track_performance`, etc.) — para practicar JOINs de verdad conviene
+la base MySQL real.
+
 ## Install
 
 ```bash

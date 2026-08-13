@@ -1,0 +1,101 @@
+artist_id,artist_name,label_id,genre_id,artist_type,home_country,debut_year,monthly_listeners_baseline
+1,Metallica,2,2,independent,United States,2011,1209112
+2,Iron Maiden,3,3,independent,Colombia,2012,1520182
+3,Slayer,4,4,independent,Argentina,2013,1968573
+4,Megadeth,5,5,mainstream,Spain,2014,1277321
+5,Black Sabbath,6,6,independent,Brazil,2015,475887
+6,Judas Priest,7,7,independent,Chile,2016,542471
+7,Pantera,8,8,independent,Peru,2017,1279694
+8,Slipknot,9,9,mainstream,United Kingdom,2018,766056
+9,System of a Down,10,10,independent,Germany,2019,1986201
+10,Tool,11,11,independent,France,2020,1627837
+11,Opeth,12,12,independent,Canada,2021,175584
+12,Mastodon,1,13,mainstream,Puerto Rico,2022,1989410
+13,Gojira,2,14,independent,Dominican Republic,2023,1415298
+14,Lamb of God,3,15,independent,Italy,2024,1103260
+15,Trivium,4,1,independent,Netherlands,2010,1265406
+16,Avenged Sevenfold,5,2,mainstream,Japan,2011,1012249
+17,Bring Me the Horizon,6,3,independent,South Korea,2012,1260029
+18,Rammstein,7,4,independent,Australia,2013,1258398
+19,Nightwish,8,5,independent,India,2014,506903
+20,Within Temptation,9,6,mainstream,Mexico,2015,754324
+21,Ghost,10,7,independent,United States,2016,245910
+22,Behemoth,11,8,independent,Colombia,2017,961577
+23,Meshuggah,12,9,independent,Argentina,2018,65156
+24,Sepultura,1,10,mainstream,Spain,2019,1436051
+25,Anthrax,2,11,independent,Brazil,2020,979785
+26,Testament,3,12,independent,Chile,2021,585774
+27,Exodus,4,13,independent,Peru,2022,1984516
+28,Death,5,14,mainstream,United Kingdom,2023,160259
+29,Cannibal Corpse,6,15,independent,Germany,2024,842746
+30,Dimmu Borgir,7,1,independent,France,2010,1727953
+31,Emperor,8,2,independent,Canada,2011,106527
+32,Mayhem,9,3,mainstream,Puerto Rico,2012,1343778
+33,Immortal,10,4,independent,Dominican Republic,2013,394308
+34,Amon Amarth,11,5,independent,Italy,2014,1935206
+35,Arch Enemy,12,6,independent,Netherlands,2015,488107
+36,In Flames,1,7,mainstream,Japan,2016,629918
+37,At the Gates,2,8,independent,South Korea,2017,1680271
+38,Children of Bodom,3,9,independent,Australia,2018,506599
+39,Dream Theater,4,10,independent,India,2019,1487183
+40,Symphony X,5,11,mainstream,Mexico,2020,1911120
+41,Blind Guardian,6,12,independent,United States,2021,1089052
+42,Helloween,7,13,independent,Colombia,2022,1706898
+43,Sabaton,8,14,independent,Argentina,2023,1262337
+44,Powerwolf,9,15,mainstream,Spain,2024,1185991
+45,Korn,10,1,independent,Brazil,2010,137945
+46,Deftones,11,2,independent,Chile,2011,1126751
+47,Disturbed,12,3,independent,Peru,2012,1214919
+48,Five Finger Death Punch,1,4,mainstream,United Kingdom,2013,689346
+49,Volbeat,2,5,independent,Germany,2014,1796971
+50,Halestorm,3,6,independent,France,2015,911818
+51,Motorhead,4,7,independent,Canada,2016,1163178
+52,Venom,5,8,mainstream,Puerto Rico,2017,1075439
+53,Celtic Frost,6,9,independent,Dominican Republic,2018,1882658
+54,Bathory,7,10,independent,Italy,2019,181974
+55,Type O Negative,8,11,independent,Netherlands,2020,1256897
+56,Killswitch Engage,9,12,mainstream,Japan,2021,1733564
+57,Parkway Drive,10,13,independent,South Korea,2022,892131
+58,Architects,11,14,independent,Australia,2023,1254963
+59,Bullet for My Valentine,12,15,independent,India,2024,1593420
+60,As I Lay Dying,1,1,mainstream,Mexico,2010,197215
+61,All That Remains,2,2,independent,United States,2011,200813
+62,Machine Head,3,3,independent,Colombia,2012,407421
+63,Fear Factory,4,4,independent,Argentina,2013,1429665
+64,Static-X,5,5,mainstream,Spain,2014,1921063
+65,Mudvayne,6,6,independent,Brazil,2015,1311320
+66,Godsmack,7,7,independent,Chile,2016,788414
+67,Alice in Chains,8,8,independent,Peru,2017,2003109
+68,Soundgarden,9,9,mainstream,United Kingdom,2018,1645303
+69,Faith No More,10,10,independent,Germany,2019,212191
+70,Rage Against the Machine,11,11,independent,France,2020,120043
+71,Overkill,12,12,independent,Canada,2021,1958646
+72,Kreator,1,13,mainstream,Puerto Rico,2022,1428101
+73,Destruction,2,14,independent,Dominican Republic,2023,1259565
+74,Sodom,3,15,independent,Italy,2024,8525
+75,Watain,4,1,independent,Netherlands,2010,258928
+76,Marduk,5,2,mainstream,Japan,2011,1264068
+77,Gorgoroth,6,3,independent,South Korea,2012,1538556
+78,Cradle of Filth,7,4,independent,Australia,2013,1895578
+79,Paradise Lost,8,5,independent,India,2014,857222
+80,My Dying Bride,9,6,mainstream,Mexico,2015,594378
+81,Katatonia,10,7,independent,United States,2016,395224
+82,Anathema,11,8,independent,Colombia,2017,187988
+83,Nile,12,9,independent,Argentina,2018,1749265
+84,Morbid Angel,1,10,mainstream,Spain,2019,177365
+85,Obituary,2,11,independent,Brazil,2020,1634028
+86,Deicide,3,12,independent,Chile,2021,1633046
+87,Whitechapel,4,13,independent,Peru,2022,1258148
+88,Suicide Silence,5,14,mainstream,United Kingdom,2023,1386601
+89,Job for a Cowboy,6,15,independent,Germany,2024,1153561
+90,Chelsea Grin,7,1,independent,France,2010,1603001
+91,Bad Omens,8,2,independent,Canada,2011,549325
+92,Motionless in White,9,3,mainstream,Puerto Rico,2012,1932623
+93,Ice Nine Kills,10,4,independent,Dominican Republic,2013,10138
+94,Spiritbox,11,5,independent,Italy,2014,247823
+95,Sleep Token,12,6,independent,Netherlands,2015,1203702
+96,Amaranthe,1,7,mainstream,Japan,2016,1270041
+97,Kamelot,2,8,independent,South Korea,2017,734099
+98,Epica,3,9,independent,Australia,2018,1855375
+99,Delain,4,10,independent,India,2019,1069577
+100,Wintersun,5,11,mainstream,Mexico,2020,1776762

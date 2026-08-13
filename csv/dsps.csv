@@ -1,0 +1,8 @@
+dsp_id,dsp_name,platform_type,avg_payout_per_stream,reach_share
+1,Spotify,streaming,0.004000,0.550
+2,Apple Music,streaming,0.008000,0.180
+3,YouTube Music,video,0.002100,0.110
+4,Amazon Music,streaming,0.004200,0.070
+5,Deezer,streaming,0.004500,0.040
+6,Tidal,streaming,0.012500,0.020
+7,SoundCloud,streaming,0.002500,0.030
