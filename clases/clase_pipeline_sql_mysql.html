@@ -7,7 +7,8 @@
 <title>El Pipeline de Datos: de MySQL a tu Reporte</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-chrome.css">
 <style>
 :root{
   --ink:#1a1a2e; --teal:#00897B; --gold:#D4A017; --red:#C62828;
@@ -25,37 +26,6 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif; color:var(--ink); margin:0 0 .
 code, .mono, .ex-input, .ex-table, .compare-table td.sql-col{font-family:'DM Mono',monospace;}
 p{margin:0 0 1em;}
 a{color:var(--teal);}
-
-/* ---------- layout con sidebar ---------- */
-.course-layout{display:flex; align-items:flex-start; max-width:1400px; margin:0 auto;}
-.course-sidebar{
-  width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
-  border-right:1px solid var(--border); padding:28px 18px; background:var(--bg-soft);
-}
-.course-sidebar h3{font-family:'DM Sans',sans-serif; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); margin:0 0 14px;}
-.course-nav-group{margin-bottom:26px;}
-.course-nav-item{
-  display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:8px;
-  font-size:.86rem; color:var(--ink); text-decoration:none; margin-bottom:2px; line-height:1.3;
-}
-.course-nav-item .n{color:var(--gray); font-size:.78rem; min-width:1.1em;}
-.course-nav-item.active{background:var(--teal); color:#fff; font-weight:600;}
-.course-nav-item.active .n{color:#d9f2ef;}
-.course-nav-item.disabled{color:var(--gray); cursor:default;}
-.course-nav-item.disabled .badge{
-  margin-left:auto; font-size:.65rem; background:var(--border); color:var(--gray);
-  padding:2px 6px; border-radius:999px; white-space:nowrap;
-}
-.course-nav-item.next{border:1px dashed var(--gold); color:#8a6a10;}
-.course-main{flex:1; min-width:0;}
-@media(max-width:900px){
-  .course-layout{flex-direction:column;}
-  .course-sidebar{
-    width:100%; height:auto; position:static; border-right:none; border-bottom:1px solid var(--border);
-    padding:16px; overflow-x:auto;
-  }
-  .course-nav-group{margin-bottom:14px;}
-}
 
 /* ---------- hero / header ---------- */
 .hero{padding:52px 40px 36px; border-bottom:1px solid var(--border);}
@@ -167,29 +137,6 @@ footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px so
 </style>
 </head>
 <body>
-<div class="course-layout">
-
-<aside class="course-sidebar">
-  <h3>De los Datos al Criterio</h3>
-  <div class="course-nav-group">
-    <a class="course-nav-item" href="clase1_mentalidad_analitica.html"><span class="n">·</span> Mentalidad Analítica</a>
-    <a class="course-nav-item" href="clase2_herramientas_analiticas_1.html"><span class="n">·</span> Herramientas Analíticas</a>
-    <a class="course-nav-item" href="clase3_limpieza_calidad_datos_5.html"><span class="n">·</span> Limpieza y Calidad de Datos</a>
-    <a class="course-nav-item" href="clase4_sql_criterio_negocio_5.html"><span class="n">·</span> SQL y Criterio de Negocio</a>
-    <a class="course-nav-item" href="clase5_visualizacion_graficacion_3.html"><span class="n">·</span> Visualización y Graficación</a>
-    <a class="course-nav-item" href="clase6_modelos_estadisticos_4.html"><span class="n">·</span> Modelos Estadísticos Aplicados</a>
-    <a class="course-nav-item" href="clase7_dashboards_sheets_1.html"><span class="n">·</span> Dashboards en Sheets</a>
-    <a class="course-nav-item active" href="clase_pipeline_sql_mysql.html"><span class="n">·</span> El Pipeline de Datos: MySQL</a>
-    <a class="course-nav-item next" title="Sugerida como siguiente clase, aún no existe"><span class="n">·</span> Storytelling y Comunicación <span class="badge">próxima</span></a>
-  </div>
-  <div class="course-nav-group">
-    <h3>Repaso</h3>
-    <a class="course-nav-item" href="repaso_clases1-3_1.html"><span class="n">·</span> Repaso Clases 1–3</a>
-  </div>
-</aside>
-
-<main class="course-main">
-
 <div class="hero">
   <div class="kicker">De los Datos al Criterio</div>
   <h1>El Pipeline de Datos: de MySQL a tu Reporte</h1>
@@ -594,9 +541,6 @@ footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px so
 <footer>
   De los Datos al Criterio · Base de práctica: MusicWorks (simulada) · Nombres de artistas reales, métricas 100% ilustrativas.
 </footer>
-
-</main>
-</div>
 
 <script>
 'use strict';
@@ -1070,5 +1014,6 @@ document.addEventListener('DOMContentLoaded', function(){
   mountExercise('ex12', { check: checkByReference('SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name HAVING total > 5', false) });
 });
 </script>
+<script src="shared-chrome.js"></script>
 </body>
 </html>

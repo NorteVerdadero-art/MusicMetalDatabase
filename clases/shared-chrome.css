@@ -1,0 +1,79 @@
+/* =====================================================================
+   shared-chrome.css — sidebar de navegación, toggles y modo oscuro
+   compartidos por todas las clases de "De los Datos al Criterio".
+   Se referencia con <link> local (mismo directorio), no es un recurso
+   externo — cada clase sigue siendo un HTML autocontenido en su
+   contenido; esto solo centraliza el "chrome" para que sea uniforme
+   y editable en un solo lugar.
+   ===================================================================== */
+
+#cc-sidebar{
+  position:fixed; top:0; left:0; width:250px; height:100vh; overflow-y:auto;
+  z-index:2000; background:#F8F9FA; border-right:1px solid #E5E7EB;
+  padding:26px 16px 80px; font-family:'DM Sans',sans-serif;
+  transition:transform .25s ease;
+}
+#cc-sidebar.cc-collapsed{ transform:translateX(-100%); }
+#cc-sidebar h3{ font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:#6B7280; margin:0 0 12px; font-weight:600; }
+#cc-sidebar .cc-group{ margin-bottom:22px; }
+#cc-sidebar .cc-item{
+  display:flex; align-items:center; gap:7px; padding:8px 9px; border-radius:7px;
+  font-size:.83rem; color:#1a1a2e; text-decoration:none; margin-bottom:2px; line-height:1.3;
+}
+#cc-sidebar a.cc-item:hover{ background:#eceef5; }
+#cc-sidebar .cc-item .cc-n{ color:#6B7280; font-size:.75rem; }
+#cc-sidebar a.cc-item.cc-active{ background:#00897B; color:#fff; font-weight:600; }
+#cc-sidebar a.cc-item.cc-active .cc-n{ color:#d9f2ef; }
+#cc-sidebar .cc-item.cc-next{ border:1px dashed #D4A017; color:#8a6a10; cursor:default; }
+#cc-sidebar .cc-badge{ margin-left:auto; font-size:.6rem; background:#E5E7EB; color:#6B7280; padding:2px 6px; border-radius:999px; white-space:nowrap; }
+
+#cc-toggle-btn, #cc-dark-btn{
+  position:fixed; top:14px; z-index:2001; width:34px; height:34px; border-radius:8px;
+  background:#fff; border:1px solid #E5E7EB; cursor:pointer; display:flex; align-items:center;
+  justify-content:center; font-size:1rem; box-shadow:0 1px 3px rgba(0,0,0,.1); line-height:1;
+}
+#cc-toggle-btn{ left:262px; transition:left .25s ease; }
+#cc-toggle-btn.cc-collapsed{ left:14px; }
+#cc-dark-btn{ right:14px; }
+
+body.cc-pushed{ margin-left:250px; transition:margin-left .25s ease; }
+body.cc-pushed.cc-collapsed{ margin-left:0; }
+
+@media(max-width:900px){
+  #cc-sidebar{ width:82%; max-width:300px; }
+  body.cc-pushed, body.cc-pushed.cc-collapsed{ margin-left:0; }
+  #cc-toggle-btn, #cc-toggle-btn.cc-collapsed{ left:14px; }
+}
+
+/* =====================================================================
+   Modo oscuro — redefine cada variante de nombre de variable usada a
+   través de las clases (algunas se renombraron con el tiempo: --border
+   pasó a --bd, --purple a --pu, etc). Las que un archivo no usa quedan
+   como propiedades CSS sin efecto, no rompen nada.
+   Cobertura: variables (~85-90% del CSS de cada clase). Puede haber
+   componentes puntuales con color fijo en hex (mockups de Sheets, por
+   ejemplo) que no se re-tematizan — es una limitación conocida, no un
+   bug pendiente de arreglar hoy.
+   ===================================================================== */
+html[data-theme="dark"]{
+  --black:#EDEDF3; --ink:#EDEDF3; --white:#14141c; --light:#1b1b26;
+  --gray:#9CA3AF; --border:#2e2e3c; --bd:#2e2e3c;
+  --teal:#2FB3A3; --teal-light:#0d2b28; --teal-l:#0d2b28;
+  --gold:#E8B93D; --gold-light:#2b2410; --gold-l:#2b2410;
+  --red:#EF6B6B; --red-light:#2e1518; --red-l:#2e1518;
+  --purple:#B073E0; --purple-light:#241530; --pu:#B073E0; --pu-l:#241530;
+  --sh:#3FDB9B; --sh-light:#0f2a1c; --sh-l:#0f2a1c;
+  --bl:#6FB1E8; --bl-light:#14232f; --bl-l:#14232f;
+  --sq:#6FB1E8; --sq-light:#14232f; --sq-l:#14232f;
+  --bg:#14141c; --bg-soft:#1b1b26;
+}
+html[data-theme="dark"] body{ background:#14141c !important; color:#EDEDF3 !important; }
+html[data-theme="dark"] .header, html[data-theme="dark"] header{
+  background:#14141c !important; border-color:#2e2e3c !important;
+}
+html[data-theme="dark"] #cc-sidebar{ background:#181822; border-color:#2e2e3c; }
+html[data-theme="dark"] #cc-sidebar .cc-item{ color:#EDEDF3; }
+html[data-theme="dark"] #cc-sidebar a.cc-item:hover{ background:#232332; }
+html[data-theme="dark"] #cc-toggle-btn, html[data-theme="dark"] #cc-dark-btn{
+  background:#1b1b26; border-color:#2e2e3c; color:#EDEDF3;
+}
