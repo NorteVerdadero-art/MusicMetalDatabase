@@ -47,7 +47,7 @@ JOIN artists ar ON ar.artist_id = r.artist_id
 JOIN genres g ON g.genre_id = ar.genre_id
 JOIN labels l ON l.label_id = r.label_id;
 
-CREATE OR REPLACE VIEW stream_log AS
+CREATE OR REPLACE VIEW streaming_summary AS
 SELECT
   ar.artist_name, ar.artist_type, g.genre_name, d.dsp_name,
   cw.iso_week AS week_num,
