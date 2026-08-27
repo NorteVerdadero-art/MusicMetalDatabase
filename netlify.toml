@@ -1,0 +1,8 @@
+[build]
+  publish = "clases"
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
