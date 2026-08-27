@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repaso — Clases 1 a 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --ink:#1a1a2e;--teal:#00897B;--teal-l:#e0f2f1;
+  --gold:#D4A017;--gold-l:#FFF8E1;--red:#C62828;--red-l:#FFEBEE;
+  --gray:#6B7280;--light:#F8F9FA;--bd:#E5E7EB;--pu:#6B21A8;--pu-l:#F3E8FF;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#fff!important;color:#0a0a0a!important;}
+body{font-family:"DM Sans",sans-serif;line-height:1.6;}
+@media(prefers-color-scheme:dark){html,body{background:#fff!important;color:#0a0a0a!important;}}
+
+.header{border-bottom:1px solid var(--bd);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+.hl{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;}
+.hm{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+.hb{background:var(--gold);color:#fff;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+
+.hero{padding:5rem 4rem 3.5rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:"";display:inline-block;width:24px;height:2px;background:var(--gold);}
+.hero h1{font-family:"Playfair Display",serif;font-size:3.2rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;color:var(--teal);}
+.hero-desc{font-size:1rem;color:var(--gray);line-height:1.75;font-weight:300;}
+.sidebar{border:1px solid var(--bd);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+.si{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.85rem;}
+.si:last-child{border-bottom:none;}
+.si-l{color:var(--gray);}
+.si-v{font-weight:600;color:var(--ink);}
+.si-v.t{color:var(--teal);}
+
+.prog{max-width:1100px;margin:0 auto;padding:0 4rem 3rem;}
+.pt{display:flex;gap:3px;margin-bottom:.5rem;}
+.ps{flex:1;height:4px;background:var(--bd);}
+.ps.a{background:var(--gold);}
+.pl{font-size:.7rem;color:var(--gray);}
+
+section{max-width:1100px;margin:0 auto;padding:3.5rem 4rem;border-top:1px solid var(--bd);}
+.sn{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+.st{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.ss{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+.tpill{display:inline-flex;align-items:center;gap:.4rem;background:#fff;border:1px solid var(--bd);padding:.3rem .8rem;border-radius:20px;font-size:.72rem;color:var(--gray);font-weight:500;margin-bottom:2rem;}
+.tpill::before{content:"⏱";}
+
+.hook{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--gold);padding:2rem 2.5rem;margin-bottom:2.5rem;}
+.hook-lbl{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;}
+.hook h3{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+.hook p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+
+.ibox{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+.ibox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.ibox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+.ibox strong{color:#9A7208;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.card{border:1px solid var(--bd);padding:1.8rem;position:relative;background:#fff;}
+.ca{position:absolute;top:0;left:0;width:100%;height:3px;}
+.card h4{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--ink);margin-top:.7rem;}
+.card p{font-size:.86rem;color:var(--gray);line-height:1.65;}
+
+.sim{border:1px solid var(--bd);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+.sim-h{background:#fff;border-bottom:1px solid var(--bd);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+.sim-ht{font-size:.85rem;font-weight:600;color:var(--ink);}
+.sim-hs{font-size:.75rem;color:var(--gray);}
+.tag{color:#fff;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+.tag-g{background:var(--gold);}
+.tag-t{background:var(--teal);}
+.tag-r{background:var(--red);}
+.tag-p{background:var(--pu);}
+
+/* MIND MAP */
+.mindmap{padding:2rem;display:flex;flex-direction:column;align-items:center;gap:0;}
+.mm-center{background:var(--ink);color:#fff;padding:1rem 2rem;font-weight:700;font-size:.95rem;text-align:center;margin-bottom:2rem;font-family:"Playfair Display",serif;}
+.mm-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;width:100%;}
+.mm-node{border:2px solid var(--bd);padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.mm-node:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(0,0,0,.08);}
+.mm-node.c1{border-top:4px solid var(--teal);}
+.mm-node.c2{border-top:4px solid var(--gold);}
+.mm-node.c3{border-top:4px solid var(--red);}
+.mm-num{font-family:"DM Mono",monospace;font-size:.65rem;color:var(--gray);margin-bottom:.3rem;}
+.mm-title{font-weight:700;font-size:.88rem;color:var(--ink);margin-bottom:.5rem;}
+.mm-desc{font-size:.75rem;color:var(--gray);line-height:1.5;display:none;}
+.mm-node.open .mm-desc{display:block;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--bd);}
+.mm-arrows{display:flex;justify-content:space-around;padding:.5rem 0;font-size:1.2rem;color:var(--bd);}
+
+/* QUIZ */
+.quiz-item{border:1px solid var(--bd);background:#fff;margin-bottom:1rem;overflow:hidden;}
+.quiz-q{padding:1.2rem 1.5rem;font-weight:600;font-size:.92rem;color:var(--ink);border-bottom:1px solid var(--bd);display:flex;gap:.8rem;align-items:flex-start;}
+.quiz-num{font-family:"DM Mono",monospace;font-size:.72rem;color:var(--gold);font-weight:700;flex-shrink:0;margin-top:.1rem;}
+.quiz-opts{padding:1rem 1.5rem;display:flex;flex-direction:column;gap:.5rem;}
+.quiz-opt{border:1px solid var(--bd);padding:.6rem 1rem;font-size:.85rem;color:var(--ink);cursor:pointer;transition:all .15s;border-radius:2px;}
+.quiz-opt:hover{border-color:var(--teal);background:var(--teal-l);}
+.quiz-opt.correct{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:600;}
+.quiz-opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red);}
+.quiz-opt.disabled{cursor:default;}
+.quiz-fb{padding:0 1.5rem 1.2rem;font-size:.82rem;color:var(--gray);line-height:1.6;display:none;}
+.quiz-fb.show{display:block;}
+.quiz-fb strong{color:var(--teal);}
+
+.quiz-score{background:var(--ink);color:#fff;padding:1.5rem 2rem;text-align:center;margin-bottom:2rem;display:none;}
+.quiz-score.show{display:block;}
+.quiz-score-num{font-family:"Playfair Display",serif;font-size:2.5rem;font-weight:900;color:var(--gold);}
+.quiz-score-lbl{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:.3rem;}
+
+/* SIMULACIÓN SHEETS */
+.sh-mock{border:1px solid var(--bd);overflow:hidden;margin-bottom:.8rem;}
+.sh-top{background:#0F9D58;padding:.4rem 1rem;display:flex;align-items:center;gap:.8rem;}
+.sh-top-t{color:#fff;font-size:.78rem;font-weight:600;}
+.sh-fx{background:#F8F8F8;border-bottom:1px solid var(--bd);padding:.4rem .8rem;display:flex;gap:.6rem;align-items:center;font-family:"DM Mono",monospace;font-size:.78rem;}
+.sh-fxl{background:var(--bd);padding:.1rem .4rem;border-radius:2px;font-weight:600;color:var(--gray);font-size:.7rem;}
+.sh-fxv{color:#0F9D58;flex:1;}
+.sh-t{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.76rem;}
+.sh-t th{background:#F0F0F0;border:1px solid #D0D0D0;padding:.3rem .7rem;font-size:.7rem;color:var(--gray);text-align:center;font-weight:600;}
+.sh-t td{border:1px solid #E0E0E0;padding:.32rem .7rem;background:#fff;color:var(--ink);cursor:pointer;transition:background .15s;}
+.sh-t td.rh{background:#F0F0F0;color:var(--gray);text-align:center;font-weight:600;font-size:.68rem;cursor:default;}
+.sh-t td.ch{background:#fff;color:#0F9D58;font-weight:700;font-size:.74rem;font-family:"DM Sans",sans-serif;border-bottom:2px solid #0F9D58;cursor:default;}
+.sh-t td.err{background:var(--red-l);color:var(--red);font-weight:600;}
+.sh-t td.ok{background:var(--teal-l);}
+.sh-t td:hover:not(.rh):not(.ch){background:var(--gold-l);}
+
+/* PASO A PASO */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{border:1px solid var(--bd);border-top:none;padding:1.2rem 1.5rem;display:grid;grid-template-columns:36px 1fr;gap:1rem;align-items:start;background:#fff;cursor:pointer;transition:background .15s;}
+.step:first-child{border-top:1px solid var(--bd);}
+.step:hover{background:var(--light);}
+.step.active{background:var(--teal-l);border-color:var(--teal);}
+.step-n{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:.78rem;font-weight:700;color:var(--gold);flex-shrink:0;}
+.step-n.done{background:var(--gold);color:#fff;}
+.step-t{font-weight:700;font-size:.88rem;color:var(--ink);margin-bottom:.3rem;}
+.step-d{font-size:.8rem;color:var(--gray);line-height:1.5;}
+
+/* CHECKLIST */
+.chk-row{display:flex;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--bd);cursor:pointer;align-items:flex-start;}
+.chk-row:last-child{border-bottom:none;}
+.chk-box{width:20px;height:20px;border:2px solid var(--bd);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;transition:all .15s;margin-top:.1rem;}
+.chk-row.done .chk-box{background:var(--teal);border-color:var(--teal);color:#fff;}
+.chk-row.done .chk-txt{color:var(--teal);}
+.chk-txt{font-size:.85rem;color:var(--gray);line-height:1.5;}
+.chk-conf{display:flex;gap:.3rem;margin-left:auto;flex-shrink:0;}
+.conf-btn{width:24px;height:24px;border:1px solid var(--bd);border-radius:2px;background:#fff;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.conf-btn.sel{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+.progress-bar{height:6px;background:var(--light);border-radius:3px;overflow:hidden;margin:1rem 1.5rem .4rem;border:1px solid var(--bd);}
+.progress-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .4s;}
+.progress-lbl{padding:0 1.5rem .8rem;font-size:.75rem;color:var(--gray);display:flex;justify-content:space-between;}
+
+/* ERROR REFERENCE */
+.err-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.err-item{border:1px solid var(--bd);border-left:3px solid var(--red);padding:1.1rem;background:#fff;}
+.err-cls{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:.5rem;}
+.err-t{font-weight:700;font-size:.84rem;color:var(--ink);margin-bottom:.4rem;}
+.err-d{font-size:.78rem;color:var(--gray);line-height:1.5;}
+
+/* FINAL EXERCISE */
+.final-box{border:1px solid var(--bd);overflow:hidden;background:#fff;margin-bottom:2rem;}
+.final-h{background:var(--ink);color:#fff;padding:1rem 1.5rem;}
+.final-h-t{font-weight:700;font-size:.95rem;}
+.final-h-s{font-size:.78rem;color:rgba(255,255,255,.65);margin-top:.2rem;}
+.final-body{padding:1.5rem;}
+.final-task{display:flex;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--bd);align-items:flex-start;}
+.final-task:last-child{border-bottom:none;}
+.ft-icon{font-size:1.1rem;flex-shrink:0;margin-top:.1rem;}
+.ft-txt{font-size:.85rem;color:var(--ink);line-height:1.6;}
+
+.closing{background:#fff;border-top:1px solid var(--bd);padding:3.5rem 4rem;}
+.closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.closing h3{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.nc{border:1px solid var(--bd);border-top:3px solid var(--teal);padding:1.5rem;background:#fff;}
+.nc-l{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;}
+.nc-t{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+.nc-i{list-style:none;font-size:.82rem;color:var(--gray);}
+.nc-i li{padding:.3rem 0;padding-left:1rem;position:relative;}
+.nc-i li::before{content:"→";position:absolute;left:0;color:var(--teal);}
+.kl{list-style:none;}
+.kl li{display:flex;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--bd);font-size:.87rem;align-items:flex-start;line-height:1.5;}
+.kl li:last-child{border-bottom:none;}
+.kc{color:var(--gold);flex-shrink:0;margin-top:.1rem;}
+footer{border-top:1px solid var(--bd);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+footer span{font-size:.75rem;color:var(--gray);}
+
+
+.tag-p{background:var(--pu);}
+.fc-card{border:1px solid var(--bd);background:#fff;padding:1.2rem;cursor:pointer;min-height:140px;display:flex;flex-direction:column;justify-content:center;text-align:center;transition:all .2s;position:relative;}
+.fc-card:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(0,0,0,.07);}
+.fc-card.flipped{background:var(--teal-l);border-color:var(--teal);}
+.fc-tag{position:absolute;top:.6rem;left:.6rem;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.1rem .4rem;border-radius:2px;}
+.fc-tag.c1{background:var(--teal-l);color:var(--teal);}
+.fc-tag.c2{background:var(--gold-l);color:#9A7208;}
+.fc-tag.c3{background:var(--red-l);color:var(--red);}
+.fc-term{font-family:"Playfair Display",serif;font-weight:700;font-size:1rem;color:var(--ink);}
+.fc-def{font-size:.8rem;color:var(--ink);line-height:1.5;display:none;}
+.fc-card.flipped .fc-term{display:none;}
+.fc-card.flipped .fc-def{display:block;}
+.fc-hint{font-size:.68rem;color:var(--gray);margin-top:.6rem;font-style:italic;}
+.fc-card.flipped .fc-hint{display:none;}
+
+@media(max-width:768px){
+  .hero,.g2,.g3,.mm-row,.closing-inner{grid-template-columns:1fr;}
+  .header,.prog,section,footer,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+  .hero{padding:3rem 1.5rem 2rem;}
+  .hero h1{font-size:2.2rem;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hl">De los Datos al Criterio</div>
+  <div class="hm"><span>Industria Musical</span><span class="hb">Repaso · Clases 01–03</span></div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">Sesión de consolidación</div>
+    <h1>Repaso<br><em>Clases 1 a 3</em></h1>
+    <p class="hero-desc">De la mentalidad analítica a datos limpios y confiables. Antes de avanzar a SQL y métricas, consolidamos el fundamento con el catálogo real de Alzada.</p>
+  </div>
+  <div class="sidebar">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Ficha de la sesión</div>
+    <div class="si"><span class="si-l">Duración</span><span class="si-v">~2.5 horas</span></div>
+    <div class="si"><span class="si-l">Bloques</span><span class="si-v">7</span></div>
+    <div class="si"><span class="si-l">Clases cubiertas</span><span class="si-v">1, 2 y 3</span></div>
+    <div class="si"><span class="si-l">Casos</span><span class="si-v t">2 integradores</span></div>
+    <div class="si"><span class="si-l">Dataset</span><span class="si-v">Master Alzada (real)</span></div>
+  </div>
+</div>
+
+<div class="prog">
+  <div class="pt"><div class="ps a"></div><div class="ps a"></div><div class="ps a"></div><div class="ps a"></div><div class="ps a"></div><div class="ps a"></div></div>
+  <div class="pl">Repaso · 7 bloques · sesión extendida</div>
+</div>
+
+<!-- B1 MAPA MENTAL -->
+<section>
+  <div class="sn">01 · Mapa Mental</div>
+  <div class="st">Cómo se conectan las 3 clases</div>
+  <div class="ss">Haz clic en cada nodo para recordar de qué trataba</div>
+
+  <div class="hook">
+    <div class="hook-lbl">La idea central</div>
+    <h3>Ninguna de las 3 clases funciona sola. Son una secuencia obligatoria.</h3>
+    <p>Sin mentalidad analítica, Sheets es solo una hoja de cálculo. Sin dominar Sheets, no puedes limpiar datos con eficiencia. Sin datos limpios, cualquier análisis posterior es una mentira bien presentada.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Mapa mental interactivo</div><div class="sim-hs">Clic en cada bloque para expandir</div></div>
+      <span class="tag tag-g">INTERACTIVO</span>
+    </div>
+    <div class="mindmap">
+      <div class="mm-center">DE LOS DATOS AL CRITERIO<br><span style="font-size:.7rem;font-weight:400;opacity:.7;">Clases 1–3</span></div>
+      <div class="mm-row" id="mm-row"></div>
+      <div class="mm-arrows"><span>↓</span><span>↓</span><span>↓</span></div>
+      <div style="text-align:center;font-size:.82rem;color:var(--gray);font-style:italic;margin-top:.5rem;">Cada clase depende de la anterior — no son módulos independientes</div>
+    </div>
+  </div>
+</section>
+
+<!-- B2 QUIZ -->
+<section>
+  <div class="sn">02 · Quiz de Criterio</div>
+  <div class="st">10 preguntas — no de memoria, de criterio</div>
+  <div class="ss">No hay trampa. Cada pregunta refleja una decisión real que ya tomaste en clase</div>
+
+  <div class="quiz-score" id="quiz-score">
+    <div class="quiz-score-num" id="qs-num">0/10</div>
+    <div class="quiz-score-lbl">Respuestas correctas</div>
+  </div>
+
+  <div id="quiz-container"></div>
+</section>
+
+<!-- B3 CASO INTEGRADOR -->
+<section>
+  <div class="sn">03 · Caso Integrador</div>
+  <div class="st">Dos casos reales — Luna Cold y Santi</div>
+  <div class="ss">Aplica las 3 clases juntas sobre problemas reales del catálogo Alzada</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Caso 1 — Pregunta de negocio</div>
+    <h3>El sello quiere invertir en campaña para Luna Cold. Antes de decidir, hay un problema de datos que debe resolverse primero.</h3>
+    <p>Este caso obliga a pensar con mentalidad analítica (¿qué pregunta respondo realmente?), usar Sheets (explorar el catálogo), y auditar datos (detectar el problema oculto) — las 3 clases en secuencia.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Caso 1 — Auditoría de Luna Cold</div><div class="sim-hs">Sigue los 4 pasos en orden. Haz clic en cada uno.</div></div>
+      <span class="tag tag-t">PASO A PASO</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div style="border-right:1px solid var(--bd);">
+        <div class="steps" id="case1-steps"></div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;" id="case1-panel-label">Datos de Luna Cold</div>
+        <div id="case1-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hook" style="margin-top:2.5rem;">
+    <div class="hook-lbl">Caso 2 — Practica tú solo</div>
+    <h3>Ahora es tu turno: Santi tiene el mismo patrón de problema que Luna Cold.</h3>
+    <p>Antes de revelar la tabla completa, piensa: ¿cuántos tracks de Santi esperarías que tengan el problema? Luego haz clic para auditar y descúbrelo.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Caso 2 — Auditoría de Santi</div><div class="sim-hs">Encuentra los tracks distribuidos sin UPC</div></div>
+      <span class="tag tag-r">TU TURNO</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="sh-mock">
+        <div class="sh-top"><span class="sh-top-t">📊 Catálogo — Santi (4 tracks)</span></div>
+        <div class="sh-fx"><span class="sh-fxl">fx</span><span class="sh-fxv">=SI(Y(F2="DISTRIBUIDO"; ESBLANCO(E2)); "⚠ SIN UPC"; "OK")</span></div>
+        <div style="overflow-x:auto;">
+          <table class="sh-t" id="case2-table"></table>
+        </div>
+      </div>
+      <div id="case2-feedback" style="padding:1rem;background:var(--light);border:1px solid var(--bd);font-size:.83rem;color:var(--gray);margin-top:.8rem;">👆 Haz clic en cada fila para auditar el estatus de cada track</div>
+    </div>
+  </div>
+</section>
+
+<!-- B4 AUTOEVALUACIÓN -->
+<section>
+  <div class="sn">04 · Autoevaluación</div>
+  <div class="st">¿Puedo explicar esto con confianza?</div>
+  <div class="ss">Marca cada punto y califica tu nivel de confianza — sé honesto, esto es solo para ti</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Checklist de dominio — Clases 1 a 3</div><div class="sim-hs">1 = necesito repasar más · 3 = lo explicaría sin dudar</div></div>
+      <span class="tag tag-g">INTERACTIVO</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="self-fill" style="width:0%"></div></div>
+    <div class="progress-lbl"><span id="self-count">0 de 12 marcados</span><span id="self-pct">0%</span></div>
+    <div style="padding:1.5rem;" id="self-list"></div>
+  </div>
+</section>
+
+<!-- B4b FLASHCARDS -->
+<section>
+  <div class="sn">04b · Ronda de Términos</div>
+  <div class="st">Flashcards — los conceptos que debes tener automatizados</div>
+  <div class="ss">Voltea cada tarjeta, intenta responder antes de ver la definición</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Flashcards interactivas — Clases 1 a 3</div><div class="sim-hs">Haz clic en cada tarjeta para voltearla</div></div>
+      <span class="tag tag-p">TÉRMINOS</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="fc-progress" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <span style="font-size:.78rem;color:var(--gray);">Revisadas: <strong id="fc-count" style="color:var(--teal);">0</strong> de <span id="fc-total">14</span></span>
+        <div style="display:flex;gap:.4rem;">
+          <button class="conf-btn" onclick="filterFC('all')" id="fc-filter-all" style="width:auto;padding:.2rem .7rem;">Todas</button>
+          <button class="conf-btn" onclick="filterFC('c1')" id="fc-filter-c1" style="width:auto;padding:.2rem .7rem;">Clase 1</button>
+          <button class="conf-btn" onclick="filterFC('c2')" id="fc-filter-c2" style="width:auto;padding:.2rem .7rem;">Clase 2</button>
+          <button class="conf-btn" onclick="filterFC('c3')" id="fc-filter-c3" style="width:auto;padding:.2rem .7rem;">Clase 3</button>
+        </div>
+      </div>
+      <div id="fc-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- B5 ERRORES -->
+<section>
+  <div class="sn">05 · Errores Más Comunes</div>
+  <div class="st">Referencia rápida — Clases 1 a 3</div>
+  <div class="ss">Los errores que más se repiten, organizados por clase</div>
+
+  <div class="err-grid" id="err-grid"></div>
+</section>
+
+<!-- B6 EJERCICIO FINAL -->
+<section>
+  <div class="sn">06 · Ejercicio Final</div>
+  <div class="st">Construye tu mini-reporte</div>
+  <div class="ss">Cierra la sesión con algo tangible usando lo aprendido</div>
+
+  <div class="final-box">
+    <div class="final-h">
+      <div class="final-h-t">Mini-reporte: Estado del catálogo Alzada</div>
+      <div class="final-h-s">Usa Google Sheets. Sigue estos pasos con el archivo real del catálogo.</div>
+    </div>
+    <div class="final-body">
+      <div class="final-task"><span class="ft-icon">1️⃣</span><span class="ft-txt"><strong>Define la pregunta</strong> (Clase 1) — antes de tocar Sheets, escribe en una nota: ¿qué pregunta de negocio quiero responder con este reporte?</span></div>
+      <div class="final-task"><span class="ft-icon">2️⃣</span><span class="ft-txt"><strong>Construye la tabla dinámica</strong> (Clase 2) — agrupa el catálogo por sello (PyC) y cuenta tracks totales y distribuidos.</span></div>
+      <div class="final-task"><span class="ft-icon">3️⃣</span><span class="ft-txt"><strong>Audita la calidad</strong> (Clase 3) — agrega una columna con =SI(Y(Estatus="DISTRIBUIDO"; ESBLANCO(UPC)); "⚠ Revisar"; "OK") para detectar tracks problemáticos.</span></div>
+      <div class="final-task"><span class="ft-icon">4️⃣</span><span class="ft-txt"><strong>Resume en 3 líneas</strong> — escribe qué encontraste: cuántos tracks distribuidos por sello, y cuántos tienen problema de UPC.</span></div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Por qué este ejercicio importa</div>
+    <p>Este es exactamente el tipo de entregable que producirás en el trabajo real: una pregunta clara, un análisis en Sheets, una auditoría de calidad, y un resumen ejecutivo. <strong>Las 3 clases convertidas en un hábito de trabajo.</strong></p>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Lo que ya dominas</h3>
+      <p>Si completaste este repaso con confianza, estás listo para avanzar.</p>
+      <ul class="kl">
+        <li><span class="kc">✓</span> Diferenciar entre reportear y analizar — la pregunta siempre primero.</li>
+        <li><span class="kc">✓</span> Usar Sheets con criterio: fórmulas, tablas dinámicas, no solo exploración.</li>
+        <li><span class="kc">✓</span> Auditar un dataset antes de confiar en él — nunca analizar a ciegas.</li>
+        <li><span class="kc">✓</span> Detectar los 3 tipos de error: estructura, contenido y lógica.</li>
+        <li><span class="kc">✓</span> Aplicar las 3 clases juntas en un caso real, no por separado.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="nc">
+        <div class="nc-l">Ya viste también</div>
+        <div class="nc-t">Clase 4 — SQL integrado a Sheets</div>
+        <ul class="nc-i">
+          <li>SELECT, WHERE, GROUP BY con el catálogo Alzada</li>
+          <li>SQL como extensión de lo que ya sabes en Sheets</li>
+          <li>Connected Sheets para conectar ambos mundos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Repaso Clases 01–03</span>
+</footer>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+
+var MM = [
+  {c:"c1",n:"Clase 1",t:"Mentalidad Analítica",d:"El proceso: pregunta → datos → análisis → insight → decisión. Reportear ≠ analizar. Los 4 tipos de análisis: descriptivo, diagnóstico, predictivo, prescriptivo."},
+  {c:"c2",n:"Clase 2",t:"Herramientas Analíticas",d:"Fórmulas de Sheets con criterio de negocio (SUMAR.SI, CONTAR.SI, BUSCARV). Tablas dinámicas. Limpieza básica. LLMs como copiloto analítico."},
+  {c:"c3",n:"Clase 3",t:"Limpieza y Calidad",d:"3 tipos de error: estructura, contenido, lógica. Proceso de auditoría en 6 pasos. Nunca analizar datos sin auditar primero. Outliers: investigar antes de eliminar."},
+];
+
+var QUIZ = [
+  {q:"Un manager te dice: 'Tuvimos 12,400 streams el mes pasado.' ¿Esto es analizar o reportear?",
+   opts:["Analizar — usó un número real","Reportear — no hay pregunta ni comparación detrás","Ambos son lo mismo"],
+   correct:1,
+   fb:"Reportear es mostrar un número sin contexto. Analizar requiere una pregunta: ¿por qué subió o bajó? ¿comparado con qué?"},
+  {q:"¿Cuál es el primer paso del proceso analítico?",
+   opts:["Abrir Sheets y ver qué hay","Definir la pregunta que quiero responder","Limpiar los datos"],
+   correct:1,
+   fb:"Sin pregunta no hay dirección. La pregunta define qué datos necesitas y qué análisis aplica — siempre va primero."},
+  {q:"En Sheets, =SUMAR.SI(rango; criterio; suma) es el equivalente de:",
+   opts:["Un filtro simple","Una tabla dinámica agrupada","Una suma condicional — suma solo lo que cumple el criterio"],
+   correct:2,
+   fb:"SUMAR.SI suma valores que cumplen una condición específica — como filtrar y sumar al mismo tiempo."},
+  {q:"¿Cuál es la diferencia entre reportear y analizar en la práctica?",
+   opts:["Reportear usa Sheets, analizar usa SQL","Reportear muestra el dato, analizar explica el por qué y sugiere una acción","No hay diferencia real"],
+   correct:1,
+   fb:"El análisis siempre va un paso más allá del dato: explica causas y orienta una decisión."},
+  {q:"Un track dice 'DISTRIBUIDO' pero su celda de UPC está vacía. ¿Qué tipo de error es?",
+   opts:["Error de estructura","Error de contenido","Error de lógica de negocio"],
+   correct:2,
+   fb:"Los datos son técnicamente válidos (el campo puede estar vacío) pero es imposible en la práctica — un track distribuido sin UPC es un error de lógica, no de formato."},
+  {q:"¿Cuál es el orden correcto del proceso de auditoría?",
+   opts:["Analizar → limpiar → auditar","Perfil del dataset → estructura → nulos → tipos → duplicados → lógica","Lógica de negocio primero, todo lo demás después"],
+   correct:1,
+   fb:"El proceso es secuencial: primero entiendes qué hay (perfil), luego estructura, luego contenido, y al final lógica de negocio — que requiere conocer el contexto."},
+  {q:"Encuentras un artista con streams 10x el promedio del catálogo. ¿Qué haces primero?",
+   opts:["Eliminarlo — es claramente un error","Investigar la causa antes de decidir","Ignorarlo y seguir con el análisis"],
+   correct:1,
+   fb:"Un outlier puede ser un error o el insight más importante. Nunca se elimina sin investigar — la pregunta es siempre '¿tiene explicación?'"},
+  {q:"¿Por qué nunca debes limpiar la celda original directamente en Sheets?",
+   opts:["Porque Sheets no lo permite","Porque necesitas poder comparar y revertir si algo sale mal","Porque es más lento"],
+   correct:1,
+   fb:"Trabajar en columnas auxiliares te permite verificar el resultado antes de sobrescribir, y revertir si detectas un error en tu propia limpieza."},
+  {q:"=CONTAR.SI(rango; criterio) en Sheets responde principalmente:",
+   opts:["¿Cuánto suma algo bajo una condición?","¿Cuántas veces ocurre algo bajo una condición?","¿Cuál es el promedio de algo?"],
+   correct:1,
+   fb:"CONTAR.SI cuenta ocurrencias que cumplen un criterio — diferente de SUMAR.SI que suma valores."},
+  {q:"Tienes un dataset con 5% de valores nulos en la columna de revenue. ¿Qué principio aplicas?",
+   opts:["Eliminar automáticamente esas filas","Decidir conscientemente: ¿corregir, eliminar o marcar como incierto? según el contexto","Ignorar los nulos, no afectan el análisis"],
+   correct:1,
+   fb:"La limpieza siempre es una decisión consciente, no automática. Depende de si puedes verificar el valor correcto o no."},
+];
+
+var CASE1_STEPS = [
+  {t:"Paso 1 — Define la pregunta (Clase 1)",
+   d:"Antes de abrir Sheets: ¿qué necesito saber realmente? No es '¿cuántos streams tiene Luna Cold?' — es '¿está lista para recibir inversión de campaña?'",
+   panel:"question"},
+  {t:"Paso 2 — Explora en Sheets (Clase 2)",
+   d:"Abres el catálogo y filtras por Luna Cold. Ves 4 tracks: 3 distribuidos, 1 pendiente. A primera vista se ve bien.",
+   panel:"explore"},
+  {t:"Paso 3 — Audita los datos (Clase 3)",
+   d:"Antes de confiar en esos 3 tracks distribuidos, verificas: ¿tienen UPC? Aplicas la fórmula de auditoría del checklist.",
+   panel:"audit"},
+  {t:"Paso 4 — Conclusión con criterio",
+   d:"2 de 3 tracks distribuidos NO tienen UPC. Antes de invertir en campaña, el sello debe resolver esto — o la campaña dirigirá tráfico a tracks sin identificación correcta en plataformas.",
+   panel:"conclusion"},
+];
+
+var CASE1_PANELS = {
+  question: '<div style="padding:1rem;background:var(--gold-l);border:1px solid #FFE082;border-left:3px solid var(--gold);font-size:.85rem;color:var(--ink);line-height:1.7;"><strong>Pregunta incorrecta:</strong> "¿Cuántos streams tiene Luna Cold?"<br><br><strong>Pregunta correcta:</strong> "¿Está el catálogo de Luna Cold en condiciones de recibir inversión de campaña?"<br><br>La segunda pregunta te obliga a revisar calidad de datos, no solo volumen.</div>',
+  explore: '<table class="sh-t"><thead><tr><th></th><th>Track</th><th>Álbum</th><th>Estatus</th></tr></thead><tbody><tr><td class="rh">1</td><td>Silencio Urbano</td><td>—</td><td>DISTRIBUIDO</td></tr><tr><td class="rh">2</td><td>Altamar</td><td>Mi Camino</td><td>DISTRIBUIDO</td></tr><tr><td class="rh">3</td><td>Tundra</td><td>—</td><td>NO DISTRIBUIDO</td></tr><tr><td class="rh">4</td><td>Odisea</td><td>Singles 2025</td><td>DISTRIBUIDO</td></tr></tbody></table><div style="font-size:.78rem;color:var(--gray);margin-top:.8rem;">3 de 4 tracks distribuidos. Se ve saludable a primera vista.</div>',
+  audit: '<table class="sh-t"><thead><tr><th></th><th>Track</th><th>UPC</th><th>Auditoría</th></tr></thead><tbody><tr><td class="rh">1</td><td>Silencio Urbano</td><td class="err">vacío</td><td class="err">⚠ SIN UPC</td></tr><tr><td class="rh">2</td><td>Altamar</td><td class="ok">4846564823662</td><td class="ok">OK</td></tr><tr><td class="rh">4</td><td>Odisea</td><td class="err">vacío</td><td class="err">⚠ SIN UPC</td></tr></tbody></table><div style="font-size:.78rem;color:var(--red);margin-top:.8rem;font-weight:600;">2 de 3 tracks distribuidos NO tienen UPC.</div>',
+  conclusion: '<div style="padding:1rem;background:var(--red-l);border:1px solid #FFCDD2;border-left:3px solid var(--red);font-size:.85rem;color:var(--ink);line-height:1.7;"><strong>Recomendación:</strong> Pausar la inversión en campaña hasta resolver el UPC faltante en "Silencio Urbano" y "Odisea".<br><br>Sin UPC, esos tracks no se identifican correctamente en reportes de regalías. Invertir en tráfico hacia un track mal identificado es dinero potencialmente perdido.</div>'
+};
+
+var CASE2_ROWS = [
+  {track:"Ritmo Vital",upc:"2786801128059",estatus:"NO DISTRIBUIDO",problem:false},
+  {track:"Horizonte",upc:null,estatus:"DISTRIBUIDO",problem:true},
+  {track:"Infinito",upc:"2748467737826",estatus:"NO DISTRIBUIDO",problem:false},
+  {track:"Abismo",upc:null,estatus:"DISTRIBUIDO",problem:true},
+];
+
+var SELF_LEFT = [
+  "Puedo explicar la diferencia entre reportear y analizar con un ejemplo propio",
+  "Sé nombrar los 4 tipos de análisis (descriptivo, diagnóstico, predictivo, prescriptivo)",
+  "Puedo escribir SUMAR.SI y CONTAR.SI sin buscar la sintaxis",
+  "Sé cuándo usar BUSCARV vs una tabla dinámica",
+  "Puedo explicar qué hace una tabla dinámica sin usar la palabra 'tabla dinámica'",
+  "Sé identificar cuándo pedirle ayuda a un LLM en vez de buscar la fórmula yo mismo",
+];
+var SELF_RIGHT = [
+  "Puedo nombrar los 3 tipos de error: estructura, contenido, lógica",
+  "Sé los 6 pasos del proceso de auditoría en orden",
+  "Puedo explicar por qué nunca se limpia la celda original directamente",
+  "Sé identificar cuándo un outlier debe investigarse vs eliminarse",
+  "Puedo escribir una fórmula de auditoría tipo SI(Y(...))",
+  "Entiendo por qué 'conocer los límites de mis datos' es parte del análisis",
+];
+
+var ERRORS = [
+  {cls:"CLASE 1",t:"Confundir reportear con analizar",d:"Mostrar un número sin pregunta detrás. 'Tuvimos 12K streams' no es análisis — falta el por qué o el comparado con qué."},
+  {cls:"CLASE 1",t:"Saltar directo a la herramienta",d:"Abrir Sheets antes de definir la pregunta. El resultado es exploración sin dirección, no análisis."},
+  {cls:"CLASE 1",t:"Cherry picking sin darse cuenta",d:"Elegir solo los datos que confirman lo que ya creías, ignorando los que lo contradicen."},
+  {cls:"CLASE 2",t:"Usar coma en vez de punto y coma",d:"En Sheets español MX el separador de argumentos es ; no ,. Es el error de sintaxis más común."},
+  {cls:"CLASE 2",t:"Confundir SUMAR.SI con CONTAR.SI",d:"SUMAR.SI suma valores. CONTAR.SI cuenta ocurrencias. Son operaciones distintas con propósitos distintos."},
+  {cls:"CLASE 2",t:"No verificar el resultado de BUSCARV",d:"Un #N/A silencioso puede pasar desapercibido si no revisas la columna completa después de aplicar la fórmula."},
+  {cls:"CLASE 3",t:"Eliminar un outlier sin investigar",d:"Un valor extremo puede ser un error o el insight más importante. Nunca se decide sin revisar la causa primero."},
+  {cls:"CLASE 3",t:"Analizar antes de auditar",d:"Confiar en un dataset sin revisarlo primero. Produce insights falsos que parecen sólidos."},
+  {cls:"CLASE 3",t:"Ignorar errores de lógica de negocio",d:"Un save rate de 340% pasa las validaciones de formato pero es imposible en la realidad. Requiere criterio, no solo fórmulas."},
+];
+
+// ═══════════════════════ RENDER: MIND MAP ═══════════════════════
+function buildMindmap() {
+  var row = document.getElementById("mm-row");
+  for (var i = 0; i < MM.length; i++) {
+    var m = MM[i];
+    var node = document.createElement("div");
+    node.className = "mm-node " + m.c;
+    node.innerHTML =
+      "<div class='mm-num'>" + m.n + "</div>" +
+      "<div class='mm-title'>" + m.t + "</div>" +
+      "<div class='mm-desc'>" + m.d + "</div>";
+    (function(n) {
+      n.addEventListener("click", function() {
+        n.classList.toggle("open");
+      });
+    })(node);
+    row.appendChild(node);
+  }
+}
+
+// ═══════════════════════ RENDER: QUIZ ═══════════════════════
+var quizAnswered = 0;
+var quizCorrect = 0;
+
+function buildQuiz() {
+  var cont = document.getElementById("quiz-container");
+  for (var i = 0; i < QUIZ.length; i++) {
+    var q = QUIZ[i];
+    var item = document.createElement("div");
+    item.className = "quiz-item";
+
+    var qDiv = document.createElement("div");
+    qDiv.className = "quiz-q";
+    qDiv.innerHTML = "<span class='quiz-num'>P" + (i+1) + "</span><span>" + q.q + "</span>";
+
+    var optsDiv = document.createElement("div");
+    optsDiv.className = "quiz-opts";
+    for (var j = 0; j < q.opts.length; j++) {
+      var opt = document.createElement("div");
+      opt.className = "quiz-opt";
+      opt.textContent = q.opts[j];
+      opt.setAttribute("data-qi", i);
+      opt.setAttribute("data-oi", j);
+      opt.addEventListener("click", handleQuizClick);
+      optsDiv.appendChild(opt);
+    }
+
+    var fbDiv = document.createElement("div");
+    fbDiv.className = "quiz-fb";
+    fbDiv.id = "qfb-" + i;
+    fbDiv.innerHTML = "<strong>Por qué:</strong> " + q.fb;
+
+    item.appendChild(qDiv);
+    item.appendChild(optsDiv);
+    item.appendChild(fbDiv);
+    cont.appendChild(item);
+  }
+}
+
+function handleQuizClick(e) {
+  var el = e.currentTarget;
+  var qi = parseInt(el.getAttribute("data-qi"));
+  var oi = parseInt(el.getAttribute("data-oi"));
+  var q = QUIZ[qi];
+  var parent = el.parentElement;
+
+  if (parent.getAttribute("data-answered")) return;
+  parent.setAttribute("data-answered", "1");
+
+  var opts = parent.querySelectorAll(".quiz-opt");
+  for (var k = 0; k < opts.length; k++) {
+    opts[k].classList.add("disabled");
+    var oidx = parseInt(opts[k].getAttribute("data-oi"));
+    if (oidx === q.correct) opts[k].classList.add("correct");
+  }
+  if (oi !== q.correct) el.classList.add("wrong");
+
+  document.getElementById("qfb-" + qi).classList.add("show");
+
+  quizAnswered++;
+  if (oi === q.correct) quizCorrect++;
+
+  if (quizAnswered === QUIZ.length) {
+    document.getElementById("quiz-score").classList.add("show");
+    document.getElementById("qs-num").textContent = quizCorrect + "/" + QUIZ.length;
+  }
+}
+
+// ═══════════════════════ CASE 1 STEPPER ═══════════════════════
+function buildCase1() {
+  var cont = document.getElementById("case1-steps");
+  for (var i = 0; i < CASE1_STEPS.length; i++) {
+    var s = CASE1_STEPS[i];
+    var div = document.createElement("div");
+    div.className = "step";
+    div.id = "c1step-" + i;
+    div.innerHTML =
+      "<div class='step-n' id='c1num-" + i + "'>" + (i+1) + "</div>" +
+      "<div><div class='step-t'>" + s.t + "</div><div class='step-d'>" + s.d + "</div></div>";
+    (function(idx) {
+      div.addEventListener("click", function() { showCase1Step(idx); });
+    })(i);
+    cont.appendChild(div);
+  }
+  showCase1Step(0);
+}
+
+function showCase1Step(idx) {
+  for (var i = 0; i < CASE1_STEPS.length; i++) {
+    var el = document.getElementById("c1step-" + i);
+    var num = document.getElementById("c1num-" + i);
+    el.classList.toggle("active", i === idx);
+    num.classList.toggle("done", i < idx);
+    num.textContent = i < idx ? "✓" : (i + 1);
+  }
+  var s = CASE1_STEPS[idx];
+  document.getElementById("case1-panel").innerHTML = CASE1_PANELS[s.panel];
+}
+
+// ═══════════════════════ CASE 2 INTERACTIVE ═══════════════════════
+function buildCase2() {
+  var table = document.getElementById("case2-table");
+  var html = "<thead><tr><th></th><th>Track</th><th>UPC</th><th>Estatus</th><th>Auditoría</th></tr></thead><tbody>";
+  for (var i = 0; i < CASE2_ROWS.length; i++) {
+    var r = CASE2_ROWS[i];
+    html += "<tr id='c2row-" + i + "' style='cursor:pointer' data-idx='" + i + "'>" +
+      "<td class='rh'>" + (i+1) + "</td>" +
+      "<td>" + r.track + "</td>" +
+      "<td>" + (r.upc || "—") + "</td>" +
+      "<td>" + r.estatus + "</td>" +
+      "<td id='c2check-" + i + "'>?</td>" +
+      "</tr>";
+  }
+  html += "</tbody>";
+  table.innerHTML = html;
+
+  var rows = table.querySelectorAll("tr[data-idx]");
+  for (var j = 0; j < rows.length; j++) {
+    rows[j].addEventListener("click", function() {
+      checkCase2(parseInt(this.getAttribute("data-idx")));
+    });
+  }
+}
+
+var case2Found = 0;
+function checkCase2(idx) {
+  var row = CASE2_ROWS[idx];
+  var tr = document.getElementById("c2row-" + idx);
+  var check = document.getElementById("c2check-" + idx);
+  if (tr.getAttribute("data-done")) return;
+  tr.setAttribute("data-done", "1");
+
+  var isProblem = row.estatus === "DISTRIBUIDO" && !row.upc;
+  if (isProblem) {
+    tr.querySelectorAll("td").forEach(function(td) { td.classList.add("err"); });
+    check.textContent = "⚠ SIN UPC";
+    case2Found++;
+    document.getElementById("case2-feedback").innerHTML =
+      "🔴 <strong>" + row.track + "</strong> está distribuido pero no tiene UPC — mismo problema que Luna Cold. Encontrados: " + case2Found + " de 2.";
+  } else {
+    tr.querySelectorAll("td").forEach(function(td) { td.classList.add("ok"); });
+    check.textContent = "OK";
+    document.getElementById("case2-feedback").innerHTML =
+      "✅ <strong>" + row.track + "</strong> está en orden — " + (row.estatus === "NO DISTRIBUIDO" ? "aún no distribuido, no es urgente." : "tiene UPC asignado correctamente.");
+  }
+}
+
+// ═══════════════════════ SELF-ASSESSMENT ═══════════════════════
+var selfChecked = 0;
+var selfTotal = SELF_LEFT.length + SELF_RIGHT.length;
+
+function buildSelfAssessment() {
+  var cont = document.getElementById("self-list");
+  var grid = document.createElement("div");
+  grid.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:0;";
+
+  var col1 = document.createElement("div");
+  col1.style.cssText = "padding-right:1.5rem;border-right:1px solid var(--bd);";
+  var t1 = document.createElement("div");
+  t1.style.cssText = "font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;";
+  t1.textContent = "Clases 1 y 2";
+  col1.appendChild(t1);
+  for (var i = 0; i < SELF_LEFT.length; i++) col1.appendChild(buildSelfRow(SELF_LEFT[i]));
+
+  var col2 = document.createElement("div");
+  col2.style.cssText = "padding-left:1.5rem;";
+  var t2 = document.createElement("div");
+  t2.style.cssText = "font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;";
+  t2.textContent = "Clase 3";
+  col2.appendChild(t2);
+  for (var j = 0; j < SELF_RIGHT.length; j++) col2.appendChild(buildSelfRow(SELF_RIGHT[j]));
+
+  grid.appendChild(col1);
+  grid.appendChild(col2);
+  cont.appendChild(grid);
+}
+
+function buildSelfRow(text) {
+  var row = document.createElement("div");
+  row.className = "chk-row";
+  row.innerHTML = "<div class='chk-box'></div><span class='chk-txt'>" + text + "</span>";
+  row.addEventListener("click", function() {
+    var wasDone = this.classList.contains("done");
+    this.classList.toggle("done");
+    this.querySelector(".chk-box").textContent = wasDone ? "" : "✓";
+    selfChecked += wasDone ? -1 : 1;
+    var pct = Math.round(selfChecked / selfTotal * 100);
+    document.getElementById("self-fill").style.width = pct + "%";
+    document.getElementById("self-count").textContent = selfChecked + " de " + selfTotal + " marcados";
+    document.getElementById("self-pct").textContent = pct + "%";
+  });
+  return row;
+}
+
+// ═══════════════════════ ERRORS ═══════════════════════
+function buildErrors() {
+  var grid = document.getElementById("err-grid");
+  for (var i = 0; i < ERRORS.length; i++) {
+    var e = ERRORS[i];
+    var div = document.createElement("div");
+    div.className = "err-item";
+    div.innerHTML =
+      "<div class='err-cls'>" + e.cls + "</div>" +
+      "<div class='err-t'>" + e.t + "</div>" +
+      "<div class='err-d'>" + e.d + "</div>";
+    grid.appendChild(div);
+  }
+}
+
+
+var FLASHCARDS = [
+  {cls:"c1",term:"Mentalidad Analítica",def:"El hábito de partir de una pregunta antes de tocar cualquier dato. Sin pregunta, no hay análisis — solo exploración sin dirección."},
+  {cls:"c1",term:"Análisis Descriptivo",def:"Responde '¿qué pasó?'. Es el nivel más básico: reportar hechos del pasado sin explicar causas."},
+  {cls:"c1",term:"Análisis Diagnóstico",def:"Responde '¿por qué pasó?'. Busca causas cruzando variables y comparando escenarios."},
+  {cls:"c1",term:"Cherry Picking",def:"Seleccionar solo los datos que confirman lo que ya creías, ignorando los que lo contradicen. Un sesgo peligroso y común."},
+  {cls:"c1",term:"Correlación vs Causalidad",def:"Que dos cosas ocurran juntas no significa que una cause la otra. El error analítico más frecuente."},
+  {cls:"c2",term:"SUMAR.SI",def:"Fórmula de Sheets que suma valores que cumplen una condición específica. Equivalente a filtrar y sumar al mismo tiempo."},
+  {cls:"c2",term:"BUSCARV",def:"Conecta dos tablas por un campo en común — busca un valor y trae información relacionada desde otra hoja."},
+  {cls:"c2",term:"Tabla Dinámica",def:"Resume una tabla grande en una vista flexible: tú decides filas, columnas y qué se calcula, sin tocar los datos originales."},
+  {cls:"c2",term:"LLM como Copiloto",def:"Usar Claude o ChatGPT para generar fórmulas, explicar errores o sugerir análisis — acelera la ejecución, no reemplaza el criterio."},
+  {cls:"c3",term:"Error de Estructura",def:"Problemas fáciles de detectar: valores vacíos, filas duplicadas, columnas mal formadas."},
+  {cls:"c3",term:"Error de Contenido",def:"El dato existe pero está mal formateado: texto inconsistente, fechas en distintos formatos, números como texto."},
+  {cls:"c3",term:"Error de Lógica",def:"El dato es técnicamente válido pero imposible en la realidad — como un save rate de 340%. Requiere conocer el negocio, no solo fórmulas."},
+  {cls:"c3",term:"Outlier",def:"Un valor que se aleja del patrón general. Puede ser un error o el insight más importante — nunca se elimina sin investigar la causa."},
+  {cls:"c3",term:"Auditoría de Datos",def:"Proceso sistemático de 6 pasos para verificar calidad antes de analizar: perfil, estructura, nulos, tipos, duplicados y lógica de negocio."},
+];
+
+var fcCurrentFilter = "all";
+var fcFlippedCount = 0;
+
+function buildFlashcards() {
+  renderFC("all");
+}
+
+function renderFC(filter) {
+  var grid = document.getElementById("fc-grid");
+  grid.innerHTML = "";
+  var visible = FLASHCARDS.filter(function(f) {
+    return filter === "all" || f.cls === filter;
+  });
+  document.getElementById("fc-total").textContent = visible.length;
+
+  for (var i = 0; i < visible.length; i++) {
+    var f = visible[i];
+    var card = document.createElement("div");
+    card.className = "fc-card";
+    card.innerHTML =
+      "<span class='fc-tag " + f.cls + "'>" + (f.cls === "c1" ? "Clase 1" : f.cls === "c2" ? "Clase 2" : "Clase 3") + "</span>" +
+      "<div class='fc-term'>" + f.term + "</div>" +
+      "<div class='fc-def'>" + f.def + "</div>" +
+      "<div class='fc-hint'>Clic para ver la definición</div>";
+    card.addEventListener("click", function() {
+      var wasFlipped = this.classList.contains("flipped");
+      this.classList.toggle("flipped");
+      if (!wasFlipped) {
+        fcFlippedCount++;
+        document.getElementById("fc-count").textContent = fcFlippedCount;
+      }
+    });
+    grid.appendChild(card);
+  }
+}
+
+function filterFC(cls) {
+  fcCurrentFilter = cls;
+  ["all","c1","c2","c3"].forEach(function(c) {
+    var btn = document.getElementById("fc-filter-" + c);
+    if (btn) btn.classList.toggle("sel", c === cls);
+  });
+  fcFlippedCount = 0;
+  document.getElementById("fc-count").textContent = "0";
+  renderFC(cls);
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+document.addEventListener("DOMContentLoaded", function() {
+  buildMindmap();
+  buildQuiz();
+  buildCase1();
+  buildCase2();
+  buildSelfAssessment();
+  buildErrors();
+  buildFlashcards();
+});
+</script>
+</body>
+</html>

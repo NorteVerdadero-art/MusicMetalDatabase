@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 6 — Modelos Estadísticos Aplicados</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --ink:#1a1a2e;--teal:#00897B;--teal-l:#e0f2f1;
+  --gold:#D4A017;--gold-l:#FFF8E1;--red:#C62828;--red-l:#FFEBEE;
+  --gray:#6B7280;--light:#F8F9FA;--bd:#E5E7EB;--pu:#6B21A8;--pu-l:#F3E8FF;
+  --sh:#0F9D58;--sh-l:#E8F5E9;--bl:#1565C0;--bl-l:#E3F2FD;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#fff!important;color:#0a0a0a!important;}
+body{font-family:"DM Sans",sans-serif;line-height:1.6;}
+@media(prefers-color-scheme:dark){html,body{background:#fff!important;color:#0a0a0a!important;}}
+
+.header{border-bottom:1px solid var(--bd);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+.hl{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;}
+.hm{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+.hb{background:var(--teal);color:#fff;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+
+.hero{padding:5.5rem 4rem 3.5rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:"";display:inline-block;width:24px;height:2px;background:var(--teal);}
+.hero h1{font-family:"Playfair Display",serif;font-size:3.2rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;color:var(--teal);}
+.hero-desc{font-size:1rem;color:var(--gray);line-height:1.75;font-weight:300;}
+.sidebar{border:1px solid var(--bd);border-top:3px solid var(--teal);padding:1.5rem;background:#fff;}
+.si{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.85rem;}
+.si:last-child{border-bottom:none;}
+.si-l{color:var(--gray);}
+.si-v{font-weight:600;color:var(--ink);}
+.si-v.t{color:var(--teal);}
+
+.prog{max-width:1100px;margin:0 auto;padding:0 4rem 3rem;}
+.pt{display:flex;gap:3px;margin-bottom:.5rem;}
+.ps{flex:1;height:4px;background:var(--bd);}
+.ps.a{background:var(--teal);}
+.ps.c{background:linear-gradient(90deg,var(--teal) 60%,var(--bd) 60%);}
+.pl{font-size:.7rem;color:var(--gray);}
+
+section{max-width:1100px;margin:0 auto;padding:3.8rem 4rem;border-top:1px solid var(--bd);}
+.sn{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+.st{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.ss{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+
+.hook{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--teal);padding:2rem 2.5rem;margin-bottom:2.5rem;}
+.hook-lbl{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.8rem;}
+.hook h3{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+.hook p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+
+.ibox{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+.ibox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.ibox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+.ibox strong{color:#9A7208;}
+
+.wbox{background:#fff;border:1px solid #FFCDD2;border-left:4px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;}
+.wbox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+.wbox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.card{border:1px solid var(--bd);padding:1.8rem;position:relative;background:#fff;}
+.ca{position:absolute;top:0;left:0;width:100%;height:3px;}
+.card h4{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--ink);margin-top:.7rem;}
+.card p{font-size:.86rem;color:var(--gray);line-height:1.65;}
+
+.sim{border:1px solid var(--bd);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+.sim-h{background:#fff;border-bottom:1px solid var(--bd);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+.sim-ht{font-size:.85rem;font-weight:600;color:var(--ink);}
+.sim-hs{font-size:.75rem;color:var(--gray);}
+.tag{color:#fff;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+.tag-t{background:var(--teal);}
+.tag-g{background:var(--gold);}
+.tag-r{background:var(--red);}
+.tag-p{background:var(--pu);}
+.tag-sh{background:var(--sh);}
+.tag-bl{background:var(--bl);}
+
+.tab{border:1px solid var(--bd);background:#fff;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--gray);transition:all .15s;border-radius:2px;}
+.tab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.tab:hover:not(.on){border-color:var(--teal);color:var(--teal);}
+
+/* CHART VISUALS */
+.chart-box{padding:1.5rem;}
+.chart-title{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;font-family:"Playfair Display",serif;font-style:italic;}
+.bar-chart{display:flex;flex-direction:column;gap:.7rem;}
+.bar-row{display:flex;align-items:center;gap:.7rem;}
+.bar-label{font-size:.76rem;color:var(--gray);width:130px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;background:var(--light);border-radius:2px;height:26px;overflow:hidden;border:1px solid var(--bd);}
+.bar-fill{height:100%;border-radius:2px;display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;transition:width .5s ease;}
+.bar-val{font-size:.7rem;font-weight:600;color:#fff;font-family:"DM Mono",monospace;}
+.bar-pct{font-size:.7rem;color:var(--gray);font-family:"DM Mono",monospace;width:60px;flex-shrink:0;}
+
+.line-svg{width:100%;height:220px;}
+.pie-wrap{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+.pie-legend{display:flex;flex-direction:column;gap:.5rem;}
+.leg-item{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--ink);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+.scatter-svg{width:100%;height:280px;}
+.dot-point{cursor:pointer;transition:r .15s;}
+.dot-point:hover{r:7;}
+
+/* TABLE COND */
+.ctbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.ctbl th{background:#fff;border:1px solid var(--bd);padding:.5rem .9rem;text-align:left;font-size:.72rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);}
+.ctbl td{border:1px solid #ECECEC;padding:.5rem .9rem;color:var(--ink);background:#fff;}
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:2px;font-size:.66rem;font-weight:700;}
+.badge-hi{background:var(--teal-l);color:var(--teal);}
+.badge-mid{background:var(--gold-l);color:#9A7208;}
+.badge-lo{background:var(--red-l);color:var(--red);}
+.mbar{height:8px;border-radius:2px;display:inline-block;margin-left:.4rem;vertical-align:middle;}
+
+/* CHART SELECTOR */
+.selector-grid{display:grid;grid-template-columns:280px 1fr;}
+.step-panel-grid{display:grid;grid-template-columns:1fr 1fr;}
+.selector-questions{border-right:1px solid var(--bd);padding:1.2rem;}
+.sq-item{padding:.7rem .9rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.82rem;color:var(--ink);transition:all .15s;border-radius:2px;}
+.sq-item:hover{border-color:var(--teal);background:var(--teal-l);}
+.sq-item.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.selector-result{padding:1.5rem;}
+
+/* SHEETS MOCK */
+.sh-mock{border:1px solid var(--bd);overflow:hidden;margin-bottom:.8rem;}
+.sh-top{background:var(--sh);padding:.4rem 1rem;display:flex;align-items:center;gap:.8rem;}
+.sh-top-t{color:#fff;font-size:.78rem;font-weight:600;}
+.sh-fx{background:#F8F8F8;border-bottom:1px solid var(--bd);padding:.4rem .8rem;display:flex;gap:.6rem;align-items:center;font-family:"DM Mono",monospace;font-size:.76rem;}
+.sh-fxl{background:var(--bd);padding:.1rem .4rem;border-radius:2px;font-weight:600;color:var(--gray);font-size:.68rem;}
+.sh-fxv{color:var(--sh);flex:1;}
+.sh-t{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.74rem;}
+.sh-t th{background:#F0F0F0;border:1px solid #D0D0D0;padding:.3rem .7rem;font-size:.68rem;color:var(--gray);text-align:center;font-weight:600;}
+.sh-t td{border:1px solid #E0E0E0;padding:.3rem .7rem;background:#fff;color:var(--ink);}
+.sh-t td.rh{background:#F0F0F0;color:var(--gray);text-align:center;font-weight:600;font-size:.66rem;}
+.sh-t td.ch{background:#fff;color:var(--sh);font-weight:700;font-size:.72rem;font-family:"DM Sans",sans-serif;border-bottom:2px solid var(--sh);}
+.sh-t td.ac{background:#E8F5E9;}
+
+/* STEPPER */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{border:1px solid var(--bd);border-top:none;padding:1.1rem 1.5rem;display:grid;grid-template-columns:32px 1fr;gap:1rem;align-items:start;background:#fff;cursor:pointer;transition:background .15s;}
+.step:first-child{border-top:1px solid var(--bd);}
+.step:hover{background:var(--light);}
+.step.active{background:var(--teal-l);border-color:var(--teal);}
+.step-n{width:30px;height:30px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:.76rem;font-weight:700;color:var(--teal);flex-shrink:0;}
+.step-n.done{background:var(--teal);color:#fff;}
+.step-t{font-weight:700;font-size:.86rem;color:var(--ink);margin-bottom:.25rem;}
+.step-d{font-size:.79rem;color:var(--gray);line-height:1.5;}
+
+/* GOOD/BAD CHART DETECTOR */
+.detector-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.detector-col{padding:1.5rem;}
+.detector-col+.detector-col{border-left:1px solid var(--bd);}
+.detector-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;}
+.spot-btn{margin-top:1rem;width:100%;border:1px solid var(--red);background:#fff;color:var(--red);padding:.6rem;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:2px;transition:all .15s;}
+.spot-btn:hover{background:var(--red);color:#fff;}
+.spot-answer{display:none;margin-top:.8rem;padding:.8rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.82rem;color:var(--ink);line-height:1.6;}
+.spot-answer.show{display:block;}
+
+/* LOOKER FLOW */
+.flow{display:flex;align-items:stretch;gap:0;margin-bottom:2rem;border:1px solid var(--bd);overflow:hidden;}
+.fs{flex:1;padding:1.5rem;background:#fff;position:relative;display:flex;flex-direction:column;gap:.5rem;}
+.fs+.fs{border-left:1px solid var(--bd);}
+.fs.a{border-top:3px solid var(--teal);}
+.fs.b{border-top:3px solid var(--gold);}
+.fn2{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;}
+.ft{font-weight:700;font-size:.88rem;color:var(--ink);}
+.fd{font-size:.77rem;color:var(--gray);line-height:1.5;}
+.fa{position:absolute;right:-14px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--bd);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray);z-index:2;}
+
+/* MINI DASHBOARD BUILDER */
+.dash-builder{display:grid;grid-template-columns:220px 1fr;}
+.dash-controls{border-right:1px solid var(--bd);padding:1.2rem;}
+.dash-opt{padding:.6rem .8rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.8rem;transition:all .15s;border-radius:2px;display:flex;align-items:center;gap:.5rem;}
+.dash-opt:hover{border-color:var(--teal);}
+.dash-opt.added{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:600;}
+.dash-canvas{padding:1.5rem;min-height:400px;background:var(--light);}
+.dash-widget{background:#fff;border:1px solid var(--bd);padding:1rem;margin-bottom:1rem;}
+.dash-widget-title{font-size:.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem;}
+.dash-empty{text-align:center;padding:3rem 1rem;color:var(--gray);font-size:.85rem;font-style:italic;}
+
+.closing{background:#fff;border-top:1px solid var(--bd);padding:3.8rem 4rem;}
+.closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.closing h3{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.nc{border:1px solid var(--bd);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+.nc-l{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.nc-t{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+.nc-i{list-style:none;font-size:.82rem;color:var(--gray);}
+.nc-i li{padding:.3rem 0;padding-left:1rem;position:relative;}
+.nc-i li::before{content:"→";position:absolute;left:0;color:var(--gold);}
+.kl{list-style:none;}
+.kl li{display:flex;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--bd);font-size:.87rem;align-items:flex-start;line-height:1.5;}
+.kl li:last-child{border-bottom:none;}
+.kc{color:var(--teal);flex-shrink:0;margin-top:.1rem;}
+footer{border-top:1px solid var(--bd);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+footer span{font-size:.75rem;color:var(--gray);}
+.fn3{display:flex;gap:1.5rem;}
+.fn3 a{font-size:.75rem;color:var(--gray);text-decoration:none;font-weight:500;}
+.fn3 a:hover{color:var(--teal);}
+
+@media(max-width:768px){
+  .hero,.g2,.g3,.g4,.selector-grid,.detector-grid,.dash-builder,.closing-inner,.step-panel-grid{grid-template-columns:1fr;}
+  .flow{flex-direction:column;}
+  .header,.prog,section,footer,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+  .hero{padding:3rem 1.5rem 2rem;}
+  .hero h1{font-size:2.2rem;}
+}
+</style>
+</head>
+<body><style>
+/* MODELO REAL — tarjeta con fuente citada */
+.real-model{border:1px solid var(--gold);background:#fff;padding:1.5rem;margin-bottom:1.5rem;position:relative;}
+.real-model::before{content:"MODELO REAL";position:absolute;top:-10px;left:1.2rem;background:var(--gold);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.08em;padding:.15rem .6rem;}
+.rm-name{font-family:"Playfair Display",serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:.4rem;margin-top:.4rem;}
+.rm-who{font-size:.76rem;color:var(--gold);font-weight:600;margin-bottom:.8rem;}
+.rm-desc{font-size:.86rem;color:var(--gray);line-height:1.7;margin-bottom:.8rem;}
+.rm-formula{font-family:"DM Mono",monospace;font-size:.8rem;background:var(--light);border:1px solid var(--bd);border-left:3px solid var(--gold);padding:.7rem 1rem;color:var(--ink);margin-bottom:.6rem;}
+.rm-source{font-size:.7rem;color:var(--gray);font-style:italic;}
+
+/* FORMULA BOX */
+.formula-box{font-family:"DM Mono",monospace;font-size:.95rem;background:var(--teal-l);border:1px solid var(--teal);padding:1.2rem 1.5rem;text-align:center;color:var(--ink);margin-bottom:1rem;}
+.formula-box .var{color:var(--teal);font-weight:700;}
+
+/* SCATTER/LINE existing from c5, reuse: .chart-box .bar-chart .bar-row etc already in head */
+
+/* SLIDER */
+.slider-wrap{padding:1.5rem;}
+.slider-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
+.slider-label{font-size:.8rem;color:var(--ink);width:180px;flex-shrink:0;}
+.slider-input{flex:1;}
+.slider-val{font-family:"DM Mono",monospace;font-size:.85rem;color:var(--teal);font-weight:700;width:50px;text-align:right;}
+
+/* RANKING LIVE */
+.rank-row{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border-bottom:1px solid var(--bd);}
+.rank-pos{width:24px;height:24px;border-radius:50%;background:var(--light);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gray);flex-shrink:0;}
+.rank-pos.top{background:var(--gold);color:#fff;border-color:var(--gold);}
+.rank-name{font-size:.82rem;color:var(--ink);flex:1;}
+.rank-score{font-family:"DM Mono",monospace;font-size:.85rem;font-weight:700;color:var(--teal);}
+.rank-bar{height:6px;background:var(--light);border-radius:3px;overflow:hidden;width:100px;flex-shrink:0;}
+.rank-bar-fill{height:100%;background:var(--teal);border-radius:3px;}
+
+/* CORRELATION DETECTOR */
+.corr-pair{border:1px solid var(--bd);padding:1rem;background:#fff;cursor:pointer;transition:all .15s;}
+.corr-pair:hover{border-color:var(--teal);}
+.corr-pair.sel{background:var(--teal-l);border-color:var(--teal);}
+
+/* NEW TAB SWITCHER — modelos de ponderación con costos reales */
+.tabswitch-nav{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:2rem;flex-wrap:wrap;}
+.tabswitch-btn{padding:.8rem 1.5rem;border:none;background:none;font-size:.85rem;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.tabswitch-btn:hover{color:var(--teal);}
+.tabswitch-btn.on{color:var(--teal);border-bottom-color:var(--teal);}
+.tabswitch-panel{display:none;}
+.tabswitch-panel.on{display:block;}
+.real-data-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--ink);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:.25rem .7rem;margin-bottom:1.5rem;}
+.real-data-badge::before{content:"●";color:var(--teal);}
+.cost-bar-row{display:grid;grid-template-columns:150px 1fr 90px;gap:.7rem;align-items:center;padding:.4rem 0;}
+.cost-bar-track{height:22px;border-radius:2px;overflow:hidden;display:flex;border:1px solid var(--bd);background:var(--light);}
+.cost-bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:600;color:#fff;}
+
+/* STICKY SUB-NAV — navegación agrupada de la clase */
+.subnav{position:sticky;top:64px;z-index:99;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:0;padding:0 4rem;overflow-x:auto;}
+.subnav-btn{padding:.75rem 1.3rem;border:none;background:none;font-size:.8rem;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.subnav-btn:hover{color:var(--teal);}
+.subnav-btn.on{color:var(--teal);border-bottom-color:var(--teal);}
+.subnav-hint{font-size:.72rem;color:var(--gray);padding:.75rem 1rem .75rem 0;font-style:italic;margin-left:auto;white-space:nowrap;}
+section[data-group].filtered-out{display:none;}
+@media(max-width:768px){.subnav{padding:0 1.5rem;}.subnav-hint{display:none;}}
+
+/* READ-BOX — guía de interpretación fija, siempre visible */
+.read-box{border:1px solid var(--bl);background:var(--bl-l);padding:1.3rem 1.5rem;margin-bottom:1.5rem;}
+.read-box-lbl{display:flex;align-items:center;gap:.5rem;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--bl);margin-bottom:.8rem;}
+.read-box-lbl::before{content:"📖";font-size:.9rem;}
+.read-box-item{display:grid;grid-template-columns:110px 1fr;gap:.8rem;padding:.5rem 0;border-bottom:1px solid rgba(21,101,192,.15);font-size:.83rem;align-items:start;}
+.read-box-item:last-child{border-bottom:none;}
+.read-box-val{font-family:"DM Mono",monospace;font-weight:700;color:var(--bl);}
+.read-box-txt{color:var(--ink);line-height:1.55;}
+.read-box-note{font-size:.78rem;color:var(--gray);line-height:1.6;margin-top:.8rem;padding-top:.8rem;border-top:1px solid rgba(21,101,192,.15);font-style:italic;}
+
+/* Live-updating read box (used inside interactive sims) */
+.read-box.live{border-color:var(--teal);background:var(--teal-l);}
+.read-box.live .read-box-lbl{color:var(--teal);}
+.read-box.live .read-box-val{color:var(--teal);}
+.read-box.live .read-box-item{border-bottom-color:rgba(0,137,123,.15);}
+.read-box.live .read-box-note{border-top-color:rgba(0,137,123,.15);}
+</style>
+<header class="header">
+  <div class="hl">De los Datos al Criterio</div>
+  <div class="hm"><span>Industria Musical</span><span class="hb">Modelos Estadísticos</span></div>
+</header>
+
+<div class="subnav">
+  <button class="subnav-btn on" id="subnav-clase" onclick="filterClassView('clase')">Toda la clase</button>
+  <button class="subnav-btn" id="subnav-ponderacion" onclick="filterClassView('ponderacion')">Modelos de Ponderación</button>
+  <button class="subnav-btn" id="subnav-casos" onclick="filterClassView('casos')">Casos Prácticos</button>
+  <span class="subnav-hint" id="subnav-hint"></span>
+</div>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">Bloque 6 · Ejecución analítica</div>
+    <h1>Modelos<br><em>Estadísticos</em><br>Aplicados</h1>
+    <p class="hero-desc">Los mismos modelos simples que usan Billboard y Luminate para rankear música, aplicados al catálogo Alzada. Sin matemática pesada, con fuentes verificables.</p>
+  </div>
+  <div class="sidebar">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Ficha de la clase</div>
+    <div class="si"><span class="si-l">Duración</span><span class="si-v">2 horas</span></div>
+    <div class="si"><span class="si-l">Bloques</span><span class="si-v">10</span></div>
+    <div class="si"><span class="si-l">Dataset</span><span class="si-v">Catálogo Alzada</span></div>
+    <div class="si"><span class="si-l">Demos</span><span class="si-v t">11 interactivas</span></div>
+    <div class="si"><span class="si-l">Modelos reales</span><span class="si-v">Billboard / Luminate</span></div>
+  </div>
+</div>
+
+<!-- B0 MARCO TEÓRICO -->
+<section>
+  <div class="sn">00 · Marco Teórico</div>
+  <div class="st">Modelos simples que ya usan las majors</div>
+  <div class="ss">No es teoría abstracta — son las fórmulas reales detrás de los charts de Billboard</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Punto de partida</div>
+    <h3>Cuando ves un chart de Billboard, estás viendo el resultado de un modelo estadístico simple.</h3>
+    <p>No hay inteligencia artificial compleja detrás de la mayoría de las decisiones de la industria musical. Hay correlaciones, promedios ponderados, tendencias y proyecciones — los mismos 4 modelos que vas a construir hoy, aplicados al catálogo Alzada.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4>El mito a romper</h4>
+      <p>"Modelo estadístico" suena a matemática universitaria. En la práctica de la industria musical, los modelos que mueven decisiones reales caben perfectamente en una fórmula de Sheets, sin Python ni estadística avanzada.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>Lo que sí necesitas</h4>
+      <p>Criterio para interpretar el resultado. Un modelo mal interpretado resulta más peligroso que no tener modelo, porque da una falsa sensación de certeza sobre un número que puede estar mal leído.</p>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Los 4 modelos de esta clase — todos con nombre real</div>
+  <div class="g4">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4 style="margin-top:0">Correlación</h4>
+      <p style="font-size:.78rem;">¿Se mueven juntas 2 métricas?</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4 style="margin-top:0">Media Móvil / EMA</h4>
+      <p style="font-size:.78rem;">Tendencia real vs ruido</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4 style="margin-top:0">Regresión Lineal</h4>
+      <p style="font-size:.78rem;">Proyección hacia adelante</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4 style="margin-top:0">Stream/Track Equivalent</h4>
+      <p style="font-size:.78rem;">El modelo real de Billboard</p>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Regla de esta clase</div>
+    <p>Cada modelo se construye primero con criterio (¿qué pregunta responde?) y después con fórmula. Sin la pregunta, la fórmula se queda en pura aritmética; con ella, se vuelve análisis.</p>
+  </div>
+</section>
+
+<!-- B1 CORRELACIÓN -->
+<section>
+  <div class="sn">01 · Correlación Simple</div>
+  <div class="st">¿Estas 2 métricas se mueven juntas?</div>
+  <div class="ss">El modelo más simple y más usado en toda la industria de datos</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio</div>
+    <h3>¿Los artistas con más tracks en el catálogo tienden a tener más problemas de calidad de UPC?</h3>
+    <p>La correlación no prueba causa — solo muestra si dos variables se mueven en la misma dirección, en direcciones opuestas, o sin relación aparente.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>Correlación positiva</h4>
+      <p>Cuando una sube, la otra también sube. Ejemplo hipotético: más posts en redes, más streams.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4>Correlación negativa</h4>
+      <p>Cuando una sube, la otra baja. Ejemplo: más skip rate, menos save rate.</p>
+    </div>
+  </div>
+
+  <div class="formula-box">Correlación = <span class="var">¿suben y bajan juntas?</span> → escala de -1 (opuestas) a +1 (idénticas), 0 = sin relación</div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+    <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=COEF.DE.CORREL(rango_A; rango_B)</span></div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.8rem;">
+      <strong style="color:var(--ink);">rango_A</strong> y <strong style="color:var(--ink);">rango_B</strong> son las dos columnas de datos que quieres comparar. Solo dos requisitos: deben tener el mismo número de filas, y cada fila debe representar la misma unidad de análisis en ambas columnas.<br><br>
+      Esa unidad puede ser lo que necesites — un artista, un track, un mes, una plataforma, un día. Lo importante es que la fila 5 de rango_A y la fila 5 de rango_B hablen del mismo caso.<br><br>
+      Ejemplo 1 — por artista:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=COEF.DE.CORREL(B2:B16; C2:C16)</code><br>
+      donde cada fila es un artista distinto: B = tracks totales, C = tracks sin UPC.<br><br>
+      Ejemplo 2 — por mes:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=COEF.DE.CORREL(B2:B13; C2:C13)</code><br>
+      donde cada fila es un mes distinto: B = streams del mes, C = revenue del mes.
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo leer el número de correlación (r)</div>
+    <div class="read-box-item"><span class="read-box-val">+0.70 a +1.00</span><span class="read-box-txt">Relación positiva fuerte. Cuando una métrica sube, la otra casi siempre sube también. Vale la pena investigar por qué.</span></div>
+    <div class="read-box-item"><span class="read-box-val">+0.30 a +0.69</span><span class="read-box-txt">Relación positiva moderada. Hay una tendencia a moverse juntas, aunque con bastantes excepciones — todavía lejos de una regla fija.</span></div>
+    <div class="read-box-item"><span class="read-box-val">-0.29 a +0.29</span><span class="read-box-txt">Prácticamente sin relación. Las dos métricas se mueven de forma independiente; una no predice a la otra.</span></div>
+    <div class="read-box-item"><span class="read-box-val">-0.30 a -0.69</span><span class="read-box-txt">Relación negativa moderada. Cuando una sube, la otra tiende a bajar, aunque con excepciones.</span></div>
+    <div class="read-box-item"><span class="read-box-val">-0.70 a -1.00</span><span class="read-box-txt">Relación negativa fuerte. Cuando una sube, la otra casi siempre baja. Patrón muy consistente.</span></div>
+    <div class="read-box-note">El signo (+/-) indica la dirección. El tamaño del número (sin importar el signo) indica qué tan fuerte es el patrón. Un -0.85 es una relación MÁS fuerte que un +0.40, aunque el signo sea negativo.</div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Detector de correlación — elige 2 variables del catálogo Alzada</div><div class="sim-hs">Haz clic en un par para ver si hay relación</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div class="selector-grid" style="padding:1.5rem;gap:1.5rem;">
+      <div style="display:flex;flex-direction:column;gap:.6rem;" id="corr-pairs"></div>
+      <div id="corr-result"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">Correlación espuria — el error más peligroso</div>
+    <p>Dos variables pueden moverse juntas por pura coincidencia, sin ninguna relación real. Clásico ejemplo: ventas de helado y ahogamientos suben juntos en verano, simplemente porque ambos dependen del calor de la temporada. Antes de actuar sobre una correlación, pregunta: ¿hay una tercera variable explicando ambas?</p>
+  </div>
+</section>
+
+<!-- B2 MEDIA MÓVIL -->
+<section>
+  <div class="sn">02 · Media Móvil</div>
+  <div class="st">Separar tendencia real de ruido</div>
+  <div class="ss">De la media móvil simple a la Exponential Moving Average que usan sistemas profesionales</div>
+
+  <div class="hook">
+    <div class="hook-lbl">El problema que resuelve</div>
+    <h3>Los streams de un track suben y bajan todos los días. ¿Cómo saber si la tendencia real es positiva?</h3>
+    <p>Ver el dato diario es ruido. Una media móvil suaviza esas variaciones y revela la tendencia real — subiendo, bajando o estable.</p>
+  </div>
+
+  <div class="formula-box">Media móvil (7 días) = <span class="var">(día1 + día2 + ... + día7) / 7</span> — se recalcula cada día, arrastrando la ventana</div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+    <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=PROMEDIO(rango_últimos_7_días)</span></div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.8rem;">
+      Se escribe una sola vez en la fila del séptimo día y se arrastra hacia abajo — Sheets ajusta el rango automáticamente en cada fila.<br><br>
+      Ejemplo real:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=PROMEDIO(B2:B8)</code> en la fila 8,
+      luego al arrastrar se vuelve
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=PROMEDIO(B3:B9)</code> en la fila 9, y así sucesivamente.
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo leer la gráfica de media móvil</div>
+    <div class="read-box-item"><span class="read-box-val">Línea gris (cruda)</span><span class="read-box-txt">Sube y baja mucho día a día. Esa variación es normal y refleja el comportamiento diario real, no un problema.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Línea de color (suavizada)</span><span class="read-box-txt">Se mueve mucho más despacio. Esta es la que debes mirar para saber si algo realmente está creciendo o cayendo.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Línea suave sube</span><span class="read-box-txt">Tendencia real de crecimiento, aunque los datos diarios se vean erráticos.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Línea suave plana</span><span class="read-box-txt">No hay tendencia real: el negocio está estable, ni creciendo ni cayendo, sin importar cómo se vean los picos diarios.</span></div>
+    <div class="read-box-note">Regla práctica: nunca tomes una decisión basándote en un solo día de datos. Si el dato de hoy es muy distinto al de ayer, mira la línea suavizada antes de preocuparte o celebrar.</div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Comparador — datos diarios vs media móvil de 7 días</div><div class="sim-hs">Datos ilustrativos de streams diarios de un track del catálogo</div></div>
+      <span class="tag tag-g">TOGGLE</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;gap:.6rem;">
+      <button class="tab on" id="mm-raw" onclick="showMM('raw')">Datos crudos</button>
+      <button class="tab" id="mm-smooth" onclick="showMM('smooth')">Media móvil (7d)</button>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title" id="mm-title"></div>
+      <svg id="mm-svg" class="line-svg" viewBox="0 0 500 220"></svg>
+    </div>
+  </div>
+
+  <div class="real-model">
+    <div class="rm-name">Exponential Moving Average (EMA)</div>
+    <div class="rm-who">Usada en sistemas profesionales de monitoreo de tendencias en tiempo real</div>
+    <div class="rm-desc">Una versión más avanzada de la media móvil: en vez de dar el mismo peso a los 7 días, le da más peso a los datos recientes. Reacciona más rápido a cambios reales sin perder la suavización del ruido.</div>
+    <div class="rm-formula">EMA_hoy = (dato_hoy × factor) + (EMA_ayer × (1 - factor))</div>
+    <div class="rm-source">Patente US 11,232,009 — sistemas de agregación de KPIs en tiempo real usando media móvil exponencial para líneas base de tendencia</div>
+  </div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.3rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Desglose de la fórmula — qué es cada pieza</div>
+
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.83rem;">
+      <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold);">factor</span>
+      <span style="color:var(--ink);line-height:1.6;">También se llama "constante de suavizado". Es un número entre 0 y 1 que decide cuánto peso le das al dato de hoy contra todo lo que pasó antes. Se calcula así: <code style="font-family:'DM Mono',monospace;background:var(--light);padding:.1rem .4rem;color:var(--teal);">factor = 2 / (N + 1)</code>, donde N es el número de días que quieres "recordar". Para una EMA de 7 días: 2/(7+1) = <strong>0.25</strong>.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.83rem;">
+      <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold);">dato_hoy</span>
+      <span style="color:var(--ink);line-height:1.6;">El valor real que acabas de medir — streams de hoy, revenue de hoy, lo que estés midiendo.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:.8rem;padding:.6rem 0;font-size:.83rem;">
+      <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold);">EMA_ayer</span>
+      <span style="color:var(--ink);line-height:1.6;">El resultado de la EMA que ya calculaste el día anterior. Por eso se llama "recursiva" — cada día usa el resultado del día previo, arrastrando toda la historia sin tener que volver a sumarla completa.</span>
+    </div>
+
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin:1.2rem 0 .8rem;">Ejemplo calculado a mano, día por día</div>
+    <div style="font-size:.82rem;color:var(--gray);margin-bottom:.8rem;line-height:1.6;">Usamos los mismos 7 primeros días de streams del comparador de arriba. El primer día no tiene "ayer", así que se usa el dato real como semilla inicial.</div>
+
+    <table class="ctbl" style="font-size:.78rem;">
+      <thead><tr><th>Día</th><th>Dato real</th><th>Cálculo</th><th>EMA resultante</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>820</td><td style="color:var(--gray);font-style:italic;">Semilla — se usa el dato tal cual</td><td><strong style="color:var(--teal);">820.0</strong></td></tr>
+        <tr><td>2</td><td>650</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(650×0.25) + (820×0.75)</td><td><strong style="color:var(--teal);">777.5</strong></td></tr>
+        <tr><td>3</td><td>910</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(910×0.25) + (777.5×0.75)</td><td><strong style="color:var(--teal);">810.6</strong></td></tr>
+        <tr><td>4</td><td>480</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(480×0.25) + (810.6×0.75)</td><td><strong style="color:var(--teal);">728.0</strong></td></tr>
+        <tr><td>5</td><td>1200</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(1200×0.25) + (728.0×0.75)</td><td><strong style="color:var(--teal);">846.0</strong></td></tr>
+        <tr><td>6</td><td>700</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(700×0.25) + (846.0×0.75)</td><td><strong style="color:var(--teal);">809.5</strong></td></tr>
+        <tr><td>7</td><td>890</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">(890×0.25) + (809.5×0.75)</td><td><strong style="color:var(--teal);">829.6</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:1rem;">
+      Nota algo importante: aunque el día 4 cayó fuerte (480) y el día 5 subió fuerte (1200), la EMA nunca salta de golpe a esos extremos — se mueve gradualmente hacia ellos. Eso es exactamente lo que hace: <strong style="color:var(--ink);">reacciona a lo nuevo sin dejarse engañar por un solo dato raro.</strong>
+    </div>
+
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin:1.2rem 0 .8rem;">Cómo se escribe en Google Sheets</div>
+    <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=(B3*0.25) + (C2*0.75)</span></div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.7rem;">
+      Se escribe en la columna C (tu columna de EMA), fila 3 en adelante. <strong style="color:var(--ink);">B3</strong> es el dato de hoy. <strong style="color:var(--ink);">C2</strong> es la EMA de ayer — la celda de arriba, en la misma columna donde estás calculando. La fila 2 (el primer día) simplemente copia el valor de B2 tal cual, como semilla. Luego arrastras la fórmula de C3 hacia abajo y Sheets ajusta las referencias solo.
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">¿Media móvil simple o EMA? ¿Cuál usar?</div>
+    <p>La media móvil simple (Bloque 02, arriba) es más fácil de explicar y suficiente para la mayoría de reportes internos. La EMA vale la pena cuando necesitas <strong>detectar cambios rápido</strong> — por ejemplo, monitoreo diario de campañas donde quieres notar una caída real lo antes posible, sin esperar a que se "diluya" en un promedio de 7 días completos.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Construcción guiada — Media móvil en Sheets</div><div class="sim-hs">Sigue los pasos para construirla tú mismo</div></div>
+      <span class="tag tag-sh">PASO A PASO</span>
+    </div>
+    <div class="step-panel-grid">
+      <div style="border-right:1px solid var(--bd);"><div class="steps" id="mm-steps"></div></div>
+      <div style="padding:1.5rem;" id="mm-panel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- B3 REGRESIÓN LINEAL -->
+<section>
+  <div class="sn">03 · Regresión Lineal Simple</div>
+  <div class="st">Proyecciones básicas hacia adelante</div>
+  <div class="ss">Si la tendencia se mantiene, ¿dónde estaremos en 3 meses?</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio</div>
+    <h3>Si el catálogo Alzada sigue creciendo al ritmo actual, ¿cuántos tracks distribuidos tendremos en 6 meses?</h3>
+    <p>La regresión lineal traza la línea que mejor se ajusta a los datos históricos y la extiende hacia el futuro. Es una proyección, no una certeza — supone que el patrón pasado continúa igual.</p>
+  </div>
+
+  <div class="formula-box">Proyección = <span class="var">punto de partida + (tasa de cambio × períodos hacia adelante)</span></div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Cuidado con el atajo fácil</div>
+    <div style="font-size:.83rem;color:var(--ink);line-height:1.7;">
+      Es tentador calcular la tendencia solo con el primer y el último dato: (23−8)/6 ≈ 2.5 tracks por mes. <strong>Pero eso ignora todo lo que pasó en medio</strong> — si un mes tuvo un salto raro o una caída, ese atajo no lo detecta. La regresión lineal real (y la fórmula de Sheets) usan <strong>los 6 meses completos</strong> para calcular una tendencia más confiable. Por eso el resultado real (siguiente sección) no es exactamente 2.5 — es más preciso.
+    </div>
+  </div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Cómo se calcula realmente — paso a paso con los datos de Alzada</div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem;">Tracks distribuidos acumulados por mes: <strong style="color:var(--ink);">8, 11, 14, 16, 19, 23</strong> (meses 1 a 6). La regresión lineal busca la línea recta que mejor pasa entre estos 6 puntos — no necesariamente por todos, sino la que minimiza la distancia total a cada uno.</div>
+
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pu);margin:1rem 0 .6rem;">Esa línea recta tiene 2 piezas</div>
+    <table class="ctbl" style="font-size:.78rem;margin-bottom:1rem;">
+      <thead><tr><th>Pieza</th><th>Valor real calculado</th><th>Qué significa</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Pendiente</strong></td><td style="color:var(--teal);font-weight:700;">≈ 2.89</td><td>Cuánto sube la línea por cada mes que avanza — el ritmo real de crecimiento.</td></tr>
+        <tr><td><strong>Intersección</strong></td><td style="color:var(--teal);font-weight:700;">≈ 7.95</td><td>Dónde "empezaría" la línea en el mes 0 — un punto de referencia matemático, no necesariamente un dato real.</td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem;">
+      Con esas 2 piezas, proyectar cualquier mes futuro es solo sustituir en:
+      <div style="font-family:'DM Mono',monospace;font-size:.8rem;background:var(--light);border:1px solid var(--bd);padding:.6rem 1rem;margin:.6rem 0;color:var(--ink);">valor_proyectado = intersección + (pendiente × número_de_mes)</div>
+    </div>
+
+    <table class="ctbl" style="font-size:.78rem;">
+      <thead><tr><th>Mes a proyectar</th><th>Cálculo</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td>Mes 7</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">7.95 + (2.89 × 6)</td><td><strong style="color:var(--teal);">≈ 25.3 tracks</strong></td></tr>
+        <tr><td>Mes 8</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">7.95 + (2.89 × 7)</td><td><strong style="color:var(--teal);">≈ 28.2 tracks</strong></td></tr>
+        <tr><td>Mes 9</td><td style="font-family:'DM Mono',monospace;font-size:.72rem;">7.95 + (2.89 × 8)</td><td><strong style="color:var(--teal);">≈ 31.0 tracks</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:.78rem;color:var(--gray);font-style:italic;margin-top:.8rem;line-height:1.6;">
+      Nota: el "número de mes" empieza en 0 para el mes 1 (no en 1) — así lo cuenta la fórmula internamente. Por eso el mes 7 usa el multiplicador 6, no 7. En Sheets no necesitas hacer esta cuenta a mano — <span style="color:var(--teal);">PRONOSTICO.LINEAL()</span> calcula la pendiente y la intersección por ti, automáticamente, con la fórmula de una sola línea que ves abajo.
+    </div>
+  </div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+    <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=PRONOSTICO.LINEAL(x_nuevo; rango_Y; rango_X)</span></div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.8rem;">
+      <strong style="color:var(--ink);">x_nuevo</strong> es el período que quieres proyectar (por ejemplo, el número de mes 7 si tienes datos de los meses 1-6).<br>
+      <strong style="color:var(--ink);">rango_Y</strong> son tus valores históricos conocidos (tracks distribuidos por mes).<br>
+      <strong style="color:var(--ink);">rango_X</strong> es la secuencia de períodos (1, 2, 3, 4, 5, 6).<br><br>
+      Ejemplo real con el catálogo Alzada:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=PRONOSTICO.LINEAL(9; B2:B7; A2:A7)</code><br>
+      proyecta cuántos tracks distribuidos habría en el mes 9 — el mismo <strong>≈31.0</strong> que calculamos a mano arriba, pero sin que tengas que hacer la cuenta tú.<br><br>
+      También existe <code style="font-family:'DM Mono',monospace;color:var(--teal);">=TENDENCIA(rango_Y; rango_X; x_nuevo)</code> — hace lo mismo, sintaxis alternativa.<br><br>
+      Si además quieres ver la pendiente y la intersección por separado (útil para explicarle el resultado a alguien más): <code style="font-family:'DM Mono',monospace;color:var(--teal);">=PENDIENTE(rango_Y; rango_X)</code> y <code style="font-family:'DM Mono',monospace;color:var(--teal);">=INTERSECCION.EJE(rango_Y; rango_X)</code>.
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo leer una proyección lineal</div>
+    <div class="read-box-item"><span class="read-box-val">Línea sólida</span><span class="read-box-txt">Datos reales que ya ocurrieron — esto es un hecho, no una suposición.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Línea punteada</span><span class="read-box-txt">La proyección hacia el futuro es una estimación que asume que el patrón pasado se mantiene igual — una hipótesis razonable, no un hecho.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Confianza: alta</span><span class="read-box-txt">Suficiente historia (5-6 meses o más) para que el patrón sea confiable. Aun así, trátalo como estimación, no como promesa.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Confianza: baja</span><span class="read-box-txt">Muy pocos datos (2-3 meses). La línea se ve igual de "segura" en la gráfica, pero matemáticamente es mucho menos confiable: cualquier evento nuevo puede invalidarla por completo.</span></div>
+    <div class="read-box-note">Una proyección nunca es una garantía. Responde a la pregunta "¿qué pasaría si todo sigue exactamente igual?", y en la práctica casi nada se mantiene exactamente igual por mucho tiempo.</div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Simulador de proyección — tracks distribuidos en el tiempo</div><div class="sim-hs">Ajusta el rango histórico y observa cómo cambia la proyección</div></div>
+      <span class="tag tag-p">INTERACTIVO</span>
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-row">
+        <span class="slider-label">Meses de historia usados</span>
+        <input type="range" class="slider-input" id="reg-months" min="2" max="6" value="4" oninput="updateRegression(this.value)">
+        <span class="slider-val" id="reg-months-val">4</span>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title" id="reg-title"></div>
+      <svg id="reg-svg" class="line-svg" viewBox="0 0 500 220"></svg>
+    </div>
+    <div style="padding:0 1.5rem 1.5rem;" id="reg-note"></div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">¿Cuánto error es aceptable?</div>
+    <p>Una proyección de 2 meses con datos consistentes es razonablemente confiable. Una proyección de 12 meses con solo 3 meses de historia es casi adivinación. Entre menos historia y más lejos proyectes, más se ensancha el margen de error real — aunque la línea en la gráfica se vea igual de segura.</p>
+  </div>
+</section>
+
+<!-- B4 STREAM/TRACK EQUIVALENT -->
+<section data-group="ponderacion">
+  <div class="sn">04 · El Modelo Real de Billboard</div>
+  <div class="st">Stream Equivalent Album y Track Equivalent Song</div>
+  <div class="ss">La fórmula real detrás de los charts que ves cada semana</div>
+
+  <div class="real-model">
+    <div class="rm-name">Stream Equivalent Album (SEA) / Track Equivalent Song (TES)</div>
+    <div class="rm-who">Billboard · Luminate (antes Nielsen Music)</div>
+    <div class="rm-desc">Convierte streams en "unidades equivalentes" a una venta física o digital. No todos los streams valen lo mismo — el modelo pondera según el tipo de plataforma y el tipo de suscripción del oyente.</div>
+    <div class="rm-formula">~1,000 streams premium = 1 unidad · ~2,500 streams gratuitos = 1 unidad</div>
+    <div class="rm-source">Fuente: Luminate/Billboard, metodología de equivalencias vigente desde semana 1 de 2026</div>
+  </div>
+
+  <div class="real-model">
+    <div class="rm-name">Weighted Ratio Streaming</div>
+    <div class="rm-who">Billboard Hot 100 y Billboard 200</div>
+    <div class="rm-desc">Cada tipo de stream tiene un peso distinto en el cálculo final del chart: streams de suscripción paga valen más que streams con publicidad, que a su vez valen más que streams programados o pasivos.</div>
+    <div class="rm-formula">Stream pago = 1.0 pt · Stream con ads = 0.67 pt · Stream programado = 0.5 pt</div>
+    <div class="rm-source">Fuente: Billboard, actualización de metodología de ponderación de streams</div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo leer "1,000 streams premium = 1 unidad"</div>
+    <div class="read-box-item"><span class="read-box-val">Unidad</span><span class="read-box-txt">Es una moneda común inventada por Billboard para comparar cosas distintas (una venta física, un stream, una descarga) en la misma escala.</span></div>
+    <div class="read-box-item"><span class="read-box-val">¿Por qué no cuentan igual?</span><span class="read-box-txt">Porque no cuestan ni valen lo mismo para la industria. Un stream premium genera más regalías reales que uno gratuito, y el modelo refleja ese valor económico en vez de contar solo reproducciones.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Ejemplo</span><span class="read-box-txt">Si un track tiene 2,000 streams premium, equivale a 2 "unidades", como si se hubieran vendido 2 copias del sencillo.</span></div>
+    <div class="read-box-note">Ese mismo principio de ponderar cosas distintas según su valor real, en vez de contarlas por igual, es justo lo que vas a aplicar en el modelo de Alzada más abajo, pero con calidad de metadata en vez de tipos de stream.</div>
+  </div>
+
+  <div class="hook">
+    <div class="hook-lbl">Cómo aplica al catálogo Alzada</div>
+    <h3>No tenemos streams reales del catálogo — pero sí podemos aplicar la misma lógica de ponderación a la calidad de metadata.</h3>
+    <p>En vez de ponderar tipos de stream, ponderamos qué tan "listo para monetizar" está cada track: ¿tiene UPC? ¿tiene ISRC? ¿está distribuido? Cada factor pesa distinto, igual que en el modelo real de Billboard.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Construcción guiada — Tu versión del Track Equivalent para Alzada</div><div class="sim-hs">Sigue los pasos para construir el modelo ponderado</div></div>
+      <span class="tag tag-sh">PASO A PASO</span>
+    </div>
+    <div class="step-panel-grid">
+      <div style="border-right:1px solid var(--bd);"><div class="steps" id="te-steps"></div></div>
+      <div style="padding:1.5rem;" id="te-panel"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">Disclaimer — qué es y qué no es este ejemplo</div>
+    <p>Esta versión del Track Equivalent para Alzada es una <strong>adaptación didáctica</strong>, no el modelo real de Billboard. Billboard pondera <em>streams reales</em> (pagados, con publicidad, programados) para calcular unidades de venta equivalentes. Aquí ponderamos <em>calidad de metadata</em> (UPC, ISRC, distribución) porque no contamos con streams reales del catálogo — el objetivo es que practiques la mecánica de ponderar factores distintos en un solo score, no que memorices esta fórmula específica como si fuera la de Billboard. Cuando trabajes con datos de streaming reales, los factores y pesos que ponderes serán otros — pero el principio (normalizar, asignar pesos, sumar) es exactamente el mismo.</p>
+  </div>
+</section>
+
+<!-- B5 SCORING PONDERADO -->
+<section data-group="ponderacion">
+  <div class="sn">05 · Modelo de Scoring Ponderado</div>
+  <div class="st">Construye tu propio "mini-Billboard" para Alzada</div>
+  <div class="ss">Ajusta los pesos y observa cómo cambia el ranking en vivo</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio</div>
+    <h3>¿Qué artistas del catálogo están más listos para recibir inversión de campaña?</h3>
+    <p>Un modelo de scoring combina varios factores en un solo número — igual que el Equivalent Album Unit combina ventas, sencillos y streams en una cifra. Tú decides qué tanto pesa cada factor.</p>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo leer el score de 0 a 100</div>
+    <div class="read-box-item"><span class="read-box-val">80 – 100</span><span class="read-box-txt">Catálogo saludable y listo. Buen candidato para invertir en promoción sin trabajo previo de limpieza.</span></div>
+    <div class="read-box-item"><span class="read-box-val">50 – 79</span><span class="read-box-txt">Aceptable, con pendientes. Puede recibir inversión, pero conviene resolver primero los factores más débiles.</span></div>
+    <div class="read-box-item"><span class="read-box-val">0 – 49</span><span class="read-box-txt">Requiere trabajo antes de invertir. El catálogo tiene huecos importantes de calidad o distribución.</span></div>
+    <div class="read-box-note">Importante: este número NO es una medida objetiva de "qué tan bueno es el artista". Es una medida de qué tan preparado está su catálogo, según los criterios y pesos que TÚ elegiste. Si mueves los sliders, el mismo artista puede subir o bajar — eso es normal y esperado, no un error del modelo.</div>
+  </div>
+
+  <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+    <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxv">=(D2*$H$1) + (E2*$H$2) + (F2*$H$3)</span></div>
+    <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.8rem;">
+      Cada columna (D, E, F) es un factor normalizado entre 0 y 1 (por ejemplo, % distribuido). Cada celda ancla ($H$1, $H$2, $H$3) contiene el peso de ese factor, escrito como decimal (40% = 0.4).<br><br>
+      El símbolo <code style="font-family:'DM Mono',monospace;color:var(--teal);">$</code> fija la celda del peso para que no se mueva al arrastrar la fórmula hacia abajo — así todos los artistas usan los mismos pesos.<br><br>
+      Ejemplo real con el catálogo Alzada:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--teal);background:var(--light);padding:.2rem .5rem;">=(D2*0.4) + (E2*0.35) + (F2*0.25)</code><br>
+      donde D2 = tracks normalizados, E2 = % distribuido, F2 = % con UPC completo.
+    </div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Constructor de scoring — ajusta los pesos</div><div class="sim-hs">El ranking de artistas se recalcula en tiempo real</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-row">
+        <span class="slider-label">Peso: Tracks totales</span>
+        <input type="range" class="slider-input" id="sc-w1" min="0" max="100" step="1" value="40" oninput="updateScoring()">
+        <span class="slider-val" id="sc-w1-val">40%</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Peso: % distribuido</span>
+        <input type="range" class="slider-input" id="sc-w2" min="0" max="100" step="1" value="35" oninput="updateScoring()">
+        <span class="slider-val" id="sc-w2-val">35%</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Peso: % con UPC completo</span>
+        <input type="range" class="slider-input" id="sc-w3" min="0" max="100" step="1" value="25" oninput="updateScoring()">
+        <span class="slider-val" id="sc-w3-val">25%</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--gray);margin-top:.5rem;" id="sc-total-warning"></div>
+    </div>
+    <div style="padding:0 1.5rem 1.5rem;" id="sc-ranking"></div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">No hay pesos "correctos"</div>
+    <p>Cambiar los pesos cambia el ranking — eso no es un error del modelo, es exactamente lo que hace un modelo de scoring: refleja las prioridades de quien lo construye. Un sello enfocado en volumen pondera distinto que uno enfocado en calidad de catálogo.</p>
+  </div>
+</section>
+
+<!-- B6 ERRORES COMUNES -->
+<section>
+  <div class="sn">06 · Errores Comunes</div>
+  <div class="st">Cómo se malinterpretan los modelos simples</div>
+  <div class="ss">El modelo puede estar bien construido y la conclusión seguir siendo incorrecta</div>
+
+  <div class="err-grid" id="model-errors"></div>
+</section>
+
+<!-- B7 LÍMITES -->
+<section>
+  <div class="sn">07 · Cuándo un Modelo Simple No Alcanza</div>
+  <div class="st">Los límites de lo que construiste hoy</div>
+  <div class="ss">Honestidad estadística: reconocer qué no puede responder tu modelo</div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4>Pocos datos</h4>
+      <p>Con menos de 5-6 puntos, cualquier modelo (correlación, regresión, media móvil) es poco confiable. El patrón puede ser casualidad, no tendencia.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4>Eventos externos</h4>
+      <p>Ningún modelo simple predice una playlist viral, un cambio de algoritmo de Spotify, o una mención en TV. Los modelos asumen que el pasado se repite — la realidad no siempre coopera.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4>Variables ocultas</h4>
+      <p>Una correlación puede ocultar una tercera variable real. El modelo no te dice cuál es — eso requiere criterio de negocio, no más fórmulas.</p>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">La regla de oro</div>
+    <p>Un modelo simple te da una hipótesis razonable, no una verdad. Billboard mismo <strong>ajusta su metodología cada año</strong> porque ningún modelo captura perfectamente el comportamiento real del consumo musical — y esa es la empresa con más datos y recursos de la industria.</p>
+  </div>
+</section>
+
+<!-- B8 CASO INTEGRADOR -->
+<section data-group="casos">
+  <div class="sn">08 · Caso Integrador</div>
+  <div class="st">Los 4 modelos aplicados a un artista real</div>
+  <div class="ss">Gabo & Vale — el artista con más tracks del catálogo Alzada</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Contexto del caso</div>
+    <h3>El sello evalúa si Gabo & Vale está listo para una inversión mayor de marketing.</h3>
+    <p>Aplicamos los 4 modelos en secuencia: correlación para entender relaciones, media móvil para ver la tendencia real, regresión para proyectar, y el modelo de equivalencia para dar un score final.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Caso integrador — Gabo & Vale</div><div class="sim-hs">Sigue los 4 pasos en orden</div></div>
+      <span class="tag tag-t">PASO A PASO</span>
+    </div>
+    <div class="step-panel-grid">
+      <div style="border-right:1px solid var(--bd);"><div class="steps" id="case-steps"></div></div>
+      <div style="padding:1.5rem;" id="case-panel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- B9 EJERCICIO FINAL -->
+<section data-group="casos">
+  <div class="sn">09 · Ejercicio de Ejecución</div>
+  <div class="st">Construye tu propio mini-scoring</div>
+  <div class="ss">Cierra la clase con un modelo aplicado a un artista de tu elección</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Selector — elige un artista y observa su score</div><div class="sim-hs">Usa los mismos pesos que definiste en el Bloque 05</div></div>
+      <span class="tag tag-g">EJECUTA TÚ</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem;" id="final-artist-selector"></div>
+      <div id="final-artist-result"></div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Lo que te llevas de esta clase</div>
+    <p>No memorizaste fórmulas — construiste 4 modelos que ya se usan en la industria real, con nombre propio y fuente verificable. La próxima vez que veas un chart de Billboard, vas a reconocer exactamente qué está pasando detrás del número.</p>
+  </div>
+</section>
+
+<!-- B10 EXTRA — MODELOS DE PONDERACIÓN CON COSTOS REALES -->
+<section data-group="ponderacion">
+  <div class="sn">10 · Extra — Datos Financieros Reales</div>
+  <div class="st">Modelos de ponderación con costos reales del catálogo</div>
+  <div class="ss">Los mismos principios de ponderación de este capítulo, aplicados a las cifras reales de producción de Alzada</div>
+
+  <div class="real-data-badge">DATOS 100% REALES — no ilustrativos</div>
+
+  <div class="hook">
+    <div class="hook-lbl">De dónde vienen estos números</div>
+    <h3>Video, audio y recuperación de producción — 42 tracks del catálogo con inversión real registrada.</h3>
+    <p>A diferencia de los ejemplos anteriores (marcados como ilustrativos), esta sección usa las cifras exactas del archivo de costos de Alzada: honorarios de filmmaker, productor, asistentes, fotografía, diseño y sesiones de audio, más el total de producción por track.</p>
+  </div>
+
+  <div class="tabswitch-nav">
+    <button class="tabswitch-btn on" id="ct-tab-0" onclick="showCostTab(0)">Composición Video vs Audio</button>
+    <button class="tabswitch-btn" id="ct-tab-1" onclick="showCostTab(1)">Roles dentro del Video</button>
+    <button class="tabswitch-btn" id="ct-tab-2" onclick="showCostTab(2)">Score de Prioridad Financiera</button>
+  </div>
+
+  <!-- PANEL 0 — Video vs Audio -->
+  <div class="tabswitch-panel on" id="ct-panel-0">
+    <div class="hook">
+      <div class="hook-lbl">Pregunta de negocio</div>
+      <h3>¿Qué proporción de la inversión total del catálogo va a video vs a audio?</h3>
+      <p>Es el mismo modelo de Weighted Ratio que viste con Billboard (Bloque 04) — solo que aquí pondera dólares reales invertidos, no tipos de stream.</p>
+    </div>
+
+    <div class="formula-box">% Video = <span class="var">TOTAL VIDEO / (TOTAL VIDEO + TOTAL AUDIO)</span> — sobre el catálogo completo o por track</div>
+
+    <div class="sim">
+      <div class="sim-h">
+        <div><div class="sim-ht">Composición real de la inversión — catálogo completo (42 tracks)</div><div class="sim-hs">$2,669,079 invertidos en total</div></div>
+        <span class="tag tag-t">DATOS REALES</span>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">"El video representa el 91.4% de toda la inversión de producción del catálogo"</div>
+        <div class="bar-chart">
+          <div class="bar-row">
+            <span class="bar-label">Video</span>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">$2,438,228</span></div></div>
+            <span class="bar-pct">91.4%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Audio</span>
+            <div class="bar-track"><div class="bar-fill" style="width:9.5%;background:var(--gold);"><span class="bar-val">$230,851</span></div></div>
+            <span class="bar-pct">8.6%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="read-box">
+      <div class="read-box-lbl">Cómo leer esta proporción</div>
+      <div class="read-box-item"><span class="read-box-val">91.4% video</span><span class="read-box-txt">Tiene sentido en la industria musical: producir un video (locación, cámaras, crew, edición) cuesta mucho más que una sesión de grabación de audio.</span></div>
+      <div class="read-box-item"><span class="read-box-val">Promedio/track</span><span class="read-box-txt">$63,550 de inversión total promedio — útil como referencia para presupuestar el próximo lanzamiento.</span></div>
+      <div class="read-box-note">Si un track individual se aleja mucho de este 91/9, vale la pena preguntar por qué — puede ser un video de bajo presupuesto o una producción de audio inusualmente elaborada.</div>
+    </div>
+
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin:2rem 0 1rem;">Los 8 tracks con mayor inversión total — composición individual</div>
+    <div id="cost-top8-chart"></div>
+
+    <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-top:1.5rem;">
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+      <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=D2/(D2+E2)</span></div>
+      <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.7rem;">Donde D2 = Total Video del track y E2 = Total Audio del track. Formatea la celda como porcentaje. Arrastra hacia abajo para tener el % de video de cada track del catálogo.</div>
+    </div>
+  </div>
+
+  <!-- PANEL 1 — Roles dentro del video -->
+  <div class="tabswitch-panel" id="ct-panel-1">
+    <div class="hook">
+      <div class="hook-lbl">Pregunta de negocio</div>
+      <h3>Dentro del costo de video, ¿cuánto es presupuesto externo de producción vs honorarios del equipo nombrado?</h3>
+      <p>El archivo de costos de video tiene dos tipos de gasto: la línea "Costo Prod. de video" (presupuesto externo — locación, equipo, renta) y los honorarios individuales de cada colaborador (Filmmaker, Productor, Asistentes, Fotógrafo, Diseñador).</p>
+    </div>
+
+    <div class="sim">
+      <div class="sim-h">
+        <div><div class="sim-ht">Ponderación real — presupuesto externo vs honorarios de equipo</div><div class="sim-hs">Suma de las 42 producciones de video del catálogo</div></div>
+        <span class="tag tag-t">DATOS REALES</span>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">"El presupuesto externo de producción representa el 87.7% del costo de video — los honorarios del equipo, solo 12.3%"</div>
+        <div class="bar-chart">
+          <div class="bar-row">
+            <span class="bar-label">Costo Prod. externo</span>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--pu);"><span class="bar-val">$2,265,823</span></div></div>
+            <span class="bar-pct">87.7%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Honorarios equipo</span>
+            <div class="bar-track"><div class="bar-fill" style="width:14%;background:var(--gold);"><span class="bar-val">$318,500</span></div></div>
+            <span class="bar-pct">12.3%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin:2rem 0 1rem;">Ponderación real dentro de los $318,500 en honorarios de equipo</div>
+    <div class="sim">
+      <div class="sim-h">
+        <div><div class="sim-ht">Distribución por rol — honorarios acumulados del catálogo</div></div>
+        <span class="tag tag-p">DATOS REALES</span>
+      </div>
+      <div class="chart-box">
+        <div class="bar-chart">
+          <div class="bar-row"><span class="bar-label">Filmmaker</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">$126,000</span></div></div><span class="bar-pct">39.6%</span></div>
+          <div class="bar-row"><span class="bar-label">Asistente(s)</span><div class="bar-track"><div class="bar-fill" style="width:46%;background:var(--teal);"><span class="bar-val">$58,000</span></div></div><span class="bar-pct">18.2%</span></div>
+          <div class="bar-row"><span class="bar-label">Foto fija</span><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--teal);"><span class="bar-val">$48,000</span></div></div><span class="bar-pct">15.1%</span></div>
+          <div class="bar-row"><span class="bar-label">Diseño gráfico</span><div class="bar-track"><div class="bar-fill" style="width:37%;background:var(--teal);"><span class="bar-val">$46,500</span></div></div><span class="bar-pct">14.6%</span></div>
+          <div class="bar-row"><span class="bar-label">Productor</span><div class="bar-track"><div class="bar-fill" style="width:32%;background:var(--teal);"><span class="bar-val">$40,000</span></div></div><span class="bar-pct">12.6%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="read-box">
+      <div class="read-box-lbl">Cómo leer esta ponderación por rol</div>
+      <div class="read-box-item"><span class="read-box-val">Filmmaker 39.6%</span><span class="read-box-txt">El rol individual mejor pagado del equipo de video — casi 4 de cada 10 pesos de honorarios van a esta figura.</span></div>
+      <div class="read-box-item"><span class="read-box-val">Resto (60.4%)</span><span class="read-box-txt">Se reparte entre 4 roles distintos — ningún otro rol individual se acerca al peso del Filmmaker.</span></div>
+      <div class="read-box-note">Esta ponderación te sirve para negociar presupuestos futuros: si el catálogo históricamente destina ~40% de honorarios al Filmmaker, un presupuesto nuevo que se aleje mucho de esa proporción merece una segunda revisión.</div>
+    </div>
+
+    <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;margin-top:1.5rem;">
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+      <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=SUMA(Filmmaker_rango) / SUMA(Todos_los_honorarios_rango)</span></div>
+      <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.7rem;">Suma la columna de honorarios de un rol específico y divide entre la suma de todos los honorarios nombrados del catálogo. Repite para cada rol — así construyes la tabla de ponderación completa.</div>
+    </div>
+  </div>
+
+  <!-- PANEL 2 — Score de prioridad financiera -->
+  <div class="tabswitch-panel" id="ct-panel-2">
+    <div class="hook">
+      <div class="hook-lbl">Pregunta de negocio</div>
+      <h3>¿Qué tracks necesitan seguimiento financiero prioritario según su inversión real?</h3>
+      <p>Mismo modelo de scoring ponderado del Bloque 05 — pero ahora con dólares reales de producción en vez de factores de calidad de metadata. Ajusta los pesos y observa cómo cambia el ranking de los 8 tracks con mayor inversión del catálogo.</p>
+    </div>
+
+    <div class="read-box">
+      <div class="read-box-lbl">Cómo leer este score de prioridad</div>
+      <div class="read-box-item"><span class="read-box-val">Costo total</span><span class="read-box-txt">Más dinero invertido = más importante vigilar que ese track genere retorno. Normalizado sobre el track más caro del top 8.</span></div>
+      <div class="read-box-item"><span class="read-box-val">% en video</span><span class="read-box-txt">Un video representa más riesgo si no genera vistas proporcionales a su costo — por eso pesa como factor de riesgo.</span></div>
+      <div class="read-box-item"><span class="read-box-val">Inversión en audio</span><span class="read-box-txt">Más inversión en audio puede reflejar mayor cuidado en la base musical del track — un factor que puede sumar en vez de restar, según tu criterio de negocio.</span></div>
+      <div class="read-box-note">Igual que en el Bloque 05: este score no mide qué tan "bueno" es el track — mide cuánto dinero real hay en juego. Ajusta los pesos según lo que tu sello priorice: control de gasto, apuesta visual, o inversión en la base sonora.</div>
+    </div>
+
+    <div class="sim">
+      <div class="sim-h">
+        <div><div class="sim-ht">Constructor de score financiero — ajusta los pesos</div><div class="sim-hs">Ranking en vivo de los 8 tracks con mayor inversión real</div></div>
+        <span class="tag tag-t">DATOS REALES + INTERACTIVO</span>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-row">
+          <span class="slider-label">Peso: Costo total</span>
+          <input type="range" class="slider-input" id="ct-w1" min="0" max="100" step="1" value="45" oninput="updateCostScoring()">
+          <span class="slider-val" id="ct-w1-val">45%</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Peso: % en video</span>
+          <input type="range" class="slider-input" id="ct-w2" min="0" max="100" step="1" value="30" oninput="updateCostScoring()">
+          <span class="slider-val" id="ct-w2-val">30%</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Peso: Inversión en audio</span>
+          <input type="range" class="slider-input" id="ct-w3" min="0" max="100" step="1" value="25" oninput="updateCostScoring()">
+          <span class="slider-val" id="ct-w3-val">25%</span>
+        </div>
+        <div style="font-size:.72rem;color:var(--gray);margin-top:.5rem;" id="ct-total-warning"></div>
+      </div>
+      <div style="padding:0 1.5rem 1.5rem;" id="ct-ranking"></div>
+    </div>
+
+    <div style="border:1px solid var(--bd);background:#fff;padding:1.2rem 1.5rem;">
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Fórmula real en Google Sheets</div>
+      <div class="sh-fx" style="border:1px solid var(--bd);"><span class="sh-fxl">fx</span><span class="sh-fxv">=(D2/$D$1*$H$1) + (E2*$H$2) + (F2/$F$1*$H$3)</span></div>
+      <div style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-top:.7rem;">
+        D2 = costo total del track, $D$1 = costo total máximo del catálogo (para normalizar). E2 = % de video ya calculado (0 a 1). F2 = inversión en audio, $F$1 = audio máximo del catálogo. $H$1, $H$2, $H$3 = tus pesos elegidos arriba, como decimales.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="kl">
+        <li><span class="kc">✓</span> Correlación muestra relación, no causa — cuidado con las espurias.</li>
+        <li><span class="kc">✓</span> Media móvil suaviza ruido. EMA da más peso a lo reciente.</li>
+        <li><span class="kc">✓</span> Regresión lineal proyecta, no garantiza — el margen de error crece con menos datos.</li>
+        <li><span class="kc">✓</span> Stream/Track Equivalent es el modelo real detrás de los charts de Billboard.</li>
+        <li><span class="kc">✓</span> Un modelo de scoring refleja las prioridades de quien lo construye.</li>
+        <li><span class="kc">✓</span> Ningún modelo simple predice eventos externos — ni Billboard lo logra siempre.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="nc">
+        <div class="nc-l">Próxima clase</div>
+        <div class="nc-t">Ejecución: Dashboards y Reportes en Vivo</div>
+        <ul class="nc-i">
+          <li>Construir un dashboard completo de principio a fin</li>
+          <li>Integrar visualización + modelos en un solo reporte</li>
+          <li>Automatizar actualización con Looker Studio</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Modelos Estadísticos Aplicados</span>
+  <nav class="fn3"><a href="#">← Anterior</a><a href="#">Siguiente →</a></nav>
+</footer>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+
+// B1 — Correlation pairs (illustrative, based on real catalog patterns)
+var CORR_PAIRS = [
+  {a:"Total de tracks",b:"Tracks sin UPC",r:0.12,
+   interp:"Correlación casi nula (r≈0.12). Tener más tracks NO significa tener más problemas de calidad — el volumen y los errores de metadata son independientes en este catálogo.",
+   color:"var(--gray)"},
+  {a:"Tracks distribuidos",b:"Tracks con UPC completo",r:0.81,
+   interp:"Correlación fuerte y positiva (r≈0.81). Tiene sentido: para distribuir un track normalmente se requiere el UPC — son procesos relacionados por diseño, no coincidencia.",
+   color:"var(--teal)"},
+  {a:"Streams (ilustrativo)",b:"Posts en redes (ilustrativo)",r:0.64,
+   interp:"Correlación moderada (r≈0.64). Sugiere relación, pero no prueba que los posts causen los streams — podría ser que ambos suban cuando hay un lanzamiento nuevo (variable oculta).",
+   color:"var(--gold)"},
+  {a:"Save rate (ilustrativo)",b:"Skip rate (ilustrativo)",r:-0.78,
+   interp:"Correlación fuerte y negativa (r≈-0.78). Cuando el save rate sube, el skip rate baja: la relación más intuitiva y esperable de todo el catálogo.",
+   color:"var(--red)"},
+];
+
+// B2 — Moving average illustrative data (14 days)
+var MM_RAW = [820,650,910,480,1200,700,890,1400,600,1100,980,1350,750,1250];
+var MM_LABELS = ["D1","D2","D3","D4","D5","D6","D7","D8","D9","D10","D11","D12","D13","D14"];
+
+function calcMovingAvg(data, window) {
+  var result = [];
+  for (var i = 0; i < data.length; i++) {
+    if (i < window - 1) { result.push(null); continue; }
+    var sum = 0;
+    for (var j = i - window + 1; j <= i; j++) sum += data[j];
+    result.push(Math.round(sum / window));
+  }
+  return result;
+}
+
+var MM_STEPS = [
+  {t:"Paso 1 — Ordena tus datos por fecha",
+   d:"En Sheets, columna A = fecha, columna B = streams del día. Los datos deben estar en orden cronológico, sin huecos.",
+   panel:"s1"},
+  {t:"Paso 2 — Escribe la fórmula de promedio",
+   d:"En la celda C8 (séptimo día con datos completos): =PROMEDIO(B2:B8). Toma los últimos 7 días incluyendo el actual.",
+   panel:"s2"},
+  {t:"Paso 3 — Arrastra la fórmula hacia abajo",
+   d:"Copia C8 y pégala en el resto de la columna. Sheets ajusta automáticamente el rango: C9 será PROMEDIO(B3:B9), y así sucesivamente.",
+   panel:"s3"},
+  {t:"Paso 4 — Grafica ambas líneas juntas",
+   d:"Selecciona columnas B (crudo) y C (media móvil) → Insertar gráfico de líneas. La línea suavizada revela la tendencia real.",
+   panel:"s4"},
+];
+var MM_PANELS = {
+  s1:'<div class="sh-mock"><div class="sh-top"><span class="sh-top-t">📊 streams_diarios</span></div><table class="sh-t"><thead><tr><th></th><th>A</th><th>B</th></tr></thead><tbody><tr><td class="rh">1</td><td class="ch">Fecha</td><td class="ch">Streams</td></tr><tr><td class="rh">2</td><td class="ac">01-jun</td><td class="ac">820</td></tr><tr><td class="rh">3</td><td class="ac">02-jun</td><td class="ac">650</td></tr><tr><td class="rh">4</td><td class="ac">03-jun</td><td class="ac">910</td></tr></tbody></table></div>',
+  s2:'<div class="sh-mock"><div class="sh-fx"><span class="sh-fxl">fx</span><span class="sh-fxv">=PROMEDIO(B2:B8)</span></div><table class="sh-t"><thead><tr><th></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><td class="rh">1</td><td class="ch">Fecha</td><td class="ch">Streams</td><td class="ch">Media 7d</td></tr><tr><td class="rh">8</td><td>08-jun</td><td>1400</td><td class="ac" style="font-weight:700;color:var(--sh);">807</td></tr></tbody></table></div>',
+  s3:'<div style="font-size:.82rem;color:var(--gray);line-height:1.7;padding:1rem;background:var(--light);border:1px solid var(--bd);">Al arrastrar, Sheets recalcula automáticamente:<br><br><code style="font-family:\'DM Mono\',monospace;color:var(--sh);">C9 = PROMEDIO(B3:B9)</code><br><code style="font-family:\'DM Mono\',monospace;color:var(--sh);">C10 = PROMEDIO(B4:B10)</code><br><br>La ventana de 7 días se mueve junto con la fila — por eso se llama "móvil".</div>',
+  s4:'<div style="font-size:.82rem;color:var(--gray);line-height:1.7;">El resultado final: una línea con picos y valles (datos crudos) y otra línea suave debajo que muestra hacia dónde va realmente la tendencia — ver el comparador del inicio de este bloque.</div>'
+};
+
+// B3 — Regression illustrative data (6 months of distributed track counts)
+var REG_DATA = [8,11,14,16,19,23]; // cumulative distributed tracks over 6 months
+
+// B4 — Track Equivalent steps
+var TE_STEPS = [
+  {t:"Paso 1 — Define los factores de peso",
+   d:"Igual que Billboard pondera streams pagados vs gratuitos, tú ponderas: ¿está distribuido? (40%), ¿tiene UPC? (30%), ¿tiene ISRC? (30%).",
+   panel:"te1"},
+  {t:"Paso 2 — Asigna puntos por track",
+   d:"Cada track recibe 0 o el peso completo por cada factor cumplido. Un track distribuido, con UPC e ISRC obtiene 100 puntos.",
+   panel:"te2"},
+  {t:"Paso 3 — Suma el score por artista",
+   d:"En Sheets: =SUMAR.SI(Artista_rango; artista; Score_rango) / COUNTIF(...) te da el promedio de \"salud\" del catálogo de cada artista.",
+   panel:"te3"},
+  {t:"Paso 4 — Interpreta el resultado",
+   d:"Un score alto significa catálogo listo para monetizar. Un score bajo señala trabajo pendiente antes de invertir en promoción.",
+   panel:"te4"},
+];
+var TE_PANELS = {
+  te1:'<table class="ctbl"><thead><tr><th>Factor</th><th>Peso</th></tr></thead><tbody><tr><td>Distribuido</td><td><span class="badge badge-hi">40%</span></td></tr><tr><td>UPC asignado</td><td><span class="badge badge-mid">30%</span></td></tr><tr><td>ISRC asignado</td><td><span class="badge badge-mid">30%</span></td></tr></tbody></table>',
+  te2:'<table class="ctbl"><thead><tr><th>Track</th><th>Dist.</th><th>UPC</th><th>ISRC</th><th>Score</th></tr></thead><tbody><tr><td>Montaña</td><td>✓</td><td>✓</td><td>✓</td><td><span class="badge badge-hi">100</span></td></tr><tr><td>Silencio Urbano</td><td>✓</td><td>✗</td><td>✓</td><td><span class="badge badge-mid">70</span></td></tr></tbody></table>',
+  te3:'<div class="sh-mock"><div class="sh-fx"><span class="sh-fxl">fx</span><span class="sh-fxv">=PROMEDIO.SI(A:A;"Luna Cold";E:E)</span></div><table class="sh-t"><thead><tr><th>Artista</th><th>Score prom.</th></tr></thead><tbody><tr><td>Luna Cold</td><td class="ac">55</td></tr></tbody></table></div>',
+  te4:'<div style="font-size:.82rem;color:var(--gray);line-height:1.7;padding:1rem;background:var(--red-l);border-left:3px solid var(--red);">Luna Cold: score promedio 55/100. La mitad de su catálogo distribuido no tiene UPC completo — el mismo hallazgo del caso de la Clase 3, ahora expresado como un número comparable entre artistas.</div>'
+};
+
+// B5 — Scoring artists data
+var SCORING_ARTISTS = [
+  {name:"Gabo & Vale",tracks:7,pctDist:0.71,pctUpc:0.86},
+  {name:"DJ Pyro",tracks:5,pctDist:0.80,pctUpc:0.80},
+  {name:"Kid Flaco",tracks:4,pctDist:0.50,pctUpc:1.0},
+  {name:"Luna Cold",tracks:4,pctDist:0.75,pctUpc:0.50},
+  {name:"Santi",tracks:4,pctDist:0.50,pctUpc:0.50},
+  {name:"Zoe Rey",tracks:4,pctDist:0.50,pctUpc:0.75},
+  {name:"Carlos Vega",tracks:2,pctDist:1.0,pctUpc:0.50},
+  {name:"Nova",tracks:2,pctDist:0.50,pctUpc:0.50},
+];
+
+// B6 — Common errors
+var MODEL_ERRORS = [
+  {t:"Confundir correlación con causalidad",d:"Ver que dos métricas suben juntas y asumir que una provoca la otra sin investigar si hay una tercera variable detrás."},
+  {t:"Proyectar demasiado lejos",d:"Usar 2 meses de historia para proyectar todo un año. El margen de error crece mucho más rápido de lo que parece en la gráfica."},
+  {t:"Ignorar el tamaño de muestra",d:"Sacar conclusiones de correlación o tendencia con menos de 5-6 puntos de datos — el patrón puede ser puro azar."},
+  {t:"Tratar el score como verdad absoluta",d:"Un modelo de scoring refleja los pesos que tú elegiste. Otro analista con otros pesos llegaría a un ranking distinto — igual de válido."},
+  {t:"No actualizar el modelo",d:"Billboard ajusta su metodología cada año. Un modelo de scoring construido hace 6 meses puede ya no reflejar las prioridades actuales del negocio."},
+  {t:"Presentar la proyección como certeza",d:"Decir 'vamos a tener 30 tracks distribuidos en diciembre' sin mencionar que es una proyección basada en supuestos, no un hecho."},
+];
+
+// B8 — Case study Gabo & Vale
+var CASE_STEPS = [
+  {t:"Paso 1 — Correlación: ¿más tracks, más problemas?",
+   d:"Gabo & Vale tiene 7 tracks — el mayor volumen del catálogo. Revisamos si eso se correlaciona con más errores de UPC.",
+   panel:"c1"},
+  {t:"Paso 2 — Media móvil: ¿la tendencia de distribución es positiva?",
+   d:"De sus 7 tracks, 5 están distribuidos. Observamos el ritmo de distribución en los últimos meses.",
+   panel:"c2"},
+  {t:"Paso 3 — Regresión: proyección a 3 meses",
+   d:"Si el ritmo actual se mantiene, proyectamos cuántos tracks más podrían distribuirse.",
+   panel:"c3"},
+  {t:"Paso 4 — Score final con Track Equivalent",
+   d:"Combinamos todo en el score ponderado que construiste en el Bloque 05.",
+   panel:"c4"},
+];
+var CASE_PANELS = {
+  c1:'<div style="font-size:.82rem;color:var(--ink);line-height:1.7;padding:1rem;background:var(--teal-l);border-left:3px solid var(--teal);">Gabo & Vale tiene 7 tracks totales y solo 1 sin UPC (86% de cobertura). Consistente con la correlación casi nula del Bloque 01 — el volumen alto no implica más errores.</div>',
+  c2:'<div class="bar-chart"><div class="bar-row"><span class="bar-label">Distribuidos</span><div class="bar-track"><div class="bar-fill" style="width:71%;background:var(--teal);"><span class="bar-val">5</span></div></div></div><div class="bar-row"><span class="bar-label">Pendientes</span><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--gold);"><span class="bar-val">2</span></div></div></div></div>',
+  c3:'<div style="font-size:.82rem;color:var(--ink);line-height:1.7;padding:1rem;background:var(--gold-l);border-left:3px solid var(--gold);">Con datos limitados (solo el estado actual, sin serie histórica real de este artista), la proyección es de baja confianza. Se recomienda esperar 2-3 meses de datos reales antes de proyectar formalmente.</div>',
+  c4:'<div style="font-size:.82rem;color:var(--ink);line-height:1.7;padding:1rem;background:var(--red-l);border-left:3px solid var(--red);"><strong>Score estimado: 78/100.</strong> Alto volumen, buena cobertura de UPC, distribución mayoritaria. Gabo & Vale es candidato razonable para inversión de campaña — con la salvedad de resolver el UPC faltante en el track restante antes de invertir.</div>'
+};
+
+// ═══════════════════════ RENDER: CORRELATION ═══════════════════════
+function buildCorr() {
+  var cont = document.getElementById("corr-pairs");
+  for (var i = 0; i < CORR_PAIRS.length; i++) {
+    var p = CORR_PAIRS[i];
+    var div = document.createElement("div");
+    div.className = "corr-pair";
+    div.innerHTML = "<div style='font-size:.82rem;font-weight:600;color:var(--ink);'>" + p.a + "</div><div style='font-size:.72rem;color:var(--gray);'>vs " + p.b + "</div>";
+    (function(idx) {
+      div.addEventListener("click", function() { showCorr(idx); });
+    })(i);
+    cont.appendChild(div);
+  }
+  showCorr(1);
+}
+
+function showCorr(idx) {
+  var pairs = document.querySelectorAll(".corr-pair");
+  for (var i = 0; i < pairs.length; i++) pairs[i].classList.toggle("sel", i === idx);
+  var p = CORR_PAIRS[idx];
+  var html = '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Coeficiente de correlación (r)</div>';
+  html += '<div style="font-family:DM Mono,monospace;font-size:2.2rem;font-weight:700;color:' + p.color + ';margin-bottom:.3rem;">' + (p.r > 0 ? '+' : '') + p.r.toFixed(2) + '</div>';
+  html += '<div style="height:8px;background:var(--light);border-radius:4px;overflow:hidden;border:1px solid var(--bd);margin-bottom:1rem;position:relative;">';
+  html += '<div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--bd);"></div>';
+  var pct = 50 + p.r * 50;
+  html += '<div style="position:absolute;left:' + pct + '%;top:-3px;width:14px;height:14px;background:' + p.color + ';border-radius:50%;transform:translateX(-50%);"></div>';
+  html += '</div>';
+  html += '<div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--gray);margin-bottom:1.2rem;"><span>-1 (opuestas)</span><span>0 (sin relación)</span><span>+1 (idénticas)</span></div>';
+  html += '<div style="font-size:.85rem;color:var(--ink);line-height:1.7;">' + p.interp + '</div>';
+  document.getElementById("corr-result").innerHTML = html;
+}
+
+// ═══════════════════════ RENDER: MOVING AVERAGE CHART ═══════════════════════
+function drawLineChart(svgId, dataSets, labels) {
+  var svg = document.getElementById(svgId);
+  svg.innerHTML = "";
+  var w = 500, h = 220, pad = 40;
+  var allVals = [];
+  dataSets.forEach(function(ds) { ds.data.forEach(function(v) { if (v !== null) allVals.push(v); }); });
+  var maxV = Math.max.apply(null, allVals) * 1.1;
+  var minV = 0;
+
+  var xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  xAxis.setAttribute("x1", pad); xAxis.setAttribute("y1", h - pad);
+  xAxis.setAttribute("x2", w - 15); xAxis.setAttribute("y2", h - pad);
+  xAxis.setAttribute("stroke", "var(--bd)"); xAxis.setAttribute("stroke-width", "1");
+  svg.appendChild(xAxis);
+
+  var n = labels.length;
+  var stepX = (w - pad - 25) / (n - 1);
+
+  dataSets.forEach(function(ds) {
+    var points = [];
+    var coords = [];
+    for (var i = 0; i < ds.data.length; i++) {
+      if (ds.data[i] === null) continue;
+      var x = pad + i * stepX;
+      var y = h - pad - ((ds.data[i] - minV) / (maxV - minV)) * (h - pad - 20);
+      points.push(x + "," + y);
+      coords.push({x: x, y: y});
+    }
+    var poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    poly.setAttribute("points", points.join(" "));
+    poly.setAttribute("fill", "none");
+    poly.setAttribute("stroke", ds.color);
+    poly.setAttribute("stroke-width", ds.width || "3");
+    poly.setAttribute("stroke-linejoin", "round");
+    poly.setAttribute("stroke-linecap", "round");
+    if (ds.dash) poly.setAttribute("stroke-dasharray", ds.dash);
+    svg.appendChild(poly);
+
+    if (ds.showDots !== false) {
+      coords.forEach(function(c) {
+        var dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", c.x); dot.setAttribute("cy", c.y);
+        dot.setAttribute("r", "4");
+        dot.setAttribute("fill", ds.color);
+        svg.appendChild(dot);
+      });
+    }
+  });
+
+  for (var i = 0; i < n; i += 2) {
+    var lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    lbl.setAttribute("x", pad + i * stepX); lbl.setAttribute("y", h - pad + 15);
+    lbl.setAttribute("text-anchor", "middle"); lbl.setAttribute("font-size", "8");
+    lbl.setAttribute("fill", "var(--gray)"); lbl.textContent = labels[i];
+    svg.appendChild(lbl);
+  }
+}
+
+function showMM(mode) {
+  document.getElementById("mm-raw").classList.toggle("on", mode === "raw");
+  document.getElementById("mm-smooth").classList.toggle("on", mode === "smooth");
+  var smoothed = calcMovingAvg(MM_RAW, 7);
+  if (mode === "raw") {
+    document.getElementById("mm-title").textContent = '"Los streams diarios varían constantemente: eso es ruido, todavía no una tendencia clara"';
+    drawLineChart("mm-svg", [{data: MM_RAW, color: "var(--ink)", width: "2.5"}], MM_LABELS);
+  } else {
+    document.getElementById("mm-title").textContent = '"La media móvil de 7 días revela una tendencia ascendente sostenida"';
+    drawLineChart("mm-svg", [
+      {data: MM_RAW, color: "var(--bd)", width: "1.5", showDots: false},
+      {data: smoothed, color: "var(--teal)", width: "3"}
+    ], MM_LABELS);
+  }
+}
+
+// ═══════════════════════ RENDER: MM STEPS ═══════════════════════
+function buildSteps(stepsData, panelsData, stepsContainerId, panelContainerId, stepPrefix) {
+  var cont = document.getElementById(stepsContainerId);
+  for (var i = 0; i < stepsData.length; i++) {
+    var s = stepsData[i];
+    var div = document.createElement("div");
+    div.className = "step";
+    div.id = stepPrefix + "-step-" + i;
+    div.innerHTML = "<div class='step-n' id='" + stepPrefix + "-num-" + i + "'>" + (i+1) + "</div><div><div class='step-t'>" + s.t + "</div><div class='step-d'>" + s.d + "</div></div>";
+    (function(idx) {
+      div.addEventListener("click", function() {
+        showStep(stepsData, panelsData, stepPrefix, panelContainerId, idx);
+      });
+    })(i);
+    cont.appendChild(div);
+  }
+  showStep(stepsData, panelsData, stepPrefix, panelContainerId, 0);
+}
+
+function showStep(stepsData, panelsData, stepPrefix, panelContainerId, idx) {
+  for (var i = 0; i < stepsData.length; i++) {
+    var el = document.getElementById(stepPrefix + "-step-" + i);
+    var num = document.getElementById(stepPrefix + "-num-" + i);
+    el.classList.toggle("active", i === idx);
+    num.classList.toggle("done", i < idx);
+    num.textContent = i < idx ? "✓" : (i + 1);
+  }
+  document.getElementById(panelContainerId).innerHTML = panelsData[stepsData[idx].panel];
+}
+
+// ═══════════════════════ RENDER: REGRESSION ═══════════════════════
+function linearRegression(data) {
+  var n = data.length;
+  var sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (var i = 0; i < n; i++) {
+    sumX += i; sumY += data[i]; sumXY += i * data[i]; sumX2 += i * i;
+  }
+  var slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  var intercept = (sumY - slope * sumX) / n;
+  return {slope: slope, intercept: intercept};
+}
+
+function updateRegression(monthsStr) {
+  var months = parseInt(monthsStr);
+  document.getElementById("reg-months-val").textContent = months;
+  var subset = REG_DATA.slice(REG_DATA.length - months);
+  var reg = linearRegression(subset);
+  var projected = [];
+  for (var i = 0; i < subset.length; i++) projected.push(Math.round(reg.intercept + reg.slope * i));
+  var future = [];
+  for (var i = subset.length; i < subset.length + 3; i++) future.push(Math.round(reg.intercept + reg.slope * i));
+
+  var fullData = subset.concat(future);
+  var trendData = projected.concat(future);
+  var labels = [];
+  for (var i = 1; i <= subset.length; i++) labels.push("M" + i);
+  for (var i = 1; i <= 3; i++) labels.push("M+" + i);
+
+  var actualPadded = subset.slice();
+  for (var i = 0; i < 3; i++) actualPadded.push(null);
+
+  drawLineChart("reg-svg", [
+    {data: actualPadded, color: "var(--ink)", width: "2.5"},
+    {data: trendData, color: "var(--pu)", width: "2", dash: "5,4"}
+  ], labels);
+
+  document.getElementById("reg-title").textContent = '"Con ' + months + ' meses de historia, proyectamos ' + future[2] + ' tracks distribuidos en 3 meses"';
+  var confidence = months >= 5 ? "alta" : months >= 3 ? "moderada" : "baja";
+  var confColor = months >= 5 ? "var(--teal)" : months >= 3 ? "var(--gold)" : "var(--red)";
+  document.getElementById("reg-note").innerHTML =
+    '<div style="font-size:.82rem;color:var(--gray);">Confianza de la proyección: <strong style="color:' + confColor + '">' + confidence + '</strong> — ' +
+    (months >= 5 ? "suficiente historia para una tendencia razonable." : months >= 3 ? "aceptable, pero vigila las próximas lecturas." : "muy pocos puntos, trata esta proyección como referencia aproximada, no como plan.") +
+    '</div>';
+}
+
+// ═══════════════════════ RENDER: SCORING ═══════════════════════
+function updateScoring() {
+  var w1 = parseInt(document.getElementById("sc-w1").value);
+  var w2 = parseInt(document.getElementById("sc-w2").value);
+  var w3 = parseInt(document.getElementById("sc-w3").value);
+  document.getElementById("sc-w1-val").textContent = w1 + "%";
+  document.getElementById("sc-w2-val").textContent = w2 + "%";
+  document.getElementById("sc-w3-val").textContent = w3 + "%";
+
+  var total = w1 + w2 + w3;
+  var warnEl = document.getElementById("sc-total-warning");
+  if (total !== 100) {
+    warnEl.innerHTML = "Suma actual: " + total + "% — se normaliza automáticamente para el cálculo.";
+  } else {
+    warnEl.innerHTML = "Suma actual: 100% ✓";
+  }
+
+  var maxTracks = 7;
+  var scored = SCORING_ARTISTS.map(function(a) {
+    var normTracks = a.tracks / maxTracks;
+    var score = (normTracks * w1 + a.pctDist * w2 + a.pctUpc * w3) / (total || 1);
+    return {name: a.name, score: score};
+  });
+  scored.sort(function(a, b) { return b.score - a.score; });
+  var maxScore = scored[0].score;
+
+  var html = "";
+  for (var i = 0; i < scored.length; i++) {
+    var s = scored[i];
+    var pct = Math.round((s.score / maxScore) * 100);
+    html += '<div class="rank-row">' +
+      '<div class="rank-pos' + (i === 0 ? ' top' : '') + '">' + (i+1) + '</div>' +
+      '<div class="rank-name">' + s.name + '</div>' +
+      '<div class="rank-bar"><div class="rank-bar-fill" style="width:' + pct + '%;"></div></div>' +
+      '<div class="rank-score">' + (s.score * 100).toFixed(1) + '</div>' +
+      '</div>';
+  }
+  document.getElementById("sc-ranking").innerHTML = html;
+}
+
+// ═══════════════════════ RENDER: MODEL ERRORS ═══════════════════════
+function buildModelErrors() {
+  var grid = document.getElementById("model-errors");
+  for (var i = 0; i < MODEL_ERRORS.length; i++) {
+    var e = MODEL_ERRORS[i];
+    var div = document.createElement("div");
+    div.className = "err-item";
+    div.innerHTML = "<div class='err-t'>" + e.t + "</div><div style='font-size:.8rem;color:var(--gray);line-height:1.5;'>" + e.d + "</div>";
+    grid.appendChild(div);
+  }
+}
+
+// ═══════════════════════ RENDER: FINAL EXERCISE ═══════════════════════
+function buildFinalExercise() {
+  var cont = document.getElementById("final-artist-selector");
+  for (var i = 0; i < SCORING_ARTISTS.length; i++) {
+    var a = SCORING_ARTISTS[i];
+    var btn = document.createElement("button");
+    btn.className = "tab";
+    btn.id = "fa-" + i;
+    btn.textContent = a.name;
+    (function(idx) {
+      btn.addEventListener("click", function() { showFinalArtist(idx); });
+    })(i);
+    cont.appendChild(btn);
+  }
+  showFinalArtist(0);
+}
+
+function showFinalArtist(idx) {
+  for (var i = 0; i < SCORING_ARTISTS.length; i++) {
+    document.getElementById("fa-" + i).classList.toggle("on", i === idx);
+  }
+  var a = SCORING_ARTISTS[idx];
+  var w1 = parseInt(document.getElementById("sc-w1").value) || 40;
+  var w2 = parseInt(document.getElementById("sc-w2").value) || 35;
+  var w3 = parseInt(document.getElementById("sc-w3").value) || 25;
+  var total = w1 + w2 + w3;
+  var maxTracks = 7;
+  var normTracks = a.tracks / maxTracks;
+  var score = (normTracks * w1 + a.pctDist * w2 + a.pctUpc * w3) / (total || 1);
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">';
+  html += '<div><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.6rem;">Datos de ' + a.name + '</div>';
+  html += '<table class="ctbl"><tbody>';
+  html += '<tr><td>Tracks totales</td><td>' + a.tracks + '</td></tr>';
+  html += '<tr><td>% distribuido</td><td>' + Math.round(a.pctDist*100) + '%</td></tr>';
+  html += '<tr><td>% con UPC completo</td><td>' + Math.round(a.pctUpc*100) + '%</td></tr>';
+  html += '</tbody></table></div>';
+  html += '<div><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.6rem;">Score con tus pesos</div>';
+  html += '<div style="font-family:Playfair Display,serif;font-size:2.5rem;font-weight:900;color:var(--teal);">' + (score * 100).toFixed(1) + '<span style="font-size:1rem;color:var(--gray);">/100</span></div>';
+  var scorePct = score * 100;
+  html += '<div style="font-size:.78rem;color:var(--gray);margin-top:.5rem;">' + (scorePct >= 70 ? "Catálogo listo — buen candidato para inversión." : scorePct >= 50 ? "Aceptable, pero con áreas de mejora antes de invertir." : "Requiere trabajo de calidad de datos antes de considerar inversión.") + '</div>';
+  html += '</div></div>';
+  document.getElementById("final-artist-result").innerHTML = html;
+}
+
+// ═══════════════════════ B10 — REAL COST DATA ═══════════════════════
+
+// Real data extracted from Copia_de_Master_Alzada__DUMMY_.xlsx
+// Sheets: 05_COSTOS_VIDEO, 06_COSTOS_AUDIO, 07_RECUPERACIÓN
+var COST_TRACKS = [
+  {id:'ALZ-DJP-SIM-0037', video:106810, audio:19019, total:125829},
+  {id:'ALZ-ALA-FUE-0007', video:100173, audio:17043, total:117216},
+  {id:'ALZ-SAN-INF-0033', video:98782, audio:11151, total:109933},
+  {id:'ALZ-CAR-CRI-0012', video:106147, audio:3470, total:109617},
+  {id:'ALZ-KID-ZEN-0040', video:104073, audio:2677, total:106750},
+  {id:'ALZ-THE-RES-0036', video:87673, audio:17371, total:105044},
+  {id:'ALZ-MCK-LUN-0002', video:104530, audio:0, total:104530},
+  {id:'ALZ-KID-NOS-0016', video:95248, audio:8935, total:104183}
+];
+
+// ── TAB SWITCHER ──
+function showCostTab(idx) {
+  for (var i = 0; i < 3; i++) {
+    var btn = document.getElementById("ct-tab-" + i);
+    var panel = document.getElementById("ct-panel-" + i);
+    if (btn) btn.classList.toggle("on", i === idx);
+    if (panel) panel.classList.toggle("on", i === idx);
+  }
+}
+
+// ── PANEL 0: top-8 individual composition chart ──
+function buildCostTop8Chart() {
+  var cont = document.getElementById("cost-top8-chart");
+  if (!cont) return;
+  var html = '<div class="chart-box" style="padding:1.5rem;border:1px solid var(--bd);background:#fff;">';
+  COST_TRACKS.forEach(function(t) {
+    var pctV = Math.round(t.video / t.total * 100);
+    var pctA = 100 - pctV;
+    html += '<div class="cost-bar-row">';
+    html += '<span style="font-family:\'DM Mono\',monospace;font-size:.74rem;color:var(--gray);">' + t.id + '</span>';
+    html += '<div class="cost-bar-track">';
+    html += '<div class="cost-bar-seg" style="width:' + pctV + '%;background:var(--teal);">' + pctV + '%</div>';
+    if (pctA > 0) html += '<div class="cost-bar-seg" style="width:' + pctA + '%;background:var(--gold);">' + pctA + '%</div>';
+    html += '</div>';
+    html += '<span style="font-family:\'DM Mono\',monospace;font-size:.74rem;color:var(--ink);font-weight:600;text-align:right;">$' + t.total.toLocaleString() + '</span>';
+    html += '</div>';
+  });
+  html += '<div style="display:flex;gap:1.2rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--bd);">';
+  html += '<div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Video</div>';
+  html += '<div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Audio</div>';
+  html += '</div></div>';
+  cont.innerHTML = html;
+}
+
+// ── PANEL 2: weighted financial priority score ──
+function updateCostScoring() {
+  var w1 = parseInt(document.getElementById("ct-w1").value);
+  var w2 = parseInt(document.getElementById("ct-w2").value);
+  var w3 = parseInt(document.getElementById("ct-w3").value);
+  document.getElementById("ct-w1-val").textContent = w1 + "%";
+  document.getElementById("ct-w2-val").textContent = w2 + "%";
+  document.getElementById("ct-w3-val").textContent = w3 + "%";
+
+  var total = w1 + w2 + w3;
+  var warnEl = document.getElementById("ct-total-warning");
+  if (total !== 100) {
+    warnEl.innerHTML = "Suma actual: " + total + "% — se normaliza automáticamente para el cálculo.";
+  } else {
+    warnEl.innerHTML = "Suma actual: 100% ✓";
+  }
+
+  var maxTotal = Math.max.apply(null, COST_TRACKS.map(function(t){ return t.total; }));
+  var maxAudio = Math.max.apply(null, COST_TRACKS.map(function(t){ return t.audio; }));
+
+  var scored = COST_TRACKS.map(function(t) {
+    var normTotal = t.total / maxTotal;
+    var pctVideo = t.video / t.total;
+    var normAudio = maxAudio > 0 ? t.audio / maxAudio : 0;
+    var score = (normTotal * w1 + pctVideo * w2 + normAudio * w3) / (total || 1);
+    return {id: t.id, total: t.total, score: score};
+  });
+  scored.sort(function(a, b) { return b.score - a.score; });
+  var maxScore = scored[0].score;
+
+  var html = "";
+  for (var i = 0; i < scored.length; i++) {
+    var s = scored[i];
+    var pct = Math.round((s.score / maxScore) * 100);
+    html += '<div class="rank-row">' +
+      '<div class="rank-pos' + (i === 0 ? ' top' : '') + '">' + (i+1) + '</div>' +
+      '<div class="rank-name" style="font-family:\'DM Mono\',monospace;font-size:.78rem;">' + s.id + '</div>' +
+      '<div style="font-size:.75rem;color:var(--gray);width:90px;text-align:right;">$' + s.total.toLocaleString() + '</div>' +
+      '<div class="rank-bar"><div class="rank-bar-fill" style="width:' + pct + '%;"></div></div>' +
+      '<div class="rank-score">' + Math.round(s.score * 100) + '</div>' +
+      '</div>';
+  }
+  document.getElementById("ct-ranking").innerHTML = html;
+}
+
+
+// ═══════════════════════ STICKY SUB-NAV FILTER ═══════════════════════
+function filterClassView(mode) {
+  ['clase','ponderacion','casos'].forEach(function(m) {
+    var btn = document.getElementById('subnav-' + m);
+    if (btn) btn.classList.toggle('on', m === mode);
+  });
+
+  var sections = document.querySelectorAll('section[data-group]');
+  var hint = document.getElementById('subnav-hint');
+
+  if (mode === 'clase') {
+    sections.forEach(function(s) { s.classList.remove('filtered-out'); });
+    hint.textContent = '';
+  } else {
+    sections.forEach(function(s) {
+      var groups = (s.getAttribute('data-group') || '').split(' ');
+      if (groups.indexOf(mode) === -1) {
+        s.classList.add('filtered-out');
+      } else {
+        s.classList.remove('filtered-out');
+      }
+    });
+    hint.textContent = mode === 'ponderacion'
+      ? 'Mostrando solo los bloques con modelos de ponderación (04, 05, 10)'
+      : 'Mostrando solo los bloques con casos prácticos (08, 09)';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  buildCorr();
+  showMM("raw");
+  buildSteps(MM_STEPS, MM_PANELS, "mm-steps", "mm-panel", "mm");
+  updateRegression(4);
+  buildSteps(TE_STEPS, TE_PANELS, "te-steps", "te-panel", "te");
+  updateScoring();
+  buildModelErrors();
+  buildSteps(CASE_STEPS, CASE_PANELS, "case-steps", "case-panel", "case");
+  buildFinalExercise();
+  buildCostTop8Chart();
+  updateCostScoring();
+});
+</script>
+</body>
+</html>

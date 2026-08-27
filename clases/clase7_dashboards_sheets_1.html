@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 7 — Dashboards en Google Sheets</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --ink:#1a1a2e;--teal:#00897B;--teal-l:#e0f2f1;
+  --gold:#D4A017;--gold-l:#FFF8E1;--red:#C62828;--red-l:#FFEBEE;
+  --gray:#6B7280;--light:#F8F9FA;--bd:#E5E7EB;--pu:#6B21A8;--pu-l:#F3E8FF;
+  --sh:#0F9D58;--sh-l:#E8F5E9;--bl:#1565C0;--bl-l:#E3F2FD;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#fff!important;color:#0a0a0a!important;}
+body{font-family:"DM Sans",sans-serif;line-height:1.6;}
+@media(prefers-color-scheme:dark){html,body{background:#fff!important;color:#0a0a0a!important;}}
+
+.header{border-bottom:1px solid var(--bd);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+.hl{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;}
+.hm{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+.hb{background:var(--teal);color:#fff;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+
+.hero{padding:5.5rem 4rem 3.5rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:"";display:inline-block;width:24px;height:2px;background:var(--teal);}
+.hero h1{font-family:"Playfair Display",serif;font-size:3.2rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;color:var(--teal);}
+.hero-desc{font-size:1rem;color:var(--gray);line-height:1.75;font-weight:300;}
+.sidebar{border:1px solid var(--bd);border-top:3px solid var(--teal);padding:1.5rem;background:#fff;}
+.si{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.85rem;}
+.si:last-child{border-bottom:none;}
+.si-l{color:var(--gray);}
+.si-v{font-weight:600;color:var(--ink);}
+.si-v.t{color:var(--teal);}
+
+.prog{max-width:1100px;margin:0 auto;padding:0 4rem 3rem;}
+.pt{display:flex;gap:3px;margin-bottom:.5rem;}
+.ps{flex:1;height:4px;background:var(--bd);}
+.ps.a{background:var(--teal);}
+.ps.c{background:linear-gradient(90deg,var(--teal) 60%,var(--bd) 60%);}
+.pl{font-size:.7rem;color:var(--gray);}
+
+section{max-width:1100px;margin:0 auto;padding:3.8rem 4rem;border-top:1px solid var(--bd);}
+.sn{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+.st{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.ss{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+
+.hook{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--teal);padding:2rem 2.5rem;margin-bottom:2.5rem;}
+.hook-lbl{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.8rem;}
+.hook h3{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+.hook p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+
+.ibox{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+.ibox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.ibox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+.ibox strong{color:#9A7208;}
+
+.wbox{background:#fff;border:1px solid #FFCDD2;border-left:4px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;}
+.wbox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+.wbox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.card{border:1px solid var(--bd);padding:1.8rem;position:relative;background:#fff;}
+.ca{position:absolute;top:0;left:0;width:100%;height:3px;}
+.card h4{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--ink);margin-top:.7rem;}
+.card p{font-size:.86rem;color:var(--gray);line-height:1.65;}
+
+.sim{border:1px solid var(--bd);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+.sim-h{background:#fff;border-bottom:1px solid var(--bd);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+.sim-ht{font-size:.85rem;font-weight:600;color:var(--ink);}
+.sim-hs{font-size:.75rem;color:var(--gray);}
+.tag{color:#fff;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+.tag-t{background:var(--teal);}
+.tag-g{background:var(--gold);}
+.tag-r{background:var(--red);}
+.tag-p{background:var(--pu);}
+.tag-sh{background:var(--sh);}
+.tag-bl{background:var(--bl);}
+
+.tab{border:1px solid var(--bd);background:#fff;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--gray);transition:all .15s;border-radius:2px;}
+.tab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.tab:hover:not(.on){border-color:var(--teal);color:var(--teal);}
+
+/* CHART VISUALS */
+.chart-box{padding:1.5rem;}
+.chart-title{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;font-family:"Playfair Display",serif;font-style:italic;}
+.bar-chart{display:flex;flex-direction:column;gap:.7rem;}
+.bar-row{display:flex;align-items:center;gap:.7rem;}
+.bar-label{font-size:.76rem;color:var(--gray);width:130px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;background:var(--light);border-radius:2px;height:26px;overflow:hidden;border:1px solid var(--bd);}
+.bar-fill{height:100%;border-radius:2px;display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;transition:width .5s ease;}
+.bar-val{font-size:.7rem;font-weight:600;color:#fff;font-family:"DM Mono",monospace;}
+.bar-pct{font-size:.7rem;color:var(--gray);font-family:"DM Mono",monospace;width:60px;flex-shrink:0;}
+
+.line-svg{width:100%;height:220px;}
+.pie-wrap{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+.pie-legend{display:flex;flex-direction:column;gap:.5rem;}
+.leg-item{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--ink);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+.scatter-svg{width:100%;height:280px;}
+.dot-point{cursor:pointer;transition:r .15s;}
+.dot-point:hover{r:7;}
+
+/* TABLE COND */
+.ctbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.ctbl th{background:#fff;border:1px solid var(--bd);padding:.5rem .9rem;text-align:left;font-size:.72rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);}
+.ctbl td{border:1px solid #ECECEC;padding:.5rem .9rem;color:var(--ink);background:#fff;}
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:2px;font-size:.66rem;font-weight:700;}
+.badge-hi{background:var(--teal-l);color:var(--teal);}
+.badge-mid{background:var(--gold-l);color:#9A7208;}
+.badge-lo{background:var(--red-l);color:var(--red);}
+.mbar{height:8px;border-radius:2px;display:inline-block;margin-left:.4rem;vertical-align:middle;}
+
+/* CHART SELECTOR */
+.selector-grid{display:grid;grid-template-columns:280px 1fr;}
+.step-panel-grid{display:grid;grid-template-columns:1fr 1fr;}
+.selector-questions{border-right:1px solid var(--bd);padding:1.2rem;}
+.sq-item{padding:.7rem .9rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.82rem;color:var(--ink);transition:all .15s;border-radius:2px;}
+.sq-item:hover{border-color:var(--teal);background:var(--teal-l);}
+.sq-item.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.selector-result{padding:1.5rem;}
+
+/* SHEETS MOCK */
+.sh-mock{border:1px solid var(--bd);overflow:hidden;margin-bottom:.8rem;}
+.sh-top{background:var(--sh);padding:.4rem 1rem;display:flex;align-items:center;gap:.8rem;}
+.sh-top-t{color:#fff;font-size:.78rem;font-weight:600;}
+.sh-fx{background:#F8F8F8;border-bottom:1px solid var(--bd);padding:.4rem .8rem;display:flex;gap:.6rem;align-items:center;font-family:"DM Mono",monospace;font-size:.76rem;}
+.sh-fxl{background:var(--bd);padding:.1rem .4rem;border-radius:2px;font-weight:600;color:var(--gray);font-size:.68rem;}
+.sh-fxv{color:var(--sh);flex:1;}
+.sh-t{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.74rem;}
+.sh-t th{background:#F0F0F0;border:1px solid #D0D0D0;padding:.3rem .7rem;font-size:.68rem;color:var(--gray);text-align:center;font-weight:600;}
+.sh-t td{border:1px solid #E0E0E0;padding:.3rem .7rem;background:#fff;color:var(--ink);}
+.sh-t td.rh{background:#F0F0F0;color:var(--gray);text-align:center;font-weight:600;font-size:.66rem;}
+.sh-t td.ch{background:#fff;color:var(--sh);font-weight:700;font-size:.72rem;font-family:"DM Sans",sans-serif;border-bottom:2px solid var(--sh);}
+.sh-t td.ac{background:#E8F5E9;}
+
+/* STEPPER */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{border:1px solid var(--bd);border-top:none;padding:1.1rem 1.5rem;display:grid;grid-template-columns:32px 1fr;gap:1rem;align-items:start;background:#fff;cursor:pointer;transition:background .15s;}
+.step:first-child{border-top:1px solid var(--bd);}
+.step:hover{background:var(--light);}
+.step.active{background:var(--teal-l);border-color:var(--teal);}
+.step-n{width:30px;height:30px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:.76rem;font-weight:700;color:var(--teal);flex-shrink:0;}
+.step-n.done{background:var(--teal);color:#fff;}
+.step-t{font-weight:700;font-size:.86rem;color:var(--ink);margin-bottom:.25rem;}
+.step-d{font-size:.79rem;color:var(--gray);line-height:1.5;}
+
+/* GOOD/BAD CHART DETECTOR */
+.detector-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.detector-col{padding:1.5rem;}
+.detector-col+.detector-col{border-left:1px solid var(--bd);}
+.detector-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;}
+.spot-btn{margin-top:1rem;width:100%;border:1px solid var(--red);background:#fff;color:var(--red);padding:.6rem;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:2px;transition:all .15s;}
+.spot-btn:hover{background:var(--red);color:#fff;}
+.spot-answer{display:none;margin-top:.8rem;padding:.8rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.82rem;color:var(--ink);line-height:1.6;}
+.spot-answer.show{display:block;}
+
+/* LOOKER FLOW */
+.flow{display:flex;align-items:stretch;gap:0;margin-bottom:2rem;border:1px solid var(--bd);overflow:hidden;}
+.fs{flex:1;padding:1.5rem;background:#fff;position:relative;display:flex;flex-direction:column;gap:.5rem;}
+.fs+.fs{border-left:1px solid var(--bd);}
+.fs.a{border-top:3px solid var(--teal);}
+.fs.b{border-top:3px solid var(--gold);}
+.fn2{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;}
+.ft{font-weight:700;font-size:.88rem;color:var(--ink);}
+.fd{font-size:.77rem;color:var(--gray);line-height:1.5;}
+.fa{position:absolute;right:-14px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--bd);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray);z-index:2;}
+
+/* MINI DASHBOARD BUILDER */
+.dash-builder{display:grid;grid-template-columns:220px 1fr;}
+.dash-controls{border-right:1px solid var(--bd);padding:1.2rem;}
+.dash-opt{padding:.6rem .8rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.8rem;transition:all .15s;border-radius:2px;display:flex;align-items:center;gap:.5rem;}
+.dash-opt:hover{border-color:var(--teal);}
+.dash-opt.added{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:600;}
+.dash-canvas{padding:1.5rem;min-height:400px;background:var(--light);}
+.dash-widget{background:#fff;border:1px solid var(--bd);padding:1rem;margin-bottom:1rem;}
+.dash-widget-title{font-size:.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem;}
+.dash-empty{text-align:center;padding:3rem 1rem;color:var(--gray);font-size:.85rem;font-style:italic;}
+
+.closing{background:#fff;border-top:1px solid var(--bd);padding:3.8rem 4rem;}
+.closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.closing h3{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.nc{border:1px solid var(--bd);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+.nc-l{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.nc-t{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+.nc-i{list-style:none;font-size:.82rem;color:var(--gray);}
+.nc-i li{padding:.3rem 0;padding-left:1rem;position:relative;}
+.nc-i li::before{content:"→";position:absolute;left:0;color:var(--gold);}
+.kl{list-style:none;}
+.kl li{display:flex;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--bd);font-size:.87rem;align-items:flex-start;line-height:1.5;}
+.kl li:last-child{border-bottom:none;}
+.kc{color:var(--teal);flex-shrink:0;margin-top:.1rem;}
+footer{border-top:1px solid var(--bd);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+footer span{font-size:.75rem;color:var(--gray);}
+.fn3{display:flex;gap:1.5rem;}
+.fn3 a{font-size:.75rem;color:var(--gray);text-decoration:none;font-weight:500;}
+.fn3 a:hover{color:var(--teal);}
+
+@media(max-width:768px){
+  .hero,.g2,.g3,.g4,.selector-grid,.detector-grid,.dash-builder,.closing-inner,.step-panel-grid{grid-template-columns:1fr;}
+  .flow{flex-direction:column;}
+  .header,.prog,section,footer,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+  .hero{padding:3rem 1.5rem 2rem;}
+  .hero h1{font-size:2.2rem;}
+}
+</style>
+</head>
+<body><style>
+/* KPI ROW — la fila de números que se lee en 5 segundos */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.kpi-card{border:1px solid var(--bd);background:#fff;padding:1.3rem;text-align:center;position:relative;cursor:pointer;transition:all .15s;}
+.kpi-card:hover{border-color:var(--teal);}
+.kpi-card.picked{background:var(--teal-l);border-color:var(--teal);}
+.kpi-card.picked::after{content:"✓";position:absolute;top:.4rem;right:.5rem;color:var(--teal);font-weight:700;font-size:.8rem;}
+.kpi-num{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:var(--ink);}
+.kpi-lbl{font-size:.72rem;color:var(--gray);margin-top:.3rem;}
+.kpi-trend{font-size:.68rem;font-weight:600;margin-top:.4rem;}
+.kpi-trend.up{color:var(--teal);}
+.kpi-trend.down{color:var(--red);}
+
+/* DASHBOARD LAYERS */
+.layer-card{border:1px solid var(--bd);background:#fff;padding:1.5rem;position:relative;cursor:pointer;transition:all .15s;}
+.layer-card:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(0,0,0,.06);}
+.layer-num{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;margin-bottom:.8rem;}
+.layer-title{font-weight:700;font-size:.92rem;color:var(--ink);margin-bottom:.5rem;}
+.layer-desc{font-size:.82rem;color:var(--gray);line-height:1.6;}
+.layer-example{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--bd);font-size:.78rem;color:var(--teal);font-style:italic;}
+
+/* MOCKUP DASHBOARD PREVIEW */
+.dash-mockup{border:2px solid var(--ink);background:#fff;overflow:hidden;}
+.dash-mockup-top{background:var(--ink);color:#fff;padding:.6rem 1.2rem;font-size:.78rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+.dash-mockup-body{padding:1.5rem;}
+
+/* SPOT THE PROBLEM — bad dashboard detector */
+.bad-dash{border:1px solid var(--red);background:var(--red-l);padding:1rem;font-size:.72rem;line-height:1.5;color:var(--ink);position:relative;overflow:hidden;}
+.bad-dash-label{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:.15rem .5rem;letter-spacing:.05em;}
+
+/* PROMPT CARD — LLM examples */
+.prompt-card{border:1px solid var(--bd);background:#fff;overflow:hidden;margin-bottom:1.2rem;}
+.prompt-card-hdr{background:var(--pu-l);padding:.7rem 1.2rem;font-size:.78rem;font-weight:700;color:var(--pu);border-bottom:1px solid var(--bd);}
+.prompt-text{padding:1rem 1.2rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--ink);background:var(--light);line-height:1.7;border-bottom:1px solid var(--bd);white-space:pre-wrap;}
+.prompt-why{padding:1rem 1.2rem;font-size:.82rem;color:var(--gray);line-height:1.6;}
+
+/* CHECKLIST reused pattern */
+.maint-row{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--bd);align-items:flex-start;cursor:pointer;}
+.maint-row:last-child{border-bottom:none;}
+.maint-box{width:20px;height:20px;border:2px solid var(--bd);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;transition:all .15s;margin-top:.1rem;}
+.maint-row.done .maint-box{background:var(--teal);border-color:var(--teal);color:#fff;}
+.maint-row.done .maint-txt{color:var(--teal);text-decoration:line-through;}
+.maint-txt{font-size:.83rem;color:var(--gray);line-height:1.5;}
+
+/* FREEZE ROW DEMO */
+.freeze-demo{border:1px solid var(--bd);overflow:hidden;}
+.freeze-header-row{background:var(--ink);color:#fff;padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.72rem;position:sticky;top:0;}
+</style>
+<header class="header">
+  <div class="hl">De los Datos al Criterio</div>
+  <div class="hm"><span>Industria Musical</span> <span class="hb">Ejecución</span></div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">Bloque 7 · Ejecución final</div>
+    <h1>Dashboards<br>en <em>Google Sheets</em></h1>
+    <p class="hero-desc">Sin herramientas de BI, sin Looker Studio: el dashboard vive completo en Sheets. El enfoque es el acomodo visual y la elección de gráfica correcta — la mecánica técnica es lo mínimo necesario, no el centro de la clase.</p>
+  </div>
+  <div class="sidebar">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Ficha de la clase</div>
+    <div class="si"><span class="si-l">Duración</span> <span class="si-v">2 horas</span></div>
+    <div class="si"><span class="si-l">Bloques</span> <span class="si-v">10</span></div>
+    <div class="si"><span class="si-l">Dataset</span> <span class="si-v">Catálogo Alzada</span></div>
+    <div class="si"><span class="si-l">Demos</span> <span class="si-v t">11 interactivas</span></div>
+    <div class="si"><span class="si-l">Herramientas</span> <span class="si-v">Solo Sheets + LLM</span></div>
+  </div>
+</div>
+
+<!-- B0 MARCO TEÓRICO -->
+<section>
+  <div class="sn">00 · Marco Teórico</div>
+  <div class="st">Qué hace útil a un dashboard</div>
+  <div class="ss">La diferencia entre un reporte que se usa y uno que se ignora</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Punto de partida</div>
+    <h3>Un dashboard que nadie revisa dos veces se convierte en un archivo que solo ocupa espacio.</h3>
+    <p>La mayoría de los dashboards fallan por exceso de datos sin jerarquía, no por falta de ellos. Esta clase se trata de decidir qué merece estar arriba de todo y qué se queda en el detalle, más que de meter más gráficas.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4>Dashboard decorativo</h4>
+      <p>Tiene 15 gráficas, todas del mismo tamaño, sin orden claro. El lector tiene que buscar el dato que le importa entre todo lo demás. Se ve "completo" pero no ayuda a decidir nada rápido.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>Dashboard ejecutivo</h4>
+      <p>Los 3-4 números más importantes están arriba, grandes, con tendencia. El detalle vive abajo para quien quiera profundizar. En 5 segundos, cualquiera entiende el estado del negocio.</p>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Regla de esta clase</div>
+    <p>Antes de construir cualquier dashboard, responde: <strong>¿quién lo va a ver y qué decisión va a tomar con él?</strong> Un dashboard para el sello es distinto a uno para tu propio seguimiento diario — aunque los datos de origen sean los mismos.</p>
+  </div>
+</section>
+<!-- B1 ARQUITECTURA -->
+<section>
+  <div class="sn">01 · Arquitectura de un Dashboard</div>
+  <div class="st">Las 4 capas de todo reporte ejecutivo</div>
+  <div class="ss">Resumen, detalle, alerta y tendencia — en ese orden de importancia visual</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Las 4 capas — haz clic en cada una</div><div class="sim-hs">Ejemplo real con el catálogo Alzada en cada capa</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="g4" id="layers-grid"></div>
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Por qué el orden importa</div>
+    <div class="read-box-item"><span class="read-box-val">1. Resumen:</span> <span class="read-box-txt">Va siempre arriba: para algunos lectores, es lo único que verán del reporte.</span></div>
+    <div class="read-box-item"><span class="read-box-val">2. Alerta:</span> <span class="read-box-txt">Va justo debajo del resumen — lo que necesita acción ya, antes que cualquier gráfica bonita.</span></div>
+    <div class="read-box-item"><span class="read-box-val">3. Tendencia:</span> <span class="read-box-txt">Contexto de hacia dónde va el negocio. Importante, aunque no urgente.</span></div>
+    <div class="read-box-item"><span class="read-box-val">4. Detalle:</span> <span class="read-box-txt">Va al final — para quien quiera profundizar, no para el vistazo rápido.</span></div>
+    <div class="read-box-note">Si inviertes este orden — el detalle arriba y el resumen escondido abajo — el dashboard técnicamente tiene toda la información, pero nadie la va a encontrar a tiempo.</div>
+  </div>
+</section>
+<!-- B2 ELECCIÓN GRÁFICA PARA DASHBOARDS -->
+<section>
+  <div class="sn">02 · Elección Gráfica para Dashboards</div>
+  <div class="st">Qué gráfica usa cada widget</div>
+  <div class="ss">Los mismos 6 tipos de gráfica de Clase 5, ahora aplicados a la pregunta específica: ¿qué necesita este widget del dashboard?</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Por qué esto va antes que la construcción técnica</div>
+    <h3>El widget equivocado con la fórmula perfecta sigue siendo un mal dashboard.</h3>
+    <p>Antes de escribir una sola fórmula, cada espacio del dashboard ya debería tener resuelta esta pregunta: ¿esto necesita una gráfica, una tabla, o solo un número grande? La mayoría de los dashboards saturados nacen de responder esta pregunta mal, no de un error técnico.</p>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Recordatorio rápido — Clase 5</div>
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4 style="margin-top:0">📊 Barras</h4>
+      <p style="font-size:.8rem;">Comparar categorías — sellos, artistas, roles.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4 style="margin-top:0">📈 Líneas</h4>
+      <p style="font-size:.8rem;">Evolución en el tiempo — tendencia y proyección.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4 style="margin-top:0">🥧 Pastel / Dona</h4>
+      <p style="font-size:.8rem;">Composición de un total — máximo 5 categorías.</p>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4 style="margin-top:0">⚬ Dispersión</h4>
+      <p style="font-size:.8rem;">Relación entre 2 variables numéricas.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--sh)"></div>
+      <h4 style="margin-top:0">📊 Barras apiladas</h4>
+      <p style="font-size:.8rem;">Composición + comparación al mismo tiempo.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--bl)"></div>
+      <h4 style="margin-top:0">📋 Tabla condicional</h4>
+      <p style="font-size:.8rem;">Detalle con jerarquía visual por color.</p>
+    </div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Selector — ¿qué necesita este widget?</div><div class="sim-hs">Haz clic en una necesidad real de dashboard y ve qué gráfica (o qué NO gráfica) usar</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div class="selector-grid">
+      <div class="selector-questions" id="widget-questions"></div>
+      <div class="selector-result" id="widget-result"></div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">La opción que más se olvida: ningún gráfico</div>
+    <p>Un KPI destacado (el "23" de tracks distribuidos) no necesita gráfica — el número grande y bien tipografiado ES el widget. Ponerle una gráfica de fondo o un medidor circular solo compite por atención con el número que ya lo dice todo. Menos elementos visuales, no más, suele ser la corrección correcta.</p>
+  </div>
+</section>
+
+<!-- B3 KPIs DESTACADOS -->
+<section>
+  <div class="sn">03 · KPIs Destacados</div>
+  <div class="st">La fila que se lee en 5 segundos</div>
+  <div class="ss">De todos los números posibles del catálogo Alzada, ¿cuáles 4 van arriba de todo?</div>
+
+  <div class="hook">
+    <div class="hook-lbl">El ejercicio de esta sección</div>
+    <h3>Tienes más de 15 métricas posibles del catálogo. Solo 4 caben en la fila de KPIs.</h3>
+    <p>Elegir mal aquí es el error de diseño más costoso: si los 4 números de arriba no importan, nadie sigue leyendo el resto del dashboard. Haz clic en las 4 tarjetas que elegirías para un reporte ejecutivo mensual al sello.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Selector de KPIs — elige tus 4 finalistas</div><div class="sim-hs">Datos reales del catálogo Alzada · haz clic para seleccionar</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="kpi-row" id="kpi-selector"></div>
+      <div style="font-size:.78rem;color:var(--gray);" id="kpi-count">Selecciona 4 métricas para tu fila de KPIs ejecutivos</div>
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Criterio para elegir un buen KPI destacado</div>
+    <div class="read-box-item"><span class="read-box-val">Accionable:</span> <span class="read-box-txt">Si el número sube o baja, alguien sabe qué hacer al respecto. "Tracks sin UPC: 11" lleva a una acción clara.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Con tendencia:</span> <span class="read-box-txt">Mejor si muestra hacia dónde va, no solo dónde está — un número solo es una foto, con tendencia es una película.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Entendible sin contexto:</span> <span class="read-box-txt">Alguien que abre el dashboard por primera vez debe entender el número sin que se lo expliques.</span></div>
+    <div class="read-box-note">Métricas de vanidad como "total de tracks en el catálogo" se ven bien pero no llevan a ninguna decisión — son candidatas débiles para esta fila, mejor van en el detalle.</div>
+  </div>
+</section>
+<!-- B4 ACOMODO VISUAL — PATRONES F Y Z -->
+<section>
+  <div class="sn">04 · Acomodo Visual — Patrones F y Z</div>
+  <div class="st">Cómo se lee un dashboard antes de construirlo</div>
+  <div class="ss">Formato condicional, filas congeladas, y los patrones F y Z que deciden dónde va cada elemento</div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>Congelar filas y columnas</h4>
+      <p>Vista → Congelar → 1 fila. Los encabezados quedan visibles aunque el lector baje mucho en la tabla de detalle. Sin esto, en la fila 40 nadie recuerda qué significa la columna C.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4>Formato condicional con escala de color</h4>
+      <p>Formato → Formato condicional → Escala de color. Verde-amarillo-rojo automático según el valor. Convierte una tabla de números en un mapa de calor sin gráficas adicionales.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4>Espaciado y agrupación</h4>
+      <p>Filas y columnas ocultas o agrupadas (Datos → Agrupar) permiten colapsar el detalle y dejar visible solo el resumen — el lector expande solo si necesita más.</p>
+    </div>
+  </div>
+
+  <div class="hook">
+    <div class="hook-lbl">Metodología de lectura visual</div>
+    <h3>Los ojos no leen un dashboard de manera uniforme — siguen patrones predecibles en forma de F o de Z.</h3>
+    <p>Estudios de eyetracking del Nielsen Norman Group (2006, 232 usuarios) muestran que la vista escanea contenido en un patrón consistente con la letra F cuando hay mucho texto o datos. Para layouts más simples con pocos elementos, la industria del diseño usa el patrón Z como guía complementaria. Saber cuál aplica a tu dashboard decide dónde va cada elemento.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Patrón F vs Patrón Z — alterna para ver el recorrido de la vista</div><div class="sim-hs">Mismo layout de dashboard, dos formas distintas de escanearlo</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="fz-toggle">
+        <button class="tab on" id="fz-btn-f" onclick="showPattern('f')">Patrón F</button>
+        <button class="tab" id="fz-btn-z" onclick="showPattern('z')">Patrón Z</button>
+      </div>
+      <div class="pattern-mock">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div class="mock-block" style="height:50px;display:flex;align-items:center;padding-left:1rem;font-size:.78rem;color:var(--gray);">KPI principal</div>
+          <div class="mock-block" style="height:50px;display:flex;align-items:center;padding-left:1rem;font-size:.78rem;color:var(--gray);">Título / contexto</div>
+        </div>
+        <div class="mock-block" style="height:70px;margin-bottom:1rem;display:flex;align-items:center;padding-left:1rem;font-size:.78rem;color:var(--gray);">Fila de alertas — ancho completo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="mock-block" style="height:90px;display:flex;align-items:center;padding-left:1rem;font-size:.78rem;color:var(--gray);">Detalle / tabla</div>
+          <div class="mock-block" style="height:90px;display:flex;align-items:center;padding-left:1rem;font-size:.78rem;color:var(--gray);">Acción / siguiente paso</div>
+        </div>
+        <svg class="pattern-svg" viewBox="0 0 600 320" preserveAspectRatio="none">
+          <!-- F pattern: top horizontal, second horizontal shorter, vertical down left -->
+          <path class="pattern-line f-line" d="M 30,45 L 570,45 M 30,45 L 30,150 L 350,150 M 30,150 L 30,300" />
+          <circle class="pattern-dot f-dot" cx="30" cy="45" r="7"/>
+          <text class="pattern-num f-dot" x="30" y="49">1</text>
+          <circle class="pattern-dot f-dot" cx="570" cy="45" r="7"/>
+          <text class="pattern-num f-dot" x="570" y="49">2</text>
+          <circle class="pattern-dot f-dot" cx="350" cy="150" r="7"/>
+          <text class="pattern-num f-dot" x="350" y="154">3</text>
+          <circle class="pattern-dot f-dot" cx="30" cy="300" r="7"/>
+          <text class="pattern-num f-dot" x="30" y="304">4</text>
+          <!-- Z pattern: top-left to top-right, diagonal to bottom-left, to bottom-right -->
+          <path class="pattern-line z-line" d="M 30,45 L 570,45 L 30,290 L 570,290" />
+          <circle class="pattern-dot z-dot" cx="30" cy="45" r="7"/>
+          <text class="pattern-num z-dot" x="30" y="49">1</text>
+          <circle class="pattern-dot z-dot" cx="570" cy="45" r="7"/>
+          <text class="pattern-num z-dot" x="570" y="49">2</text>
+          <circle class="pattern-dot z-dot" cx="30" cy="290" r="7"/>
+          <text class="pattern-num z-dot" x="30" y="294">3</text>
+          <circle class="pattern-dot z-dot" cx="570" cy="290" r="7"/>
+          <text class="pattern-num z-dot" x="570" y="294">4</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>Cuándo usar patrón F</h4>
+      <p>Dashboards con tablas densas o mucho texto — como la capa de detalle. La vista lee completo el primer renglón, luego cada vez menos de los siguientes, terminando en un barrido vertical por la izquierda. <strong>Por eso la columna más importante de una tabla siempre va primero, a la izquierda.</strong></p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4>Cuándo usar patrón Z</h4>
+      <p>Layouts simples con pocos elementos — como la fila de KPIs o la vista general del dashboard. El recorrido diagonal conecta 4 puntos clave. <strong>Por eso el KPI más importante va arriba-izquierda, y la acción o conclusión principal va abajo-derecha</strong> — el último lugar que la vista recorre.</p>
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Cómo aplicar esto a tu dashboard en Sheets</div>
+    <div class="read-box-item"><span class="read-box-val">Arriba-izquierda:</span> <span class="read-box-txt">El primer lugar que ve cualquier lector, en ambos patrones. Ahí va tu KPI o alerta más crítica — nunca algo secundario.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Columna izquierda:</span> <span class="read-box-txt">En tablas de detalle, la vista se concentra aquí más que en cualquier otra columna. TRACK_ID o el nombre del artista deben ir primero, no al final.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Abajo-derecha:</span> <span class="read-box-txt">El punto que menos atención recibe en ambos patrones. Nunca pongas ahí una alerta urgente — se pierde.</span></div>
+    <div class="read-box-note">Fuente: Nielsen Norman Group, estudio de eyetracking de 2006 con 232 usuarios (patrón F). El patrón Z es una heurística de diseño visual ampliamente usada en la industria para layouts simples, complementaria al hallazgo de NN/g.</div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Detector — encuentra los errores de diseño</div><div class="sim-hs">3 fragmentos de dashboards reales con problemas de legibilidad</div></div>
+      <span class="tag tag-r">ENCUENTRA EL ERROR</span>
+    </div>
+    <div style="padding:1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;" id="design-detector"></div>
+  </div>
+</section>
+<!-- B5 MECÁNICA BÁSICA EN SHEETS -->
+<section>
+  <div class="sn">05 · Mecánica Básica en Sheets</div>
+  <div class="st">Lo mínimo técnico que necesitas — nada más</div>
+  <div class="ss">3 conceptos, 3 fórmulas, sin tutoriales largos — esto es referencia, no algo para memorizar de una sentada</div>
+
+  <div class="hook">
+    <div class="hook-lbl">El objetivo de este bloque</div>
+    <h3>No necesitas dominar 10 fórmulas de Sheets para construir un buen dashboard — necesitas 3, y saber cuándo usarlas.</h3>
+    <p>Todo lo demás (el diseño, la jerarquía, la elección de gráfica) ya lo viste en los bloques anteriores. Esto es la mecánica de soporte, no el corazón de la clase.</p>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>1. Estructura tus datos</h4>
+      <p>Selecciona tu rango → Formato → Tabla. Convierte celdas sueltas en una Tabla real, con encabezados reconocidos y formato consistente.</p>
+      <div class="sh-fx" style="border:1px solid var(--bd);margin-top:.8rem;"><span class="sh-fxl">fx</span> <span class="sh-fxv">=CONTAR.SI(Tabla1[Estatus]; "DISTRIBUIDO")</span></div>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4>2. Conecta hojas distintas</h4>
+      <p>Trae un resultado de otra hoja sin copiar y pegar. Las comillas simples solo son obligatorias si el nombre de la hoja tiene espacios.</p>
+      <div class="sh-fx" style="border:1px solid var(--bd);margin-top:.8rem;"><span class="sh-fxl">fx</span> <span class="sh-fxv">='Scoring Financiero'!B2</span></div>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4>3. Actualiza sin copiar y pegar</h4>
+      <p>Conecta tu dashboard a un archivo distinto. La primera vez pide autorización — se confirma una sola vez con un botón.</p>
+      <div class="sh-fx" style="border:1px solid var(--bd);margin-top:.8rem;font-size:.7rem;"><span class="sh-fxl">fx</span> <span class="sh-fxv">=IMPORTRANGE("URL"; "Catálogo!A2:N44")</span></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">Si esto se siente denso, vas bien</div>
+    <p>Estas 3 fórmulas cubren el 90% de lo que necesitas técnicamente. No hace falta memorizarlas ahora — vuelve a este bloque como referencia cuando las necesites mientras construyes tu propio dashboard.</p>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin:2rem 0 1rem;">Checklist de mantenimiento — revisa esto cada vez que abras el dashboard</div>
+  <div class="sim">
+    <div style="padding:1.5rem;" id="maint-checklist"></div>
+  </div>
+</section>
+
+<!-- B6 LLMs COMO COPILOTO -->
+<section>
+  <div class="sn">06 · LLMs como Copiloto de Dashboard</div>
+  <div class="st">Prompts reales para mejorar tu reporte</div>
+  <div class="ss">Sin acceso a un diseñador o analista senior, un LLM cubre buena parte de esa revisión</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Dónde ayuda más un LLM en este proceso</div>
+    <h3>No para construir el dashboard por ti — para revisar decisiones que ya tomaste.</h3>
+    <p>Generar la fórmula exacta, sugerir qué KPI falta, o detectar que tu jerarquía visual está invertida. El criterio de qué mostrar sigue siendo tuyo — el LLM acelera la ejecución y detecta puntos ciegos.</p>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-card-hdr">Prompt 1 — Generar la fórmula puente entre hojas</div>
+    <div class="prompt-text">Tengo dos hojas en Google Sheets: "Catálogo" con columnas TRACK_ID, Estatus_Distribucion, PyC — y "Scoring Financiero" con TRACK_ID y Score. Quiero en mi hoja "Dashboard" una fórmula que traiga solo los TRACK_ID de "Scoring Financiero" con Score menor a 50, junto con su Estatus_Distribucion desde "Catálogo".</div>
+    <div class="prompt-why">Por qué funciona: le das el nombre exacto de las hojas, las columnas exactas, y la condición exacta. Entre más específico el prompt, menos ajustes necesitas después.</div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-card-hdr">Prompt 2 — Revisar jerarquía visual</div>
+    <div class="prompt-text">Voy a describirte el orden de mi dashboard de arriba a abajo: 1) tabla completa de 42 tracks con todas las columnas, 2) gráfica de tracks por sello, 3) los 4 KPIs principales, 4) alerta de tracks sin UPC. ¿Este orden tiene sentido para un reporte ejecutivo o debería reorganizarlo?</div>
+    <div class="prompt-why">Por qué funciona: no le pides que "haga un dashboard" (muy abierto) — le describes lo que ya construiste para que evalúe el orden, algo que sí puede analizar bien con una descripción de texto.</div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-card-hdr">Prompt 3 — Sugerir qué KPI falta</div>
+    <div class="prompt-text">Mi dashboard de catálogo musical destaca estos 4 KPIs: tracks totales, % distribuido, tracks sin UPC, inversión total en producción. Es para presentar mensualmente al sello. ¿Qué KPI importante podría estar faltando desde una perspectiva de negocio musical?</div>
+    <div class="prompt-why">Por qué funciona: le das el contexto completo (los 4 que ya tienes + la audiencia) para que la sugerencia sea relevante, no una lista genérica de métricas de cualquier industria.</div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">Lo que un LLM no puede decidir por ti</div>
+    <p>Qué tan agresivos son tus umbrales de alerta, qué le importa realmente a tu sello, o si un número "se ve bien" en tu contexto específico. Esas son decisiones de negocio — el LLM te da opciones razonables, tú decides con el contexto que solo tú tienes.</p>
+  </div>
+</section>
+<!-- B8 CASO INTEGRADOR -->
+<section>
+  <div class="sn">07 · Caso Integrador</div>
+  <div class="st">Arma el dashboard ejecutivo de Alzada, completo</div>
+  <div class="ss">Los 8 bloques anteriores aplicados en un solo caso, paso a paso</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Contexto del caso</div>
+    <h3>El sello pide un reporte mensual de una sola página — nada de hojas sueltas ni explicaciones verbales.</h3>
+    <p>Vas a construir el dashboard completo: KPIs arriba, alerta de calidad, tendencia con proyección, y detalle al final. Todo con datos reales del catálogo.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Caso integrador — Dashboard ejecutivo de Alzada</div><div class="sim-hs">Sigue los 5 pasos en orden</div></div>
+      <span class="tag tag-t">PASO A PASO</span>
+    </div>
+    <div class="step-panel-grid">
+      <div style="border-right:1px solid var(--bd);"><div class="steps" id="case-steps"></div></div>
+      <div style="padding:1.5rem;" id="case-panel"></div>
+    </div>
+  </div>
+</section>
+<!-- B9 EJERCICIO FINAL -->
+<section>
+  <div class="sn">08 · Ejercicio de Ejecución</div>
+  <div class="st">Construye tu propio dashboard</div>
+  <div class="ss">Cierra la clase armando tu versión del reporte ejecutivo con los widgets que tú elijas</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Constructor de dashboard — Catálogo Alzada</div><div class="sim-hs">Agrega widgets y ordénalos como lo presentarías al sello</div></div>
+      <span class="tag tag-g">CONSTRUYE TÚ</span>
+    </div>
+    <div class="dash-builder">
+      <div class="dash-controls">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.8rem;">Widgets disponibles</div>
+        <div id="final-dash-options"></div>
+        <div style="font-size:.72rem;color:var(--gray);margin-top:1rem;line-height:1.5;">Piensa en las 4 capas del Bloque 01: resumen, alerta, tendencia, detalle.</div>
+      </div>
+      <div class="dash-canvas" id="final-dash-canvas">
+        <div class="dash-empty">👈 Agrega widgets desde la izquierda para construir tu dashboard ejecutivo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Lo que te llevas de esta clase</div>
+    <p>Un dashboard es, ante todo, una decisión editorial sobre qué merece la atención de quien lo lee primero — más que una colección de gráficas. Todo lo que construiste en Sheets hasta ahora (fórmulas, modelos, visualización) converge aquí en un solo entregable real.</p>
+  </div>
+</section>
+<!-- B10 SIMULACIÓN DASHBOARD COMPLETO -->
+<section>
+  <div class="sn">09 · Simulación Completa</div>
+  <div class="st">Dashboard ejecutivo — industria musical, ensamblado</div>
+  <div class="ss">Un ejemplo terminado, no una plantilla — así se ve todo lo de esta clase junto, con datos reales de Alzada</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Por qué esta sección es distinta al ejercicio anterior</div>
+    <h3>En el Bloque 08 tú elegiste los widgets. Aquí ves una versión ya resuelta, con las decisiones de diseño explicadas.</h3>
+    <p>Este es el tipo de reporte que un analista de datos en un sello discográfico entrega mensualmente: una sola vista, sin pestañas adicionales, sin que el lector tenga que buscar nada.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Dashboard Ejecutivo — Catálogo Alzada, corte mensual</div><div class="sim-hs">Activa el patrón F o Z para ver por qué cada elemento está donde está</div></div>
+      <span class="tag tag-t">DATOS REALES</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="fz-toggle">
+        <button class="tab on" id="fz2-btn-f" onclick="showPattern2('f')">Ver patrón F</button>
+        <button class="tab" id="fz2-btn-z" onclick="showPattern2('z')">Ver patrón Z</button>
+        <button class="tab" id="fz2-btn-off" onclick="showPattern2('off')">Sin overlay</button>
+      </div>
+
+      <div class="dash-mockup" style="position:relative;">
+        <div class="dash-mockup-top">
+          <span>📊 Alzada_Dashboard_Ejecutivo — Hoja: Resumen</span>
+          <span style="opacity:.7;">Actualizado hoy</span>
+        </div>
+        <div class="dash-mockup-body">
+
+          <!-- KPI ROW -->
+          <div class="kpi-row" style="margin-bottom:1rem;">
+            <div class="kpi-card" style="cursor:default;">
+              <div class="kpi-num">23</div>
+              <div class="kpi-lbl">Tracks distribuidos</div>
+              <div class="kpi-trend up">↑ +4 este mes</div>
+            </div>
+            <div class="kpi-card" style="cursor:default;">
+              <div class="kpi-num">55%</div>
+              <div class="kpi-lbl">% del catálogo activo</div>
+              <div class="kpi-trend up">↑ tendencia positiva</div>
+            </div>
+            <div class="kpi-card" style="cursor:default;">
+              <div class="kpi-num">11</div>
+              <div class="kpi-lbl">Tracks sin UPC</div>
+              <div class="kpi-trend down">↓ -2 vs mes pasado</div>
+            </div>
+            <div class="kpi-card" style="cursor:default;">
+              <div class="kpi-num">$2.67M</div>
+              <div class="kpi-lbl">Inversión total</div>
+            </div>
+          </div>
+
+          <!-- ALERT ROW -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div style="padding:.8rem 1rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.8rem;">
+              <strong>⚠ 8 tracks distribuidos sin UPC</strong><br>
+              <span style="color:var(--gray);">Luna Cold, Santi, Gabo & Vale — revisar antes del próximo reporte de regalías.</span>
+            </div>
+            <div style="padding:.8rem 1rem;background:var(--gold-l);border-left:3px solid var(--gold);font-size:.8rem;">
+              <strong>💰 3 tracks con score financiero bajo 50</strong><br>
+              <span style="color:var(--gray);">Alta inversión en video sin distribución confirmada aún.</span>
+            </div>
+          </div>
+
+          <!-- TREND + COMPOSITION -->
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div style="border:1px solid var(--bd);padding:1rem;">
+              <div style="font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:.6rem;">Tendencia de distribución + proyección</div>
+              <div style="font-size:.78rem;color:var(--ink);">8 → 11 → 14 → 16 → 19 → <strong>23</strong> <span style="color:var(--pu);">┈→ 25 → 28 → 31</span></div>
+              <div style="font-size:.7rem;color:var(--gray);margin-top:.4rem;">Meses 1–6 reales · 7–9 proyectados (PRONOSTICO.LINEAL)</div>
+            </div>
+            <div style="border:1px solid var(--bd);padding:1rem;">
+              <div style="font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:.6rem;">Por sello</div>
+              <div class="bar-chart">
+                <div class="bar-row"><span class="bar-label" style="width:70px;font-size:.7rem;">Rise</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">15</span></div></div></div>
+                <div class="bar-row"><span class="bar-label" style="width:70px;font-size:.7rem;">Blegh!</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DETAIL -->
+          <div style="padding:.6rem 1rem;background:var(--light);border:1px solid var(--bd);font-family:'DM Mono',monospace;font-size:.76rem;color:var(--gray);">
+            ▸ Detalle completo — 42 tracks (colapsado, clic para expandir)
+          </div>
+
+        </div>
+
+        <svg class="pattern-svg" id="fz2-svg" viewBox="0 0 800 480" preserveAspectRatio="none">
+          <path class="pattern-line f2-line" d="M 40,60 L 760,60 M 40,60 L 40,230 L 500,230 M 40,230 L 40,450" />
+          <circle class="pattern-dot f2-dot" cx="40" cy="60" r="8"/><text class="pattern-num f2-dot" x="40" y="64">1</text>
+          <circle class="pattern-dot f2-dot" cx="760" cy="60" r="8"/><text class="pattern-num f2-dot" x="760" y="64">2</text>
+          <circle class="pattern-dot f2-dot" cx="500" cy="230" r="8"/><text class="pattern-num f2-dot" x="500" y="234">3</text>
+          <circle class="pattern-dot f2-dot" cx="40" cy="450" r="8"/><text class="pattern-num f2-dot" x="40" y="454">4</text>
+
+          <path class="pattern-line z2-line" d="M 40,60 L 760,60 L 40,440 L 760,440" />
+          <circle class="pattern-dot z2-dot" cx="40" cy="60" r="8"/><text class="pattern-num z2-dot" x="40" y="64">1</text>
+          <circle class="pattern-dot z2-dot" cx="760" cy="60" r="8"/><text class="pattern-num z2-dot" x="760" y="64">2</text>
+          <circle class="pattern-dot z2-dot" cx="40" cy="440" r="8"/><text class="pattern-num z2-dot" x="40" y="444">3</text>
+          <circle class="pattern-dot z2-dot" cx="760" cy="440" r="8"/><text class="pattern-num z2-dot" x="760" y="444">4</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="read-box">
+    <div class="read-box-lbl">Las decisiones de diseño detrás de este dashboard</div>
+    <div class="read-box-item"><span class="read-box-val">KPIs arriba:</span> <span class="read-box-txt">Los 4 números que definimos con criterio en el Bloque 03 — el primer punto que toca la vista en ambos patrones.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Alertas debajo:</span> <span class="read-box-txt">Justo después del resumen, no al final — siguiendo la capa 2 de la arquitectura del Bloque 01.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Tendencia con proyección:</span> <span class="read-box-txt">La línea punteada es el modelo de regresión de Clase 6, integrado a la misma vista con la fórmula puente del Bloque 05.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Detalle colapsado al final:</span> <span class="read-box-txt">Vive en el punto de menor atención del patrón — exactamente donde debe ir el contenido que no todos necesitan ver.</span></div>
+    <div class="read-box-note">Este es el mismo ejercicio del Bloque 08, ya resuelto. Compara tus decisiones con las de aquí — no porque sea la única forma correcta, sino porque contrastar tu criterio contra un ejemplo resuelto es la forma más rápida de afinarlo.</div>
+  </div>
+</section>
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="kl">
+        <li><span class="kc">✓</span> Las 4 capas de un dashboard: resumen, alerta, tendencia, detalle — en ese orden.</li>
+        <li><span class="kc">✓</span> No todo widget necesita gráfica — un KPI destacado es solo un número grande.</li>
+        <li><span class="kc">✓</span> Máximo 4 KPIs destacados — accionables, con tendencia, entendibles sin contexto.</li>
+        <li><span class="kc">✓</span> Los patrones F y Z deciden dónde va cada elemento antes de construir nada.</li>
+        <li><span class="kc">✓</span> La mecánica técnica (Tablas, fórmula puente, IMPORTRANGE) es soporte, no el centro de la clase.</li>
+        <li><span class="kc">✓</span> Un LLM revisa jerarquía y sugiere KPIs — el criterio de negocio sigue siendo tuyo.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="nc">
+        <div class="nc-l">Próxima clase</div>
+        <div class="nc-t">Storytelling y Comunicación de Datos</div>
+        <ul class="nc-i">
+          <li>Cómo presentar hallazgos a una audiencia no técnica</li>
+          <li>Estructura narrativa para reportes de datos</li>
+          <li>De número a decisión: el puente que falta en la mayoría de reportes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Dashboards en Google Sheets</span>
+  <nav class="fn3"><a href="#">← Clase anterior</a><a href="#">Siguiente →</a></nav>
+</footer>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+
+// B1 — 4 layers
+var LAYERS = [
+  {n:1, title:"Resumen", icon:"📊",
+   desc:"Los 3-4 números que resumen el estado del negocio en un vistazo. Van siempre arriba.",
+   example:'🎵 "42 tracks · 23 distribuidos (55%) · $2.67M invertidos"'},
+  {n:2, title:"Alerta", icon:"⚠️",
+   desc:"Lo que necesita atención ya — problemas activos, no historial. Justo debajo del resumen.",
+   example:'🎵 "11 tracks sin UPC · 3 con score financiero bajo 50"'},
+  {n:3, title:"Tendencia", icon:"📈",
+   desc:"Hacia dónde va el negocio en el tiempo — contexto, no urgencia inmediata.",
+   example:'🎵 "Distribución mensual: 8→11→14→16→19→23, proyectado 31 en mes 9"'},
+  {n:4, title:"Detalle", icon:"📋",
+   desc:"La tabla completa, para quien quiera profundizar. Al final, no arriba.",
+   example:'🎵 "Tabla de 42 filas: TRACK_ID, artista, sello, estatus, costos"'}
+];
+
+// B2 — chart selector for dashboard widgets
+var WIDGET_SELECTOR = [
+  {q:"Necesito destacar un KPI (ej. tracks distribuidos)", chart:"Ninguna gráfica — número grande",
+   why:"Un KPI destacado ya es autoexplicativo. Agregar una gráfica de fondo o un medidor solo compite por atención con el número. Tipografía grande + tendencia con una flecha es suficiente."},
+  {q:"Necesito mostrar evolución en el tiempo", chart:"Línea",
+   why:"La tendencia de distribución mes a mes necesita mostrar dirección. Una línea conecta los puntos y revela hacia dónde va — igual que en Clase 5 y 6, mínimo 4-5 puntos para que sea tendencia real."},
+  {q:"Necesito una alerta o lista de pendientes", chart:"Tabla con formato condicional",
+   why:"Una alerta no es una gráfica — es una lista corta y accionable. El color (rojo/amarillo) hace el trabajo visual que necesitas, sin curvas ni barras de por medio."},
+  {q:"Necesito comparar el catálogo por sello", chart:"Barras",
+   why:"Comparar 3 categorías (Rise, Blegh!, Alzada Corp.) por una magnitud — el caso clásico de barras. Simple, directo, sin interpretación adicional necesaria."},
+  {q:"Necesito ver relación entre 2 métricas", chart:"Dispersión",
+   why:"Si quieres saber si más tracks se relaciona con más problemas de UPC, cada punto es un artista — el patrón general revela si hay relación o no."},
+  {q:"Necesito el detalle completo del catálogo", chart:"Tabla simple",
+   why:"42 filas con muchas columnas no caben en ninguna gráfica sin perder información. Va al final, colapsada, con formato condicional en las columnas clave."},
+];
+
+// B3 — KPI options (real Alzada numbers)
+var KPI_OPTIONS = [
+  {id:'k1', num:'42', lbl:'Tracks totales en catálogo', trend:null, good:false},
+  {id:'k2', num:'55%', lbl:'% del catálogo distribuido', trend:'up', good:true},
+  {id:'k3', num:'11', lbl:'Tracks sin UPC asignado', trend:'down', good:true},
+  {id:'k4', num:'$2.67M', lbl:'Inversión total de producción', trend:null, good:true},
+  {id:'k5', num:'3', lbl:'Sellos activos', trend:null, good:false},
+  {id:'k6', num:'91.4%', lbl:'% de inversión en video', trend:null, good:false},
+  {id:'k7', num:'$63.5K', lbl:'Inversión promedio por track', trend:null, good:false},
+  {id:'k8', num:'23', lbl:'Tracks distribuidos', trend:'up', good:true},
+];
+
+// B5 — design detector
+var DESIGN_ERRORS = [
+  {title:"Tabla sin congelar", desc:"847 filas de datos, encabezados desaparecen al hacer scroll. En la fila 40 nadie recuerda qué es la columna F.", fix:"Vista → Congelar → 1 fila"},
+  {title:"Sin formato condicional", desc:"120 números en una columna, todos en negro sobre blanco. El lector tiene que leer cada uno para encontrar los problemáticos.", fix:"Formato condicional → Escala de color"},
+  {title:"Todo del mismo tamaño", desc:"El KPI más importante y el dato menos relevante ocupan el mismo espacio visual. No hay jerarquía — todo grita igual de fuerte.", fix:"Agranda fuente de KPIs clave, reduce el resto"},
+];
+
+// B7 — maintenance checklist
+var MAINT_ITEMS = [
+  "¿Los datos fuente están actualizados a la fecha de hoy?",
+  "¿IMPORTRANGE sigue autorizado (no aparece error de permisos)?",
+  "¿Las fórmulas de rangos con nombre siguen apuntando a la Tabla correcta?",
+  "¿El formato condicional sigue reflejando los umbrales correctos?",
+  "¿Los KPIs destacados siguen siendo los 4 más relevantes este mes?",
+  "¿La proyección se recalculó con los datos más recientes?",
+];
+
+// B8 — case integrador steps
+var CASE_STEPS = [
+  {t:"Paso 1 — Definir los 4 KPIs del resumen",
+   d:"Con el criterio del Bloque 03: tracks distribuidos, % distribuido, tracks sin UPC, inversión total. Todos accionables y con tendencia donde aplica.",
+   panel:"cs1"},
+  {t:"Paso 2 — Construir la fila de alerta",
+   d:"Filtrar automáticamente los casos que requieren atención: tracks sin UPC que ya están distribuidos, y tracks con score financiero bajo.",
+   panel:"cs2"},
+  {t:"Paso 3 — Agregar la gráfica de tendencia con proyección",
+   d:"La línea de distribución mensual (Clase 6, Bloque 03) con la proyección punteada incluida en la misma vista.",
+   panel:"cs3"},
+  {t:"Paso 4 — Colapsar el detalle",
+   d:"La tabla completa de 42 tracks va al final, agrupada con Datos → Agrupar para que empiece colapsada.",
+   panel:"cs4"},
+  {t:"Paso 5 — Revisión final con LLM",
+   d:"Antes de enviar, un prompt de revisión de jerarquía (Bloque 06) confirma que el orden tiene sentido para el sello.",
+   panel:"cs5"},
+];
+var CASE_PANELS = {
+  cs1: '<div class="kpi-row" style="grid-template-columns:repeat(2,1fr);"><div class="kpi-card picked"><div class="kpi-num">23</div><div class="kpi-lbl">Distribuidos</div><div class="kpi-trend up">↑ +4 este mes</div></div><div class="kpi-card picked"><div class="kpi-num">55%</div><div class="kpi-lbl">% del catálogo</div><div class="kpi-trend up">↑ tendencia positiva</div></div></div>',
+  cs2: '<div style="padding:.8rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.82rem;color:var(--ink);">⚠ 8 tracks distribuidos sin UPC completo — requieren corrección inmediata antes del próximo reporte de regalías.</div>',
+  cs3: '<div style="font-size:.82rem;color:var(--gray);line-height:1.7;">Línea sólida: 8→11→14→16→19→23 (real). Línea punteada: proyección a 25→28→31 (meses 7-9). Misma gráfica, misma vista — sin hoja aparte.</div>',
+  cs4: '<div style="padding:.6rem 1rem;background:var(--light);border:1px solid var(--bd);font-family:\'DM Mono\',monospace;font-size:.78rem;color:var(--gray);">▸ Tabla completa (42 filas) — colapsada, clic para expandir</div>',
+  cs5: '<div class="prompt-text" style="margin:0;">"Mi dashboard tiene: KPIs arriba, alerta de UPC, gráfica de tendencia, tabla colapsada al final. ¿Este orden funciona para un reporte mensual al sello?"</div><div style="font-size:.78rem;color:var(--teal);margin-top:.6rem;font-style:italic;">Respuesta esperada: confirma el orden o sugiere mover la alerta financiera junto a la de UPC.</div>'
+};
+
+// B9 — final dashboard widgets
+var FINAL_WIDGETS = [
+  {id:'fw1', name:'KPIs principales', icon:'📊', layer:'Resumen'},
+  {id:'fw2', name:'Alerta de UPC', icon:'⚠️', layer:'Alerta'},
+  {id:'fw3', name:'Alerta financiera', icon:'💰', layer:'Alerta'},
+  {id:'fw4', name:'Tendencia + proyección', icon:'📈', layer:'Tendencia'},
+  {id:'fw5', name:'Composición por sello', icon:'🏷️', layer:'Tendencia'},
+  {id:'fw6', name:'Tabla completa', icon:'📋', layer:'Detalle'},
+];
+var FINAL_CONTENT = {
+  fw1: '<div class="dash-widget-title">📊 KPIs Principales</div><div class="kpi-row" style="grid-template-columns:repeat(4,1fr);gap:.6rem;"><div class="kpi-card" style="padding:.7rem;"><div class="kpi-num" style="font-size:1.2rem;">42</div><div class="kpi-lbl" style="font-size:.6rem;">Tracks</div></div><div class="kpi-card" style="padding:.7rem;"><div class="kpi-num" style="font-size:1.2rem;">55%</div><div class="kpi-lbl" style="font-size:.6rem;">Distribuido</div></div><div class="kpi-card" style="padding:.7rem;"><div class="kpi-num" style="font-size:1.2rem;">11</div><div class="kpi-lbl" style="font-size:.6rem;">Sin UPC</div></div><div class="kpi-card" style="padding:.7rem;"><div class="kpi-num" style="font-size:1.2rem;">$2.67M</div><div class="kpi-lbl" style="font-size:.6rem;">Inversión</div></div></div>',
+  fw2: '<div class="dash-widget-title">⚠️ Alerta de UPC</div><div style="padding:.7rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.8rem;">8 tracks distribuidos sin UPC completo</div>',
+  fw3: '<div class="dash-widget-title">💰 Alerta Financiera</div><div style="padding:.7rem;background:var(--gold-l);border-left:3px solid var(--gold);font-size:.8rem;">3 tracks con score de prioridad bajo 50</div>',
+  fw4: '<div class="dash-widget-title">📈 Tendencia de Distribución</div><div style="font-size:.78rem;color:var(--gray);">8→11→14→16→19→23 (real) → 25→28→31 (proyectado)</div>',
+  fw5: '<div class="dash-widget-title">🏷️ Composición por Sello</div><div class="bar-chart"><div class="bar-row"><span class="bar-label" style="width:90px;">Rise</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">15</span></div></div></div><div class="bar-row"><span class="bar-label" style="width:90px;">Blegh!</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div></div>',
+  fw6: '<div class="dash-widget-title">📋 Tabla Completa (colapsada)</div><div style="font-size:.78rem;color:var(--gray);padding:.5rem;background:var(--light);">▸ 42 filas — clic para expandir</div>'
+};
+
+// ═══════════════════════ RENDERERS ═══════════════════════
+
+// B1 layers
+function buildLayers() {
+  var grid = document.getElementById('layers-grid');
+  if (!grid) return;
+  LAYERS.forEach(function(l, i) {
+    var div = document.createElement('div');
+    div.className = 'layer-card';
+    div.id = 'layer-' + i;
+    div.innerHTML =
+      '<div class="layer-num">' + l.n + '</div>' +
+      '<div class="layer-title">' + l.icon + ' ' + l.title + '</div>' +
+      '<div class="layer-desc">' + l.desc + '</div>' +
+      '<div class="layer-example" id="layer-ex-' + i + '" style="display:none;">' + l.example + '</div>';
+    div.addEventListener('click', function() {
+      var ex = document.getElementById('layer-ex-' + i);
+      ex.style.display = ex.style.display === 'none' ? 'block' : 'none';
+    });
+    grid.appendChild(div);
+  });
+}
+
+// B2 widget chart selector
+function buildWidgetSelector() {
+  var qCont = document.getElementById('widget-questions');
+  if (!qCont) return;
+  for (var i = 0; i < WIDGET_SELECTOR.length; i++) {
+    var item = document.createElement('div');
+    item.className = 'sq-item';
+    item.textContent = WIDGET_SELECTOR[i].q;
+    item.setAttribute('data-idx', i);
+    item.addEventListener('click', function() {
+      showWidgetResult(parseInt(this.getAttribute('data-idx')));
+    });
+    qCont.appendChild(item);
+  }
+  showWidgetResult(0);
+}
+function showWidgetResult(idx) {
+  var items = document.querySelectorAll('#widget-questions .sq-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.toggle('sel', i === idx);
+  var d = WIDGET_SELECTOR[idx];
+  var html = '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.6rem;">Widget recomendado</div>';
+  html += '<div style="font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:1rem;">' + d.chart + '</div>';
+  html += '<div style="font-size:.85rem;color:var(--gray);line-height:1.7;">' + d.why + '</div>';
+  document.getElementById('widget-result').innerHTML = html;
+}
+
+// Generic stepper builder (reused pattern)
+function buildSteps(stepsData, panelsData, stepsContainerId, panelContainerId, stepPrefix) {
+  var cont = document.getElementById(stepsContainerId);
+  if (!cont) return;
+  for (var i = 0; i < stepsData.length; i++) {
+    var s = stepsData[i];
+    var div = document.createElement('div');
+    div.className = 'step';
+    div.id = stepPrefix + '-step-' + i;
+    div.innerHTML = "<div class='step-n' id='" + stepPrefix + "-num-" + i + "'>" + (i+1) + "</div><div><div class='step-t'>" + s.t + "</div><div class='step-d'>" + s.d + "</div></div>";
+    (function(idx) {
+      div.addEventListener('click', function() { showStep(stepsData, panelsData, stepPrefix, panelContainerId, idx); });
+    })(i);
+    cont.appendChild(div);
+  }
+  showStep(stepsData, panelsData, stepPrefix, panelContainerId, 0);
+}
+function showStep(stepsData, panelsData, stepPrefix, panelContainerId, idx) {
+  for (var i = 0; i < stepsData.length; i++) {
+    var el = document.getElementById(stepPrefix + '-step-' + i);
+    var num = document.getElementById(stepPrefix + '-num-' + i);
+    el.classList.toggle('active', i === idx);
+    num.classList.toggle('done', i < idx);
+    num.textContent = i < idx ? '✓' : (i + 1);
+  }
+  document.getElementById(panelContainerId).innerHTML = panelsData[stepsData[idx].panel];
+}
+
+// B3 KPI selector
+var kpiPicked = {};
+function buildKpiSelector() {
+  var grid = document.getElementById('kpi-selector');
+  if (!grid) return;
+  KPI_OPTIONS.forEach(function(k) {
+    var div = document.createElement('div');
+    div.className = 'kpi-card';
+    div.id = 'kpi-' + k.id;
+    var trendHtml = k.trend ? '<div class="kpi-trend ' + k.trend + '">' + (k.trend === 'up' ? '↑' : '↓') + ' tendencia</div>' : '';
+    div.innerHTML = '<div class="kpi-num">' + k.num + '</div><div class="kpi-lbl">' + k.lbl + '</div>' + trendHtml;
+    div.addEventListener('click', function() { toggleKpi(k.id); });
+    grid.appendChild(div);
+  });
+}
+function toggleKpi(id) {
+  var el = document.getElementById('kpi-' + id);
+  var count = Object.keys(kpiPicked).length;
+  if (kpiPicked[id]) {
+    delete kpiPicked[id];
+    el.classList.remove('picked');
+  } else {
+    if (count >= 4) {
+      document.getElementById('kpi-count').innerHTML = '⚠ Ya elegiste 4 — quita uno antes de agregar otro. Esa es exactamente la disciplina que necesita un dashboard real.';
+      document.getElementById('kpi-count').style.color = 'var(--red)';
+      return;
+    }
+    kpiPicked[id] = true;
+    el.classList.add('picked');
+  }
+  var newCount = Object.keys(kpiPicked).length;
+  var countEl = document.getElementById('kpi-count');
+  countEl.style.color = 'var(--gray)';
+  if (newCount === 0) countEl.textContent = 'Selecciona 4 métricas para tu fila de KPIs ejecutivos';
+  else if (newCount < 4) countEl.textContent = newCount + ' de 4 seleccionados — sigue eligiendo';
+  else countEl.innerHTML = '✓ 4 de 4 — esta sería tu fila de KPIs ejecutivos';
+}
+
+// F/Z pattern toggle
+function showPattern(mode) {
+  document.getElementById('fz-btn-f').classList.toggle('on', mode === 'f');
+  document.getElementById('fz-btn-z').classList.toggle('on', mode === 'z');
+  var fEls = document.querySelectorAll('.f-line, .f-dot');
+  var zEls = document.querySelectorAll('.z-line, .z-dot');
+  fEls.forEach(function(el) { el.classList.toggle('show', mode === 'f'); });
+  zEls.forEach(function(el) { el.classList.toggle('show', mode === 'z'); });
+}
+
+// F/Z pattern toggle 2 — full dashboard simulation
+function showPattern2(mode) {
+  document.getElementById('fz2-btn-f').classList.toggle('on', mode === 'f');
+  document.getElementById('fz2-btn-z').classList.toggle('on', mode === 'z');
+  document.getElementById('fz2-btn-off').classList.toggle('on', mode === 'off');
+  var fEls = document.querySelectorAll('.f2-line, .f2-dot');
+  var zEls = document.querySelectorAll('.z2-line, .z2-dot');
+  fEls.forEach(function(el) { el.classList.toggle('show', mode === 'f'); });
+  zEls.forEach(function(el) { el.classList.toggle('show', mode === 'z'); });
+}
+
+// B5 design detector
+function buildDesignDetector() {
+  var cont = document.getElementById('design-detector');
+  if (!cont) return;
+  DESIGN_ERRORS.forEach(function(e, i) {
+    var div = document.createElement('div');
+    div.innerHTML =
+      '<div class="bad-dash"><span class="bad-dash-label">MAL DISEÑO</span>' +
+      '<strong style="display:block;margin-bottom:.4rem;">' + e.title + '</strong>' +
+      e.desc + '</div>' +
+      '<button class="spot-btn" style="margin-top:.6rem;" onclick="toggleDesignFix(' + i + ')">Ver la corrección</button>' +
+      '<div class="spot-answer" id="design-fix-' + i + '">✓ ' + e.fix + '</div>';
+    cont.appendChild(div);
+  });
+}
+function toggleDesignFix(i) {
+  document.getElementById('design-fix-' + i).classList.toggle('show');
+}
+
+// B7 maintenance checklist
+function buildMaintChecklist() {
+  var cont = document.getElementById('maint-checklist');
+  if (!cont) return;
+  MAINT_ITEMS.forEach(function(text) {
+    var row = document.createElement('div');
+    row.className = 'maint-row';
+    row.innerHTML = '<div class="maint-box"></div><span class="maint-txt">' + text + '</span>';
+    row.addEventListener('click', function() {
+      var wasDone = this.classList.contains('done');
+      this.classList.toggle('done');
+      this.querySelector('.maint-box').textContent = wasDone ? '' : '✓';
+    });
+    cont.appendChild(row);
+  });
+}
+
+// B9 final dashboard builder
+var finalDashAdded = {};
+function buildFinalDashOptions() {
+  var cont = document.getElementById('final-dash-options');
+  if (!cont) return;
+  FINAL_WIDGETS.forEach(function(w) {
+    var div = document.createElement('div');
+    div.className = 'dash-opt';
+    div.id = 'fdopt-' + w.id;
+    div.innerHTML = '<span>' + w.icon + '</span> <span>' + w.name + '</span>';
+    div.addEventListener('click', function() { toggleFinalWidget(w); });
+    cont.appendChild(div);
+  });
+}
+function toggleFinalWidget(w) {
+  var btn = document.getElementById('fdopt-' + w.id);
+  var canvas = document.getElementById('final-dash-canvas');
+  if (finalDashAdded[w.id]) {
+    delete finalDashAdded[w.id];
+    btn.classList.remove('added');
+    var existing = document.getElementById('fdwidget-' + w.id);
+    if (existing) existing.remove();
+  } else {
+    finalDashAdded[w.id] = true;
+    btn.classList.add('added');
+    var empty = canvas.querySelector('.dash-empty');
+    if (empty) empty.remove();
+    var widget = document.createElement('div');
+    widget.className = 'dash-widget';
+    widget.id = 'fdwidget-' + w.id;
+    widget.innerHTML = FINAL_CONTENT[w.id];
+    canvas.appendChild(widget);
+  }
+  if (Object.keys(finalDashAdded).length === 0) {
+    canvas.innerHTML = '<div class="dash-empty">👈 Agrega widgets desde la izquierda para construir tu dashboard ejecutivo</div>';
+  }
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  buildLayers();
+  showPattern('f');
+  buildWidgetSelector();
+  buildKpiSelector();
+  buildDesignDetector();
+  buildMaintChecklist();
+  buildSteps(CASE_STEPS, CASE_PANELS, 'case-steps', 'case-panel', 'case');
+  buildFinalDashOptions();
+});
+</script>
+</body>
+</html>

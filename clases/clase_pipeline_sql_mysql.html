@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>El Pipeline de Datos: de MySQL a tu Reporte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a2e; --teal:#00897B; --gold:#D4A017; --red:#C62828;
+  --gray:#6B7280; --pu:#6B21A8; --sh:#0F9D58; --bl:#1565C0;
+  --bg:#ffffff; --bg-soft:#f7f7fb; --border:#e5e5ec;
+}
+@media (prefers-color-scheme: dark){ :root{ color-scheme:light; } }
+*{box-sizing:border-box;}
+html{color-scheme:light;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'DM Sans',system-ui,sans-serif; line-height:1.6; font-size:16px;
+}
+h1,h2,h3,h4{font-family:'Playfair Display',serif; color:var(--ink); margin:0 0 .5em;}
+code, .mono, .ex-input, .ex-table, .compare-table td.sql-col{font-family:'DM Mono',monospace;}
+p{margin:0 0 1em;}
+a{color:var(--teal);}
+
+/* ---------- layout con sidebar ---------- */
+.course-layout{display:flex; align-items:flex-start; max-width:1400px; margin:0 auto;}
+.course-sidebar{
+  width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--border); padding:28px 18px; background:var(--bg-soft);
+}
+.course-sidebar h3{font-family:'DM Sans',sans-serif; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); margin:0 0 14px;}
+.course-nav-group{margin-bottom:26px;}
+.course-nav-item{
+  display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:8px;
+  font-size:.86rem; color:var(--ink); text-decoration:none; margin-bottom:2px; line-height:1.3;
+}
+.course-nav-item .n{color:var(--gray); font-size:.78rem; min-width:1.1em;}
+.course-nav-item.active{background:var(--teal); color:#fff; font-weight:600;}
+.course-nav-item.active .n{color:#d9f2ef;}
+.course-nav-item.disabled{color:var(--gray); cursor:default;}
+.course-nav-item.disabled .badge{
+  margin-left:auto; font-size:.65rem; background:var(--border); color:var(--gray);
+  padding:2px 6px; border-radius:999px; white-space:nowrap;
+}
+.course-nav-item.next{border:1px dashed var(--gold); color:#8a6a10;}
+.course-main{flex:1; min-width:0;}
+@media(max-width:900px){
+  .course-layout{flex-direction:column;}
+  .course-sidebar{
+    width:100%; height:auto; position:static; border-right:none; border-bottom:1px solid var(--border);
+    padding:16px; overflow-x:auto;
+  }
+  .course-nav-group{margin-bottom:14px;}
+}
+
+/* ---------- hero / header ---------- */
+.hero{padding:52px 40px 36px; border-bottom:1px solid var(--border);}
+.hero .kicker{color:var(--teal); font-weight:600; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; margin-bottom:10px;}
+.hero h1{font-size:2.3rem; max-width:820px;}
+.hero .sub{font-size:1.1rem; color:var(--gray); max-width:760px;}
+
+section{padding:36px 40px; border-bottom:1px solid var(--border);}
+.block-tag{
+  display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:#fff; background:var(--teal); padding:4px 10px; border-radius:999px; margin-bottom:12px;
+}
+section h2{font-size:1.5rem;}
+
+/* ---------- cajas ---------- */
+.hook, .ibox, .wbox, .read-box{
+  border-radius:10px; padding:16px 18px; margin:16px 0; border-left:4px solid;
+}
+.hook{background:#f4f4f8; border-color:var(--gray);}
+.ibox{background:#fdf6e3; border-color:var(--gold);}
+.wbox{background:#fdecea; border-color:var(--red);}
+.read-box{background:#eaf2fb; border-color:var(--bl);}
+.hook p, .ibox p, .wbox p, .read-box p{margin:0 0 .6em;}
+.hook p:last-child, .ibox p:last-child, .wbox p:last-child, .read-box p:last-child{margin-bottom:0;}
+.box-label{font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; display:block;}
+.ibox .box-label{color:#8a6a10;}
+.wbox .box-label{color:var(--red);}
+.read-box .box-label{color:var(--bl);}
+.read-box-item{display:grid; grid-template-columns:110px 1fr; gap:4px 12px; margin:6px 0;}
+.read-box-val{font-weight:700; color:var(--bl);}
+.read-box-txt{color:var(--ink);}
+
+/* ---------- tabla comparativa ---------- */
+.compare-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.92rem;}
+.compare-table th, .compare-table td{border:1px solid var(--border); padding:9px 12px; text-align:left; vertical-align:top;}
+.compare-table th{background:var(--bg-soft); font-weight:700;}
+.compare-table td.sql-col{color:var(--bl);}
+
+/* ---------- ejercicio interactivo ---------- */
+.sim{border:1px solid var(--border); border-radius:12px; margin:18px 0; overflow:hidden;}
+.sim-head{display:flex; align-items:center; justify-content:space-between; background:var(--bg-soft); padding:10px 16px; border-bottom:1px solid var(--border);}
+.sim-head .sim-title{font-weight:600; font-size:.92rem;}
+.sim-tag{font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--teal); background:#e3f2f0; padding:3px 9px; border-radius:999px;}
+.sim-body{padding:16px;}
+.ex-prompt{margin-bottom:10px;}
+.ex-input{
+  width:100%; min-height:64px; border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+  font-size:.92rem; resize:vertical; background:#fbfbfd; color:var(--ink);
+}
+.ex-actions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;}
+.ex-btn{
+  border:none; border-radius:8px; padding:9px 16px; font-weight:600; font-size:.86rem; cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+}
+.ex-run{background:var(--teal); color:#fff;}
+.ex-run:hover{background:#00695c;}
+.ex-sol-toggle{background:#fff; color:var(--gray); border:1px solid var(--border);}
+.ex-output{margin-top:14px;}
+.ex-table-wrap{overflow-x:auto; border:1px solid var(--border); border-radius:8px;}
+.ex-table{border-collapse:collapse; width:100%; font-size:.82rem; white-space:nowrap;}
+.ex-table th, .ex-table td{padding:6px 10px; border-bottom:1px solid var(--border); text-align:left;}
+.ex-table th{background:var(--bg-soft); position:sticky; top:0;}
+.ex-null{color:var(--gray); font-style:italic;}
+.ex-empty{color:var(--gray); font-style:italic; margin:8px 0 0;}
+.ex-rowcount{font-size:.78rem; color:var(--gray); margin:8px 0 0;}
+.ex-feedback{margin-top:10px; padding:9px 12px; border-radius:8px; font-size:.86rem; font-weight:600; display:none;}
+.ex-feedback:not(:empty){display:block;}
+.ex-feedback.ex-ok{background:#e6f4ea; color:#1e6b34;}
+.ex-feedback.ex-warn{background:#fff4e0; color:#8a5a00;}
+.ex-feedback.ex-err{background:#fdecea; color:var(--red); font-family:'DM Mono',monospace; font-weight:400; white-space:pre-wrap;}
+.ex-solution{display:none; margin-top:10px; background:#f4f4f8; border-radius:8px; padding:10px 12px; font-size:.86rem;}
+.ex-solution code{display:block; margin-top:4px; color:var(--bl);}
+
+/* ---------- callout "en tu máquina" ---------- */
+.machine-callout{
+  border:1px solid var(--teal); border-radius:10px; padding:16px 18px; margin:18px 0; background:#f2faf9;
+}
+.machine-callout .box-label{color:var(--teal); display:flex; align-items:center; gap:6px;}
+.machine-callout code{display:block; background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin:8px 0; font-size:.86rem; color:var(--bl); overflow-x:auto;}
+.machine-callout ol{margin:0; padding-left:1.2em;}
+.machine-callout li{margin-bottom:6px;}
+
+/* ---------- kpi ---------- */
+.kpi-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:16px 0;}
+.kpi-card{border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg-soft);}
+.kpi-card .kpi-label{font-size:.76rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px;}
+.kpi-card .kpi-blank{
+  border:2px dashed var(--border); border-radius:6px; min-height:34px; display:flex; align-items:center;
+  padding:0 10px; color:var(--gray); font-family:'DM Mono',monospace; font-size:.9rem;
+}
+.kpi-card .kpi-num{font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--ink);}
+
+/* ---------- steps ---------- */
+.steps{counter-reset:step; margin:16px 0;}
+.step{display:flex; gap:12px; margin-bottom:14px;}
+.step::before{
+  counter-increment:step; content:counter(step); flex-shrink:0; width:26px; height:26px; border-radius:50%;
+  background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700;
+}
+.step-body{padding-top:2px;}
+
+/* ---------- resumen final ---------- */
+.summary-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
+.summary-table th, .summary-table td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+.summary-table th{background:var(--bg-soft);}
+
+.closing{padding:36px 40px; background:var(--bg-soft);}
+footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="course-layout">
+
+<aside class="course-sidebar">
+  <h3>De los Datos al Criterio</h3>
+  <div class="course-nav-group">
+    <a class="course-nav-item" href="clase1_mentalidad_analitica.html"><span class="n">·</span> Mentalidad Analítica</a>
+    <a class="course-nav-item" href="clase2_herramientas_analiticas_1.html"><span class="n">·</span> Herramientas Analíticas</a>
+    <a class="course-nav-item" href="clase3_limpieza_calidad_datos_5.html"><span class="n">·</span> Limpieza y Calidad de Datos</a>
+    <a class="course-nav-item" href="clase4_sql_criterio_negocio_5.html"><span class="n">·</span> SQL y Criterio de Negocio</a>
+    <a class="course-nav-item" href="clase5_visualizacion_graficacion_3.html"><span class="n">·</span> Visualización y Graficación</a>
+    <a class="course-nav-item" href="clase6_modelos_estadisticos_4.html"><span class="n">·</span> Modelos Estadísticos Aplicados</a>
+    <a class="course-nav-item" href="clase7_dashboards_sheets_1.html"><span class="n">·</span> Dashboards en Sheets</a>
+    <a class="course-nav-item active" href="clase_pipeline_sql_mysql.html"><span class="n">·</span> El Pipeline de Datos: MySQL</a>
+    <a class="course-nav-item next" title="Sugerida como siguiente clase, aún no existe"><span class="n">·</span> Storytelling y Comunicación <span class="badge">próxima</span></a>
+  </div>
+  <div class="course-nav-group">
+    <h3>Repaso</h3>
+    <a class="course-nav-item" href="repaso_clases1-3_1.html"><span class="n">·</span> Repaso Clases 1–3</a>
+  </div>
+</aside>
+
+<main class="course-main">
+
+<div class="hero">
+  <div class="kicker">De los Datos al Criterio</div>
+  <h1>El Pipeline de Datos: de MySQL a tu Reporte</h1>
+  <p class="sub">Extracción, transformación y presentación — con SQL real, sobre tu propia base MusicWorks corriendo en tu máquina.</p>
+  <div class="hook">
+    <span class="box-label">Contexto</span>
+    <p>Hasta hoy trabajaste SQL dentro de Google Sheets, contra el catálogo real de Alzada. Hoy cambiamos de terreno: vas a conectarte a una base MySQL de verdad, con un cliente de verdad (DBeaver, Antigravity, o el que ya instalaste), y vas a correr las mismas ideas — filtrar, agrupar, ordenar — pero en el entorno donde realmente se usan en la industria.</p>
+    <p>El catálogo de hoy es <strong>MusicWorks</strong>: un sello simulado de artistas de metal, con streams, playlists y campañas ilustrativas generadas para practicar a mayor escala (miles de filas, no las 42 de Alzada). Los nombres de artistas son reales; los números de streaming, revenue y campañas son 100% simulados para el ejercicio.</p>
+  </div>
+</div>
+
+<section id="bloque-00">
+  <span class="block-tag">Bloque 00</span>
+  <h2>Por qué hoy cambiamos de entorno</h2>
+  <p>La lógica no cambia: sigues filtrando, agrupando y ordenando datos para llegar a un criterio. Lo que cambia es la sintaxis y el lugar donde vive el dato. Antes de tocar una sola query, vale la pena mapear lo que ya sabes contra lo nuevo.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>En Google Sheets</th><th>En MySQL</th><th>Qué cambia</th></tr></thead>
+    <tbody>
+      <tr><td><code>=QUERY(A:H;"SELECT B,C WHERE D='X'")</code></td><td class="sql-col">SELECT b, c FROM tabla WHERE d = 'X';</td><td>La query ya no vive dentro de una función de celda — se escribe sola, contra una tabla real, con punto y coma al final.</td></tr>
+      <tr><td>El rango <code>A:H</code></td><td class="sql-col">El nombre de una tabla (o vista)</td><td>En MySQL cada conjunto de datos tiene nombre propio, no coordenadas de celda.</td></tr>
+      <tr><td>Texto: <code>"X"</code> (comillas dobles)</td><td class="sql-col">Texto: <code>'X'</code> (comillas simples)</td><td>MySQL espera comillas simples para texto; las dobles se reservan para casos especiales.</td></tr>
+      <tr><td>Una celda vacía</td><td class="sql-col"><code>NULL</code></td><td>No es lo mismo "vacío" que "cero" — lo vemos a fondo cuando lleguemos a COALESCE en unas clases.</td></tr>
+      <tr><td>Filtrar visualmente con el ícono de embudo</td><td class="sql-col">WHERE / HAVING</td><td>Ya no hay embudo: el filtro se declara en texto, y hay dos tipos según si es antes o después de agrupar.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ibox">
+    <span class="box-label">El pipeline de hoy</span>
+    <p>Una clase, cuatro etapas: <strong>Extracción</strong> (conectarte y explorar qué hay) → <strong>Transformación</strong> (filtrar, agrupar, ordenar) → <strong>Carga</strong> (exportar el resultado a CSV) → <strong>Presentación</strong> (convertir ese resultado en 3-4 números con criterio). Cada bloque de hoy corresponde a una de esas etapas.</p>
+  </div>
+</section>
+
+<section id="bloque-01">
+  <span class="block-tag">Bloque 01</span>
+  <h2>El terreno: tu base MusicWorks</h2>
+  <p>Ya tienes MusicWorks corriendo en tu máquina. Para la práctica de hoy vamos a trabajar sobre dos vistas ya armadas — <code>track_catalog</code> y <code>stream_log</code> — que juntan varias tablas relacionadas (artistas, releases, géneros, sellos) en una sola tabla plana. Eso nos deja practicar SELECT/WHERE/GROUP BY sin necesitar todavía JOIN, que es tema de la próxima sesión.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Tabla</th><th>Columna</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="8"><code>track_catalog</code></td><td class="sql-col">track_title</td><td>Nombre de la canción</td></tr>
+      <tr><td class="sql-col">artist_name</td><td>Artista (nombres reales de metal)</td></tr>
+      <tr><td class="sql-col">artist_type</td><td><code>independent</code> o <code>mainstream</code></td></tr>
+      <tr><td class="sql-col">genre_name</td><td>Subgénero (Death Metal, Doom Metal, etc.)</td></tr>
+      <tr><td class="sql-col">release_type</td><td><code>single</code>, <code>ep</code> o <code>album</code></td></tr>
+      <tr><td class="sql-col">duration_sec</td><td>Duración en segundos</td></tr>
+      <tr><td class="sql-col">is_explicit</td><td>1 si tiene contenido explícito, 0 si no</td></tr>
+      <tr><td class="sql-col">label_type</td><td><code>major</code> o <code>indie</code></td></tr>
+      <tr><td rowspan="7"><code>stream_log</code></td><td class="sql-col">artist_name / artist_type / genre_name</td><td>Igual que arriba</td></tr>
+      <tr><td class="sql-col">dsp_name</td><td>Plataforma (Spotify, Apple Music, etc.)</td></tr>
+      <tr><td class="sql-col">week_num</td><td>Número de semana del año</td></tr>
+      <tr><td class="sql-col">streams</td><td>Reproducciones totales esa semana</td></tr>
+      <tr><td class="sql-col">revenue</td><td>Ingreso simulado en USD esa semana</td></tr>
+    </tbody>
+  </table>
+
+  <div class="wbox">
+    <span class="box-label">Recordatorio</span>
+    <p>Todo lo que vas a ver hoy — streams, revenue, campañas — es simulado. Sirve para practicar la mecánica del análisis, no para sacar conclusiones reales sobre esos artistas.</p>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Antes de tocar el panel de la clase, conéctate a tu base con DBeaver (o el cliente que instalaste) y confirma que ambas vistas existen:</p>
+    <code>SELECT COUNT(*) FROM track_catalog;<br>SELECT COUNT(*) FROM stream_log;</code>
+    <p>Si te marca error de tabla no encontrada, tu base no tiene las vistas nuevas todavía — vuelve a correr <code>install_musicworks.sql</code> (o <code>load_from_csv.sql</code>) desde el repositorio antes de seguir.</p>
+  </div>
+</section>
+
+<section id="bloque-02">
+  <span class="block-tag">Bloque 02 · Extracción</span>
+  <h2>Primera exploración</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">SELECT *</span> <span class="read-box-txt">trae todas las columnas de la tabla — útil para explorar, riesgoso en producción.</span></div>
+    <div class="read-box-item"><span class="read-box-val">LIMIT n</span> <span class="read-box-txt">corta el resultado a las primeras n filas. Sin LIMIT, una tabla de miles de filas se descarga completa.</span></div>
+  </div>
+  <p>Tu catálogo real tiene 1,605 tracks. Si corres <code>SELECT * FROM track_catalog;</code> sin LIMIT, tu cliente va a intentar traerte los 1,605 de un jalón. No está mal, pero no es lo que quieres cuando solo estás explorando.</p>
+
+  <div class="sim" id="ex1">
+    <div class="sim-head"><span class="sim-title">Ejercicio 1 · Muestra rápida</span> <span class="sim-tag">SELECT · LIMIT</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <strong>todas las columnas</strong> de <code>track_catalog</code>, pero solo las primeras <strong>10 filas</strong>.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions">
+        <button class="ex-btn ex-run">▶ Ejecutar</button>
+        <button class="ex-btn ex-sol-toggle">Ver solución</button>
+      </div>
+      <div class="ex-solution">Una forma válida:<code>SELECT * FROM track_catalog LIMIT 10;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex2">
+    <div class="sim-head"><span class="sim-title">Ejercicio 2 · Eligiendo columnas</span> <span class="sim-tag">SELECT columnas</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Ahora trae solo <code>track_title</code>, <code>artist_name</code> y <code>genre_name</code> — primeras 5 filas.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions">
+        <button class="ex-btn ex-run">▶ Ejecutar</button>
+        <button class="ex-btn ex-sol-toggle">Ver solución</button>
+      </div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, artist_name, genre_name FROM track_catalog LIMIT 5;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Replica el Ejercicio 1 contra tu base real y dime en voz alta: ¿cuántas filas tiene <code>track_catalog</code> en total, sin el LIMIT?</p>
+    <code>SELECT COUNT(*) FROM track_catalog;</code>
+  </div>
+</section>
+
+<section id="bloque-03">
+  <span class="block-tag">Bloque 03 · Transformación</span>
+  <h2>Filtrando con criterio (WHERE)</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">'texto'</span> <span class="read-box-txt">siempre con comillas simples. Sin comillas, MySQL cree que es el nombre de una columna y truena.</span></div>
+    <div class="read-box-item"><span class="read-box-val">123</span> <span class="read-box-txt">los números van sin comillas.</span></div>
+    <div class="read-box-item"><span class="read-box-val">LIKE '%x%'</span> <span class="read-box-txt">busca texto que contiene "x" en cualquier parte. El % es un comodín: "lo que sea antes/después".</span></div>
+  </div>
+
+  <div class="sim" id="ex3">
+    <div class="sim-head"><span class="sim-title">Ejercicio 3 · Filtro de texto</span> <span class="sim-tag">WHERE =</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <code>track_title</code> y <code>artist_name</code> de todos los tracks de género <code>'Doom Metal'</code>.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, artist_name FROM track_catalog WHERE genre_name = 'Doom Metal';</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex4">
+    <div class="sim-head"><span class="sim-title">Ejercicio 4 · Filtro numérico</span> <span class="sim-tag">WHERE &gt;</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <code>track_title</code> y <code>duration_sec</code> de los tracks que duran más de 240 segundos.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, duration_sec FROM track_catalog WHERE duration_sec > 240;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex5">
+    <div class="sim-head"><span class="sim-title">Ejercicio 5 · Búsqueda de texto (LIKE)</span> <span class="sim-tag">WHERE LIKE</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <code>track_title</code> y <code>artist_name</code> de los tracks cuyo título contiene la palabra "Iron" (en cualquier parte).</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, artist_name FROM track_catalog WHERE track_title LIKE '%Iron%';</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <span class="box-label">Error común</span>
+    <p>Escribir <code>WHERE genre_name = "Doom Metal"</code> con comillas dobles. En Sheets así se escribe texto; en MySQL, mejor acostúmbrate a comillas simples siempre — es lo que vas a ver en el 95% del código real.</p>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Corre el Ejercicio 3 contra tu base real y dime: ¿cuántos tracks de Doom Metal tienes en tu catálogo?</p>
+    <code>SELECT COUNT(*) FROM track_catalog WHERE genre_name = 'Doom Metal';</code>
+  </div>
+</section>
+
+<section id="bloque-04">
+  <span class="block-tag">Bloque 04 · Transformación</span>
+  <h2>Combinando condiciones (AND / OR)</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">AND</span> <span class="read-box-txt">las DOS condiciones deben cumplirse. Reduce el resultado.</span></div>
+    <div class="read-box-item"><span class="read-box-val">OR</span> <span class="read-box-txt">basta con que se cumpla UNA. Amplía el resultado.</span></div>
+  </div>
+  <p>Un error clásico de negocio: pedir "mainstream y explícito" con OR en vez de AND, y terminar con miles de filas que no son lo que pediste. Hoy solo vamos a mezclar un tipo de conector a la vez — combinar AND con OR en la misma condición necesita paréntesis, y eso lo vemos más adelante.</p>
+
+  <div class="sim" id="ex6">
+    <div class="sim-head"><span class="sim-title">Ejercicio 6 · AND</span> <span class="sim-tag">WHERE ... AND ...</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <code>track_title</code> y <code>artist_name</code> de tracks de artistas <code>'mainstream'</code> que además sean explícitos (<code>is_explicit = 1</code>).</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, artist_name FROM track_catalog WHERE artist_type = 'mainstream' AND is_explicit = 1;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex7">
+    <div class="sim-head"><span class="sim-title">Ejercicio 7 · OR</span> <span class="sim-tag">WHERE ... OR ...</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae <code>track_title</code> y <code>genre_name</code> de tracks que sean de <code>'Black Metal'</code> o de <code>'Death Metal'</code>.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, genre_name FROM track_catalog WHERE genre_name = 'Black Metal' OR genre_name = 'Death Metal';</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Corre el Ejercicio 6 contra tu base real, exporta el resultado a CSV desde DBeaver (clic derecho sobre la tabla de resultados → Export resultset → CSV), y dime cuántas filas te dio.</p>
+  </div>
+</section>
+
+<section id="bloque-05">
+  <span class="block-tag">Bloque 05 · Transformación</span>
+  <h2>Ordenar y priorizar (ORDER BY + LIMIT)</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">ORDER BY x DESC</span> <span class="read-box-txt">ordena de mayor a menor según la columna x.</span></div>
+    <div class="read-box-item"><span class="read-box-val">+ LIMIT n</span> <span class="read-box-txt">juntos arman el patrón "Top N" — casi cualquier reporte ejecutivo es esto.</span></div>
+  </div>
+
+  <div class="sim" id="ex8">
+    <div class="sim-head"><span class="sim-title">Ejercicio 8 · Top 5</span> <span class="sim-tag">ORDER BY · LIMIT</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Trae los 5 tracks más largos: <code>track_title</code> y <code>duration_sec</code>, de mayor a menor duración.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT track_title, duration_sec FROM track_catalog ORDER BY duration_sec DESC LIMIT 5;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Réplica real, con tus propios streams: dame el Top 5 de artistas por streams totales, usando <code>stream_log</code> (esto ya adelanta GROUP BY del siguiente bloque — inténtalo, y si no sale, seguimos y regresamos).</p>
+    <code>SELECT artist_name, SUM(streams) AS total_streams<br>FROM stream_log<br>GROUP BY artist_name<br>ORDER BY total_streams DESC<br>LIMIT 5;</code>
+  </div>
+</section>
+
+<section id="bloque-06">
+  <span class="block-tag">Bloque 06 · Transformación</span>
+  <h2>De filas a métricas (GROUP BY)</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">GROUP BY x</span> <span class="read-box-txt">junta las filas que comparten el mismo valor de x en un solo grupo.</span></div>
+    <div class="read-box-item"><span class="read-box-val">COUNT/SUM/AVG</span> <span class="read-box-txt">calcula un número por cada grupo — no por fila.</span></div>
+  </div>
+  <p>Esta es la transformación real del pipeline: pasar de "filas crudas" a "una métrica por grupo". Es exactamente lo que hace una tabla dinámica en Sheets cuando arrastras un campo a "Filas" y otro a "Valores" — GROUP BY es el motor que hay detrás.</p>
+
+  <div class="sim" id="ex9">
+    <div class="sim-head"><span class="sim-title">Ejercicio 9 · Contar por grupo</span> <span class="sim-tag">GROUP BY · COUNT</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">¿Cuántos tracks hay por género? Trae <code>genre_name</code> y el conteo como <code>total</code>, de mayor a menor.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name ORDER BY total DESC;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex10">
+    <div class="sim-head"><span class="sim-title">Ejercicio 10 · Sumar por grupo</span> <span class="sim-tag">GROUP BY · SUM</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Sobre <code>stream_log</code>: el Top 5 de artistas por <code>streams</code> totales (columna <code>total_streams</code>).</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT artist_name, SUM(streams) AS total_streams FROM stream_log GROUP BY artist_name ORDER BY total_streams DESC LIMIT 5;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="sim" id="ex11">
+    <div class="sim-head"><span class="sim-title">Ejercicio 11 · Contar y promediar juntos</span> <span class="sim-tag">GROUP BY · COUNT + AVG</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Por <code>release_type</code>: cuántos tracks (<code>total</code>) y la duración promedio (<code>duracion_prom</code>), de mayor a menor cantidad.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT release_type, COUNT(*) AS total, AVG(duration_sec) AS duracion_prom FROM track_catalog GROUP BY release_type ORDER BY total DESC;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <span class="box-label">Regla de oro de GROUP BY</span>
+    <p>Toda columna que pongas en el SELECT y que no esté dentro de una función (COUNT, SUM, AVG...) tiene que estar también en el GROUP BY. Si se te olvida, el ejercicio de arriba te lo va a marcar como error — así se comporta MySQL real en modo estricto también.</p>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Ahora en tu máquina</span>
+    <p>Corre el Ejercicio 9 contra tu base real y dime en voz alta: ¿cuál es el género con más tracks, y cuántos son?</p>
+  </div>
+</section>
+
+<section id="bloque-07">
+  <span class="block-tag">Bloque 07 · Transformación</span>
+  <h2>HAVING: filtrar después de agrupar</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">WHERE</span> <span class="read-box-txt">filtra fila por fila, ANTES de agrupar. No puede usar COUNT/SUM/AVG.</span></div>
+    <div class="read-box-item"><span class="read-box-val">HAVING</span> <span class="read-box-txt">filtra grupo por grupo, DESPUÉS de agrupar. Es donde sí usas COUNT/SUM/AVG.</span></div>
+  </div>
+  <p>Es la misma diferencia que hay en una tabla dinámica de Sheets entre filtrar el dato crudo antes de armar la tabla, y filtrar los totales ya calculados (por ejemplo, "solo muéstrame categorías con más de 5 productos").</p>
+
+  <div class="sim" id="ex12">
+    <div class="sim-head"><span class="sim-title">Ejercicio 12 · HAVING</span> <span class="sim-tag">GROUP BY · HAVING</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">De la misma consulta del Ejercicio 9 (género + conteo), quédate solo con los géneros que tienen <strong>más de 5 tracks</strong>.</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Dos formas válidas (ambas funcionan en MySQL):<code>SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name HAVING total > 5;</code><code>SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name HAVING COUNT(*) > 5;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <span class="box-label">Error clásico</span>
+    <p>Poner <code>WHERE COUNT(*) > 5</code> en vez de HAVING. MySQL truena porque en el momento en que se evalúa WHERE, todavía no existen los grupos ni sus conteos — eso pasa después.</p>
+  </div>
+</section>
+
+<section id="bloque-08">
+  <span class="block-tag">Bloque 08 · Carga</span>
+  <h2>Extracción real → CSV</h2>
+  <p>De aquí en adelante trabajamos contra tu base real, no contra la muestra del panel. Esta es la etapa de "Carga" del pipeline: sacar un resultado de la base y dejarlo en un archivo que cualquiera puede abrir, sin necesitar MySQL.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-body"><strong>Corre la query</strong> en tu cliente (DBeaver, Antigravity, o el que uses) y espera a ver la tabla de resultados.</div></div>
+    <div class="step"><div class="step-body"><strong>Clic derecho</strong> sobre la tabla de resultados.</div></div>
+    <div class="step"><div class="step-body">Busca <strong>"Export resultset..."</strong> (o "Exportar datos") en el menú.</div></div>
+    <div class="step"><div class="step-body">Elige formato <strong>CSV</strong>, define dónde guardarlo, y confirma.</div></div>
+    <div class="step"><div class="step-body">Ábrelo en Excel/Sheets para confirmar que se ve bien.</div></div>
+  </div>
+
+  <div class="ibox">
+    <span class="box-label">Reto en vivo</span>
+    <p>Corre esta query contra tu base real, expórtala a CSV, y dime el nombre del archivo que te generó:</p>
+  </div>
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Query para exportar</span>
+    <code>SELECT dsp_name, SUM(streams) AS total_streams, SUM(revenue) AS total_revenue<br>FROM stream_log<br>GROUP BY dsp_name<br>ORDER BY total_streams DESC;</code>
+    <p>Con el CSV ya exportado, dime: ¿cuál plataforma (DSP) te dio más streams? ¿Es la misma que te dio más revenue?</p>
+  </div>
+</section>
+
+<section id="bloque-09">
+  <span class="block-tag">Bloque 09 · Presentación</span>
+  <h2>Armar el mini reporte</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <p>Un reporte no es una tabla de miles de filas — es 3 o 4 números bien elegidos, con contexto para que alguien que no toca la base pueda tomar una decisión con ellos. Todo lo que hiciste hoy (filtrar, agrupar, ordenar) fue el camino hacia este momento.</p>
+  </div>
+  <p>Llena estas 4 tarjetas en vivo, con queries contra tu base real:</p>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Total de tracks</div>
+      <div class="kpi-blank">SELECT COUNT(*)...</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Género con más tracks</div>
+      <div class="kpi-blank">del Ejercicio 9</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Artista #1 por streams</div>
+      <div class="kpi-blank">del Ejercicio 10</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">DSP con más revenue</div>
+      <div class="kpi-blank">del Bloque 08</div>
+    </div>
+  </div>
+
+  <p>Con esas 4 tarjetas llenas, ya tienes un mini reporte real: extrajiste el dato (MySQL), lo transformaste (WHERE/GROUP BY/ORDER BY), lo cargaste (CSV), y lo presentaste (estas 4 tarjetas). Ese es el pipeline completo.</p>
+</section>
+
+<div class="closing">
+  <h2>Cierre: el pipeline completo</h2>
+  <table class="summary-table">
+    <thead><tr><th>Etapa</th><th>Qué hicimos hoy</th><th>Herramienta SQL</th></tr></thead>
+    <tbody>
+      <tr><td>Extracción</td><td>Conectarnos a MySQL, explorar qué tablas/vistas hay</td><td>SELECT * ... LIMIT</td></tr>
+      <tr><td>Transformación</td><td>Filtrar, combinar condiciones, ordenar, agrupar</td><td>WHERE, AND/OR, ORDER BY, GROUP BY, HAVING</td></tr>
+      <tr><td>Carga</td><td>Sacar el resultado de la base a un archivo portable</td><td>Export resultset → CSV</td></tr>
+      <tr><td>Presentación</td><td>Convertir el resultado en números con contexto</td><td>(criterio, no sintaxis)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ibox">
+    <span class="box-label">Próxima clase</span>
+    <p>Vimos <code>track_catalog</code> y <code>stream_log</code> como si fueran una sola tabla — en realidad son 4 y 6 tablas distintas cosidas con JOIN. La próxima sesión abrimos esa costura: cómo se construyen esas uniones, y cómo COALESCE resuelve los huecos (NULL) que aparecen cuando, por ejemplo, una playlist_placement nunca se removió.</p>
+  </div>
+</div>
+
+<footer>
+  De los Datos al Criterio · Base de práctica: MusicWorks (simulada) · Nombres de artistas reales, métricas 100% ilustrativas.
+</footer>
+
+</main>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   DATOS EMBEBIDOS — muestra real, extraída de tu propia base
+   MusicWorks (vistas track_catalog / stream_log). Solo para el
+   panel interactivo de esta clase; tu base real tiene mucho más.
+   ============================================================ */
+const TRACK_CATALOG = [{"track_title":"Hollow Hearts","artist_name":"Trivium","artist_type":"independent","genre_name":"Thrash Metal","release_type":"ep","duration_sec":269,"is_explicit":false,"label_type":"major"},{"track_title":"Crimson Vibes","artist_name":"Trivium","artist_type":"independent","genre_name":"Thrash Metal","release_type":"album","duration_sec":245,"is_explicit":false,"label_type":"major"},{"track_title":"Broken Echoes","artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","release_type":"ep","duration_sec":172,"is_explicit":false,"label_type":"indie"},{"track_title":"Solar Youth","artist_name":"As I Lay Dying","artist_type":"mainstream","genre_name":"Thrash Metal","release_type":"single","duration_sec":205,"is_explicit":false,"label_type":"major"},{"track_title":"Solar Youth","artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","release_type":"album","duration_sec":232,"is_explicit":true,"label_type":"major"},{"track_title":"Solar Youth","artist_name":"Avenged Sevenfold","artist_type":"mainstream","genre_name":"Death Metal","release_type":"ep","duration_sec":268,"is_explicit":false,"label_type":"indie"},{"track_title":"Midnight Foxes","artist_name":"Emperor","artist_type":"independent","genre_name":"Death Metal","release_type":"ep","duration_sec":154,"is_explicit":false,"label_type":"indie"},{"track_title":"Amber Phantoms","artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","release_type":"album","duration_sec":204,"is_explicit":false,"label_type":"indie"},{"track_title":"Iron Saints","artist_name":"Marduk","artist_type":"mainstream","genre_name":"Death Metal","release_type":"ep","duration_sec":237,"is_explicit":false,"label_type":"indie"},{"track_title":"Crimson Vibes","artist_name":"Bad Omens","artist_type":"independent","genre_name":"Death Metal","release_type":"ep","duration_sec":263,"is_explicit":true,"label_type":"indie"},{"track_title":"Solar Youth","artist_name":"Bring Me the Horizon","artist_type":"independent","genre_name":"Black Metal","release_type":"ep","duration_sec":173,"is_explicit":false,"label_type":"indie"},{"track_title":"Wild Ravens","artist_name":"Bring Me the Horizon","artist_type":"independent","genre_name":"Black Metal","release_type":"single","duration_sec":259,"is_explicit":false,"label_type":"indie"},{"track_title":"Solar Youth","artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","release_type":"album","duration_sec":265,"is_explicit":true,"label_type":"indie"},{"track_title":"Electric Bones","artist_name":"Machine Head","artist_type":"independent","genre_name":"Black Metal","release_type":"ep","duration_sec":255,"is_explicit":false,"label_type":"major"},{"track_title":"Broken Echoes","artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","release_type":"album","duration_sec":258,"is_explicit":false,"label_type":"indie"},{"track_title":"Neon Ghosts","artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","release_type":"ep","duration_sec":150,"is_explicit":false,"label_type":"major"},{"track_title":"Sacred Tides","artist_name":"Rammstein","artist_type":"independent","genre_name":"Doom Metal","release_type":"album","duration_sec":203,"is_explicit":false,"label_type":"indie"},{"track_title":"Static Vultures","artist_name":"Immortal","artist_type":"independent","genre_name":"Doom Metal","release_type":"ep","duration_sec":217,"is_explicit":true,"label_type":"indie"},{"track_title":"Sacred Tides","artist_name":"Five Finger Death Punch","artist_type":"mainstream","genre_name":"Doom Metal","release_type":"album","duration_sec":224,"is_explicit":false,"label_type":"major"},{"track_title":"Midnight Foxes","artist_name":"Fear Factory","artist_type":"independent","genre_name":"Doom Metal","release_type":"ep","duration_sec":240,"is_explicit":false,"label_type":"major"},{"track_title":"Iron Saints","artist_name":"Cradle of Filth","artist_type":"independent","genre_name":"Doom Metal","release_type":"album","duration_sec":228,"is_explicit":false,"label_type":"indie"},{"track_title":"Wild Ravens","artist_name":"Ice Nine Kills","artist_type":"independent","genre_name":"Doom Metal","release_type":"ep","duration_sec":156,"is_explicit":false,"label_type":"indie"},{"track_title":"Lonely Wolves","artist_name":"Nightwish","artist_type":"independent","genre_name":"Power Metal","release_type":"album","duration_sec":152,"is_explicit":false,"label_type":"indie"},{"track_title":"Lonely Wolves","artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","release_type":"album","duration_sec":187,"is_explicit":false,"label_type":"indie"},{"track_title":"Midnight Foxes","artist_name":"Volbeat","artist_type":"independent","genre_name":"Power Metal","release_type":"single","duration_sec":216,"is_explicit":true,"label_type":"major"},{"track_title":"Golden Sirens","artist_name":"Paradise Lost","artist_type":"independent","genre_name":"Power Metal","release_type":"album","duration_sec":249,"is_explicit":false,"label_type":"indie"},{"track_title":"Golden Sirens","artist_name":"Spiritbox","artist_type":"independent","genre_name":"Power Metal","release_type":"album","duration_sec":244,"is_explicit":false,"label_type":"indie"},{"track_title":"Broken Echoes","artist_name":"Black Sabbath","artist_type":"independent","genre_name":"Nu Metal","release_type":"ep","duration_sec":268,"is_explicit":false,"label_type":"indie"},{"track_title":"Velvet Roses","artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","release_type":"ep","duration_sec":189,"is_explicit":false,"label_type":"indie"},{"track_title":"Lonely Wolves","artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","release_type":"album","duration_sec":169,"is_explicit":false,"label_type":"indie"},{"track_title":"Solar Youth","artist_name":"Mudvayne","artist_type":"independent","genre_name":"Nu Metal","release_type":"ep","duration_sec":209,"is_explicit":false,"label_type":"indie"},{"track_title":"Silver Shadows","artist_name":"Sleep Token","artist_type":"independent","genre_name":"Nu Metal","release_type":"ep","duration_sec":198,"is_explicit":false,"label_type":"indie"},{"track_title":"Hollow Hearts","artist_name":"Sleep Token","artist_type":"independent","genre_name":"Nu Metal","release_type":"album","duration_sec":264,"is_explicit":false,"label_type":"indie"},{"track_title":"Broken Echoes","artist_name":"Judas Priest","artist_type":"independent","genre_name":"Metalcore","release_type":"album","duration_sec":170,"is_explicit":false,"label_type":"indie"},{"track_title":"Amber Phantoms","artist_name":"In Flames","artist_type":"mainstream","genre_name":"Metalcore","release_type":"ep","duration_sec":166,"is_explicit":false,"label_type":"major"},{"track_title":"Sunken Riot","artist_name":"Motorhead","artist_type":"independent","genre_name":"Metalcore","release_type":"ep","duration_sec":194,"is_explicit":false,"label_type":"major"},{"track_title":"Wild Ravens","artist_name":"Godsmack","artist_type":"independent","genre_name":"Metalcore","release_type":"album","duration_sec":208,"is_explicit":false,"label_type":"indie"},{"track_title":"Sacred Tides","artist_name":"Amaranthe","artist_type":"mainstream","genre_name":"Metalcore","release_type":"ep","duration_sec":244,"is_explicit":false,"label_type":"major"},{"track_title":"Restless Horizon","artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","release_type":"album","duration_sec":180,"is_explicit":false,"label_type":"indie"},{"track_title":"Electric Bones","artist_name":"Behemoth","artist_type":"independent","genre_name":"Groove Metal","release_type":"ep","duration_sec":161,"is_explicit":false,"label_type":"indie"},{"track_title":"Silver Shadows","artist_name":"At the Gates","artist_type":"independent","genre_name":"Groove Metal","release_type":"album","duration_sec":269,"is_explicit":false,"label_type":"major"},{"track_title":"Electric Bones","artist_name":"Alice in Chains","artist_type":"independent","genre_name":"Groove Metal","release_type":"album","duration_sec":235,"is_explicit":false,"label_type":"indie"},{"track_title":"Silver Shadows","artist_name":"Anathema","artist_type":"independent","genre_name":"Groove Metal","release_type":"single","duration_sec":189,"is_explicit":false,"label_type":"indie"},{"track_title":"Sacred Tides","artist_name":"Kamelot","artist_type":"independent","genre_name":"Groove Metal","release_type":"album","duration_sec":157,"is_explicit":false,"label_type":"major"},{"track_title":"Sacred Tides","artist_name":"Slipknot","artist_type":"mainstream","genre_name":"Symphonic Metal","release_type":"album","duration_sec":208,"is_explicit":true,"label_type":"indie"},{"track_title":"Amber Phantoms","artist_name":"Meshuggah","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"single","duration_sec":257,"is_explicit":false,"label_type":"indie"},{"track_title":"Iron Saints","artist_name":"Meshuggah","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"album","duration_sec":268,"is_explicit":false,"label_type":"indie"},{"track_title":"Restless Horizon","artist_name":"Children of Bodom","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"album","duration_sec":173,"is_explicit":false,"label_type":"major"},{"track_title":"Iron Saints","artist_name":"Soundgarden","artist_type":"mainstream","genre_name":"Symphonic Metal","release_type":"album","duration_sec":225,"is_explicit":false,"label_type":"indie"},{"track_title":"Glass Waves","artist_name":"Nile","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"ep","duration_sec":238,"is_explicit":false,"label_type":"indie"},{"track_title":"Static Vultures","artist_name":"Nile","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"album","duration_sec":218,"is_explicit":false,"label_type":"indie"},{"track_title":"Glass Waves","artist_name":"Epica","artist_type":"independent","genre_name":"Symphonic Metal","release_type":"album","duration_sec":241,"is_explicit":false,"label_type":"major"},{"track_title":"Restless Horizon","artist_name":"Sepultura","artist_type":"mainstream","genre_name":"Progressive Metal","release_type":"ep","duration_sec":179,"is_explicit":false,"label_type":"major"},{"track_title":"Broken Echoes","artist_name":"Bathory","artist_type":"independent","genre_name":"Progressive Metal","release_type":"single","duration_sec":150,"is_explicit":false,"label_type":"indie"},{"track_title":"Wild Ravens","artist_name":"Bathory","artist_type":"independent","genre_name":"Progressive Metal","release_type":"album","duration_sec":239,"is_explicit":false,"label_type":"indie"},{"track_title":"Iron Saints","artist_name":"Morbid Angel","artist_type":"mainstream","genre_name":"Progressive Metal","release_type":"ep","duration_sec":152,"is_explicit":false,"label_type":"major"},{"track_title":"Golden Sirens","artist_name":"Tool","artist_type":"independent","genre_name":"Heavy Metal","release_type":"single","duration_sec":191,"is_explicit":false,"label_type":"indie"},{"track_title":"Crimson Vibes","artist_name":"Anthrax","artist_type":"independent","genre_name":"Heavy Metal","release_type":"album","duration_sec":163,"is_explicit":false,"label_type":"major"},{"track_title":"Silver Shadows","artist_name":"Type O Negative","artist_type":"independent","genre_name":"Heavy Metal","release_type":"ep","duration_sec":191,"is_explicit":false,"label_type":"indie"},{"track_title":"Neon Ghosts","artist_name":"Rage Against the Machine","artist_type":"independent","genre_name":"Heavy Metal","release_type":"single","duration_sec":192,"is_explicit":true,"label_type":"indie"},{"track_title":"Broken Echoes","artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","release_type":"album","duration_sec":189,"is_explicit":false,"label_type":"major"},{"track_title":"Neon Ghosts","artist_name":"Opeth","artist_type":"independent","genre_name":"Industrial Metal","release_type":"ep","duration_sec":151,"is_explicit":false,"label_type":"indie"},{"track_title":"Paper Rebels","artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","release_type":"album","duration_sec":162,"is_explicit":true,"label_type":"major"},{"track_title":"Crimson Vibes","artist_name":"Killswitch Engage","artist_type":"mainstream","genre_name":"Industrial Metal","release_type":"ep","duration_sec":174,"is_explicit":false,"label_type":"indie"},{"track_title":"Broken Echoes","artist_name":"Overkill","artist_type":"independent","genre_name":"Industrial Metal","release_type":"ep","duration_sec":246,"is_explicit":false,"label_type":"indie"},{"track_title":"Restless Horizon","artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","release_type":"album","duration_sec":185,"is_explicit":false,"label_type":"major"},{"track_title":"Lonely Wolves","artist_name":"Exodus","artist_type":"independent","genre_name":"Folk Metal","release_type":"album","duration_sec":203,"is_explicit":true,"label_type":"major"},{"track_title":"Static Vultures","artist_name":"Helloween","artist_type":"independent","genre_name":"Folk Metal","release_type":"ep","duration_sec":228,"is_explicit":false,"label_type":"indie"},{"track_title":"Paper Rebels","artist_name":"Parkway Drive","artist_type":"independent","genre_name":"Folk Metal","release_type":"album","duration_sec":235,"is_explicit":false,"label_type":"indie"},{"track_title":"Static Vultures","artist_name":"Whitechapel","artist_type":"independent","genre_name":"Folk Metal","release_type":"album","duration_sec":234,"is_explicit":true,"label_type":"major"},{"track_title":"Paper Rebels","artist_name":"Gojira","artist_type":"independent","genre_name":"Sludge Metal","release_type":"single","duration_sec":242,"is_explicit":false,"label_type":"major"},{"track_title":"Silver Shadows","artist_name":"Death","artist_type":"mainstream","genre_name":"Sludge Metal","release_type":"album","duration_sec":233,"is_explicit":false,"label_type":"indie"},{"track_title":"Neon Ghosts","artist_name":"Sabaton","artist_type":"independent","genre_name":"Sludge Metal","release_type":"ep","duration_sec":208,"is_explicit":false,"label_type":"indie"},{"track_title":"Velvet Roses","artist_name":"Architects","artist_type":"independent","genre_name":"Sludge Metal","release_type":"album","duration_sec":252,"is_explicit":false,"label_type":"indie"},{"track_title":"Sunken Riot","artist_name":"Destruction","artist_type":"independent","genre_name":"Sludge Metal","release_type":"single","duration_sec":156,"is_explicit":false,"label_type":"major"},{"track_title":"Velvet Roses","artist_name":"Suicide Silence","artist_type":"mainstream","genre_name":"Sludge Metal","release_type":"album","duration_sec":228,"is_explicit":false,"label_type":"indie"},{"track_title":"Golden Sirens","artist_name":"Lamb of God","artist_type":"independent","genre_name":"Deathcore","release_type":"ep","duration_sec":177,"is_explicit":false,"label_type":"major"},{"track_title":"Golden Sirens","artist_name":"Cannibal Corpse","artist_type":"independent","genre_name":"Deathcore","release_type":"album","duration_sec":171,"is_explicit":false,"label_type":"indie"},{"track_title":"Electric Bones","artist_name":"Bullet for My Valentine","artist_type":"independent","genre_name":"Deathcore","release_type":"album","duration_sec":242,"is_explicit":true,"label_type":"indie"},{"track_title":"Neon Ghosts","artist_name":"Sodom","artist_type":"independent","genre_name":"Deathcore","release_type":"ep","duration_sec":193,"is_explicit":false,"label_type":"major"},{"track_title":"Neon Ghosts","artist_name":"Job for a Cowboy","artist_type":"independent","genre_name":"Deathcore","release_type":"album","duration_sec":163,"is_explicit":false,"label_type":"indie"}];
+const STREAM_LOG = [{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Amazon Music","week_num":49,"streams":64253,"revenue":269.86},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Apple Music","week_num":49,"streams":176063,"revenue":1408.5},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Deezer","week_num":49,"streams":39555,"revenue":178.0},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"SoundCloud","week_num":49,"streams":29599,"revenue":74.0},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Spotify","week_num":49,"streams":688372,"revenue":2753.49},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Tidal","week_num":49,"streams":18028,"revenue":225.35},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"YouTube Music","week_num":49,"streams":104873,"revenue":220.23},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Amazon Music","week_num":50,"streams":60303,"revenue":253.27},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Apple Music","week_num":50,"streams":181881,"revenue":1455.05},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Deezer","week_num":50,"streams":41401,"revenue":186.3},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"SoundCloud","week_num":50,"streams":29044,"revenue":72.61},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Spotify","week_num":50,"streams":617552,"revenue":2470.21},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Tidal","week_num":50,"streams":18319,"revenue":228.99},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"YouTube Music","week_num":50,"streams":103057,"revenue":216.42},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Amazon Music","week_num":51,"streams":65095,"revenue":273.4},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Apple Music","week_num":51,"streams":170763,"revenue":1366.1},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Deezer","week_num":51,"streams":42397,"revenue":190.79},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"SoundCloud","week_num":51,"streams":29400,"revenue":73.5},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Spotify","week_num":51,"streams":659085,"revenue":2636.34},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Tidal","week_num":51,"streams":17106,"revenue":213.83},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"YouTube Music","week_num":51,"streams":99330,"revenue":208.59},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Amazon Music","week_num":52,"streams":61644,"revenue":258.9},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Apple Music","week_num":52,"streams":177544,"revenue":1420.35},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Deezer","week_num":52,"streams":39173,"revenue":176.28},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"SoundCloud","week_num":52,"streams":27918,"revenue":69.8},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Spotify","week_num":52,"streams":622467,"revenue":2489.87},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"Tidal","week_num":52,"streams":16719,"revenue":208.99},{"artist_name":"Amon Amarth","artist_type":"independent","genre_name":"Power Metal","dsp_name":"YouTube Music","week_num":52,"streams":99533,"revenue":209.02},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Amazon Music","week_num":49,"streams":68174,"revenue":286.33},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Apple Music","week_num":49,"streams":162365,"revenue":1298.92},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Deezer","week_num":49,"streams":25109,"revenue":112.99},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"SoundCloud","week_num":49,"streams":27636,"revenue":69.09},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Spotify","week_num":49,"streams":663977,"revenue":2655.91},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Tidal","week_num":49,"streams":18382,"revenue":229.78},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"YouTube Music","week_num":49,"streams":114433,"revenue":240.31},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Amazon Music","week_num":50,"streams":71644,"revenue":300.9},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Apple Music","week_num":50,"streams":142483,"revenue":1139.86},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Deezer","week_num":50,"streams":24803,"revenue":111.61},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"SoundCloud","week_num":50,"streams":25010,"revenue":62.53},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Spotify","week_num":50,"streams":642513,"revenue":2570.05},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Tidal","week_num":50,"streams":18387,"revenue":229.84},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"YouTube Music","week_num":50,"streams":117056,"revenue":245.82},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Amazon Music","week_num":51,"streams":64749,"revenue":271.95},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Apple Music","week_num":51,"streams":143497,"revenue":1147.98},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Deezer","week_num":51,"streams":21738,"revenue":97.82},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"SoundCloud","week_num":51,"streams":24951,"revenue":62.38},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Spotify","week_num":51,"streams":628808,"revenue":2515.23},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Tidal","week_num":51,"streams":18558,"revenue":231.98},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"YouTube Music","week_num":51,"streams":113218,"revenue":237.76},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Amazon Music","week_num":52,"streams":61927,"revenue":260.09},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Apple Music","week_num":52,"streams":154124,"revenue":1232.99},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Deezer","week_num":52,"streams":24280,"revenue":109.26},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"SoundCloud","week_num":52,"streams":26516,"revenue":66.29},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Spotify","week_num":52,"streams":646761,"revenue":2587.04},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"Tidal","week_num":52,"streams":18625,"revenue":232.81},{"artist_name":"Arch Enemy","artist_type":"independent","genre_name":"Nu Metal","dsp_name":"YouTube Music","week_num":52,"streams":108330,"revenue":227.49},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Amazon Music","week_num":49,"streams":108624,"revenue":456.22},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Apple Music","week_num":49,"streams":277881,"revenue":2223.05},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Deezer","week_num":49,"streams":65239,"revenue":293.58},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"SoundCloud","week_num":49,"streams":47696,"revenue":119.24},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Spotify","week_num":49,"streams":1027802,"revenue":4111.21},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Tidal","week_num":49,"streams":32600,"revenue":407.5},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"YouTube Music","week_num":49,"streams":158310,"revenue":332.45},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Amazon Music","week_num":50,"streams":102858,"revenue":432.0},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Apple Music","week_num":50,"streams":279110,"revenue":2232.88},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Deezer","week_num":50,"streams":61638,"revenue":277.37},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"SoundCloud","week_num":50,"streams":46803,"revenue":117.01},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Spotify","week_num":50,"streams":1027184,"revenue":4108.74},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Tidal","week_num":50,"streams":29995,"revenue":374.94},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"YouTube Music","week_num":50,"streams":164806,"revenue":346.09},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Amazon Music","week_num":51,"streams":104621,"revenue":439.41},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Apple Music","week_num":51,"streams":281735,"revenue":2253.88},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Deezer","week_num":51,"streams":63359,"revenue":285.12},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"SoundCloud","week_num":51,"streams":48779,"revenue":121.95},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Spotify","week_num":51,"streams":977384,"revenue":3909.54},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Tidal","week_num":51,"streams":30561,"revenue":382.01},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"YouTube Music","week_num":51,"streams":167641,"revenue":352.05},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Amazon Music","week_num":52,"streams":106401,"revenue":446.88},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Apple Music","week_num":52,"streams":283929,"revenue":2271.43},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Deezer","week_num":52,"streams":61533,"revenue":276.9},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"SoundCloud","week_num":52,"streams":46593,"revenue":116.48},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Spotify","week_num":52,"streams":983329,"revenue":3933.32},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"Tidal","week_num":52,"streams":31219,"revenue":390.24},{"artist_name":"Deftones","artist_type":"independent","genre_name":"Death Metal","dsp_name":"YouTube Music","week_num":52,"streams":159822,"revenue":335.63},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":49,"streams":57033,"revenue":239.54},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":49,"streams":144860,"revenue":1158.88},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":49,"streams":34347,"revenue":154.56},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":49,"streams":26349,"revenue":65.87},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":49,"streams":596477,"revenue":2385.91},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":49,"streams":16751,"revenue":209.39},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":49,"streams":80226,"revenue":168.47},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":50,"streams":56283,"revenue":236.39},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":50,"streams":141638,"revenue":1133.1},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":50,"streams":34005,"revenue":153.02},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":50,"streams":25667,"revenue":64.17},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":50,"streams":601119,"revenue":2404.48},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":50,"streams":17054,"revenue":213.18},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":50,"streams":82340,"revenue":172.91},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":51,"streams":53915,"revenue":226.44},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":51,"streams":141631,"revenue":1133.05},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":51,"streams":34414,"revenue":154.86},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":51,"streams":26701,"revenue":66.75},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":51,"streams":560714,"revenue":2242.86},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":51,"streams":17029,"revenue":212.86},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":51,"streams":80209,"revenue":168.44},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":52,"streams":52789,"revenue":221.71},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":52,"streams":141807,"revenue":1134.46},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":52,"streams":34115,"revenue":153.52},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":52,"streams":24593,"revenue":61.48},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":52,"streams":573060,"revenue":2292.24},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":52,"streams":16319,"revenue":203.99},{"artist_name":"Deicide","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":52,"streams":82715,"revenue":173.7},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":49,"streams":117955,"revenue":495.41},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":49,"streams":290194,"revenue":2321.55},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":49,"streams":62079,"revenue":279.36},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":49,"streams":49093,"revenue":122.73},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":49,"streams":1124780,"revenue":4499.12},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":49,"streams":31857,"revenue":398.21},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":49,"streams":196087,"revenue":411.78},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":50,"streams":124827,"revenue":524.27},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":50,"streams":296952,"revenue":2375.62},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":50,"streams":61476,"revenue":276.64},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":50,"streams":48753,"revenue":121.88},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":50,"streams":1112482,"revenue":4449.93},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":50,"streams":31666,"revenue":395.83},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":50,"streams":205551,"revenue":431.66},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":51,"streams":116537,"revenue":489.46},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":51,"streams":260500,"revenue":2084.0},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":51,"streams":62859,"revenue":282.87},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":51,"streams":48639,"revenue":121.6},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":51,"streams":1123501,"revenue":4494.0},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":51,"streams":32320,"revenue":404.0},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":51,"streams":190908,"revenue":400.91},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":52,"streams":109917,"revenue":461.65},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":52,"streams":273599,"revenue":2188.79},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":52,"streams":57276,"revenue":257.74},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":52,"streams":45463,"revenue":113.66},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":52,"streams":1103515,"revenue":4414.06},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":52,"streams":30250,"revenue":378.13},{"artist_name":"Disturbed","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":52,"streams":190758,"revenue":400.59},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":49,"streams":51069,"revenue":214.49},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":49,"streams":135911,"revenue":1087.29},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":49,"streams":22017,"revenue":99.08},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":49,"streams":23830,"revenue":59.58},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":49,"streams":409760,"revenue":1639.04},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":49,"streams":13322,"revenue":166.53},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":49,"streams":59332,"revenue":124.6},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":50,"streams":48615,"revenue":204.18},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":50,"streams":127404,"revenue":1019.23},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":50,"streams":23909,"revenue":107.59},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":50,"streams":23268,"revenue":58.17},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":50,"streams":444934,"revenue":1779.74},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":50,"streams":13914,"revenue":173.93},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":50,"streams":61640,"revenue":129.44},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":51,"streams":84683,"revenue":355.67},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":51,"streams":193693,"revenue":1549.54},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":51,"streams":38775,"revenue":174.49},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":51,"streams":37404,"revenue":93.51},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":51,"streams":742163,"revenue":2968.65},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":51,"streams":25019,"revenue":312.74},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":51,"streams":119150,"revenue":250.22},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Amazon Music","week_num":52,"streams":86427,"revenue":362.99},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Apple Music","week_num":52,"streams":208589,"revenue":1668.71},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Deezer","week_num":52,"streams":36471,"revenue":164.12},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"SoundCloud","week_num":52,"streams":40162,"revenue":100.41},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Spotify","week_num":52,"streams":769627,"revenue":3078.51},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"Tidal","week_num":52,"streams":26025,"revenue":325.31},{"artist_name":"Gorgoroth","artist_type":"independent","genre_name":"Black Metal","dsp_name":"YouTube Music","week_num":52,"streams":116873,"revenue":245.43},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":49,"streams":69574,"revenue":292.21},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":49,"streams":160171,"revenue":1281.37},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":49,"streams":29380,"revenue":132.21},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":49,"streams":22883,"revenue":57.21},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":49,"streams":615850,"revenue":2463.4},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":49,"streams":20421,"revenue":255.26},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":49,"streams":113364,"revenue":238.06},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":50,"streams":70837,"revenue":297.52},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":50,"streams":162271,"revenue":1298.17},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":50,"streams":30206,"revenue":135.93},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":50,"streams":23954,"revenue":59.89},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":50,"streams":653331,"revenue":2613.32},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":50,"streams":19849,"revenue":248.11},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":50,"streams":114423,"revenue":240.29},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":51,"streams":70945,"revenue":297.97},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":51,"streams":158053,"revenue":1264.42},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":51,"streams":30584,"revenue":137.63},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":51,"streams":25327,"revenue":63.32},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":51,"streams":630903,"revenue":2523.61},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":51,"streams":18789,"revenue":234.86},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":51,"streams":108626,"revenue":228.11},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":52,"streams":65523,"revenue":275.2},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":52,"streams":143672,"revenue":1149.38},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":52,"streams":31276,"revenue":140.74},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":52,"streams":23406,"revenue":58.52},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":52,"streams":616275,"revenue":2465.1},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":52,"streams":18523,"revenue":231.54},{"artist_name":"Korn","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":52,"streams":111449,"revenue":234.04},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Amazon Music","week_num":49,"streams":79618,"revenue":334.4},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Apple Music","week_num":49,"streams":227184,"revenue":1817.47},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Deezer","week_num":49,"streams":45959,"revenue":206.82},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"SoundCloud","week_num":49,"streams":35199,"revenue":88.0},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Spotify","week_num":49,"streams":789825,"revenue":3159.3},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Tidal","week_num":49,"streams":20371,"revenue":254.64},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"YouTube Music","week_num":49,"streams":128541,"revenue":269.94},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Amazon Music","week_num":50,"streams":76468,"revenue":321.17},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Apple Music","week_num":50,"streams":221439,"revenue":1771.51},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Deezer","week_num":50,"streams":44933,"revenue":202.2},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"SoundCloud","week_num":50,"streams":36211,"revenue":90.53},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Spotify","week_num":50,"streams":778008,"revenue":3112.03},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Tidal","week_num":50,"streams":18557,"revenue":231.96},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"YouTube Music","week_num":50,"streams":125709,"revenue":263.99},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Amazon Music","week_num":51,"streams":72822,"revenue":305.85},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Apple Music","week_num":51,"streams":222262,"revenue":1778.1},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Deezer","week_num":51,"streams":43139,"revenue":194.13},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"SoundCloud","week_num":51,"streams":34256,"revenue":85.64},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Spotify","week_num":51,"streams":782647,"revenue":3130.59},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Tidal","week_num":51,"streams":18773,"revenue":234.66},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"YouTube Music","week_num":51,"streams":118456,"revenue":248.76},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Amazon Music","week_num":52,"streams":74654,"revenue":313.55},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Apple Music","week_num":52,"streams":217726,"revenue":1741.81},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Deezer","week_num":52,"streams":46379,"revenue":208.71},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"SoundCloud","week_num":52,"streams":33163,"revenue":82.91},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Spotify","week_num":52,"streams":759700,"revenue":3038.8},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"Tidal","week_num":52,"streams":19018,"revenue":237.73},{"artist_name":"Obituary","artist_type":"independent","genre_name":"Heavy Metal","dsp_name":"YouTube Music","week_num":52,"streams":111114,"revenue":233.34},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Amazon Music","week_num":49,"streams":95719,"revenue":402.02},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Apple Music","week_num":49,"streams":217434,"revenue":1739.47},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Deezer","week_num":49,"streams":57573,"revenue":259.08},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"SoundCloud","week_num":49,"streams":38293,"revenue":95.73},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Spotify","week_num":49,"streams":928553,"revenue":3714.21},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Tidal","week_num":49,"streams":23848,"revenue":298.1},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"YouTube Music","week_num":49,"streams":147534,"revenue":309.82},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Amazon Music","week_num":50,"streams":94347,"revenue":396.26},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Apple Music","week_num":50,"streams":208544,"revenue":1668.35},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Deezer","week_num":50,"streams":56324,"revenue":253.46},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"SoundCloud","week_num":50,"streams":41058,"revenue":102.65},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Spotify","week_num":50,"streams":896857,"revenue":3587.43},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Tidal","week_num":50,"streams":22752,"revenue":284.4},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"YouTube Music","week_num":50,"streams":148259,"revenue":311.34},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Amazon Music","week_num":51,"streams":88554,"revenue":371.93},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Apple Music","week_num":51,"streams":202293,"revenue":1618.34},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Deezer","week_num":51,"streams":53446,"revenue":240.51},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"SoundCloud","week_num":51,"streams":38230,"revenue":95.58},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Spotify","week_num":51,"streams":889681,"revenue":3558.72},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Tidal","week_num":51,"streams":22848,"revenue":285.6},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"YouTube Music","week_num":51,"streams":154665,"revenue":324.8},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Amazon Music","week_num":52,"streams":89070,"revenue":374.09},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Apple Music","week_num":52,"streams":201526,"revenue":1612.21},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Deezer","week_num":52,"streams":51186,"revenue":230.34},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"SoundCloud","week_num":52,"streams":37557,"revenue":93.89},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Spotify","week_num":52,"streams":889822,"revenue":3559.29},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"Tidal","week_num":52,"streams":22050,"revenue":275.63},{"artist_name":"Pantera","artist_type":"independent","genre_name":"Groove Metal","dsp_name":"YouTube Music","week_num":52,"streams":146269,"revenue":307.16},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Amazon Music","week_num":49,"streams":74923,"revenue":314.68},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Apple Music","week_num":49,"streams":161398,"revenue":1291.18},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Deezer","week_num":49,"streams":51701,"revenue":232.65},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"SoundCloud","week_num":49,"streams":36657,"revenue":91.64},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Spotify","week_num":49,"streams":765855,"revenue":3063.42},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Tidal","week_num":49,"streams":22692,"revenue":283.65},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"YouTube Music","week_num":49,"streams":122397,"revenue":257.03},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Amazon Music","week_num":50,"streams":78714,"revenue":330.6},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Apple Music","week_num":50,"streams":162108,"revenue":1296.86},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Deezer","week_num":50,"streams":48456,"revenue":218.05},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"SoundCloud","week_num":50,"streams":35738,"revenue":89.35},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Spotify","week_num":50,"streams":760378,"revenue":3041.51},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Tidal","week_num":50,"streams":19520,"revenue":244.0},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"YouTube Music","week_num":50,"streams":119658,"revenue":251.28},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Amazon Music","week_num":51,"streams":79319,"revenue":333.14},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Apple Music","week_num":51,"streams":169958,"revenue":1359.66},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Deezer","week_num":51,"streams":50194,"revenue":225.87},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"SoundCloud","week_num":51,"streams":34002,"revenue":85.01},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Spotify","week_num":51,"streams":741908,"revenue":2967.63},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Tidal","week_num":51,"streams":19955,"revenue":249.44},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"YouTube Music","week_num":51,"streams":118143,"revenue":248.1},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Amazon Music","week_num":52,"streams":73179,"revenue":307.35},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Apple Music","week_num":52,"streams":147446,"revenue":1179.57},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Deezer","week_num":52,"streams":49876,"revenue":224.44},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"SoundCloud","week_num":52,"streams":35512,"revenue":88.78},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Spotify","week_num":52,"streams":752394,"revenue":3009.58},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"Tidal","week_num":52,"streams":21091,"revenue":263.64},{"artist_name":"Slayer","artist_type":"independent","genre_name":"Doom Metal","dsp_name":"YouTube Music","week_num":52,"streams":111612,"revenue":234.39},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":49,"streams":82932,"revenue":348.31},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":49,"streams":202200,"revenue":1617.6},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":49,"streams":42153,"revenue":189.69},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":49,"streams":32862,"revenue":82.16},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":49,"streams":765807,"revenue":3063.23},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":49,"streams":23658,"revenue":295.73},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":49,"streams":122071,"revenue":256.35},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":50,"streams":81283,"revenue":341.39},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":50,"streams":191067,"revenue":1528.54},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":50,"streams":46234,"revenue":208.05},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":50,"streams":32508,"revenue":81.27},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":50,"streams":754361,"revenue":3017.44},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":50,"streams":23592,"revenue":294.9},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":50,"streams":118858,"revenue":249.6},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":51,"streams":81400,"revenue":341.88},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":51,"streams":204533,"revenue":1636.26},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":51,"streams":42600,"revenue":191.7},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":51,"streams":32299,"revenue":80.75},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":51,"streams":720927,"revenue":2883.71},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":51,"streams":23109,"revenue":288.86},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":51,"streams":122606,"revenue":257.47},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Amazon Music","week_num":52,"streams":79447,"revenue":333.68},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Apple Music","week_num":52,"streams":197791,"revenue":1582.33},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Deezer","week_num":52,"streams":41904,"revenue":188.57},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"SoundCloud","week_num":52,"streams":32714,"revenue":81.79},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Spotify","week_num":52,"streams":695163,"revenue":2780.65},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"Tidal","week_num":52,"streams":21801,"revenue":272.51},{"artist_name":"Testament","artist_type":"independent","genre_name":"Industrial Metal","dsp_name":"YouTube Music","week_num":52,"streams":122966,"revenue":258.23},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":49,"streams":115139,"revenue":483.58},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":49,"streams":279343,"revenue":2234.74},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":49,"streams":60158,"revenue":270.71},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":49,"streams":36184,"revenue":90.46},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":49,"streams":1047916,"revenue":4191.66},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":49,"streams":32724,"revenue":409.05},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":49,"streams":177619,"revenue":373.0},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":50,"streams":119276,"revenue":500.96},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":50,"streams":265289,"revenue":2122.31},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":50,"streams":59805,"revenue":269.12},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":50,"streams":37138,"revenue":92.85},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":50,"streams":1057089,"revenue":4228.36},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":50,"streams":32712,"revenue":408.9},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":50,"streams":185702,"revenue":389.97},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":51,"streams":115279,"revenue":484.17},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":51,"streams":277314,"revenue":2218.51},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":51,"streams":57573,"revenue":259.08},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":51,"streams":35089,"revenue":87.72},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":51,"streams":1040551,"revenue":4162.2},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":51,"streams":30991,"revenue":387.39},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":51,"streams":181009,"revenue":380.12},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Amazon Music","week_num":52,"streams":114041,"revenue":478.97},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Apple Music","week_num":52,"streams":266199,"revenue":2129.59},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Deezer","week_num":52,"streams":57272,"revenue":257.72},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"SoundCloud","week_num":52,"streams":36538,"revenue":91.35},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Spotify","week_num":52,"streams":1023004,"revenue":4092.02},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"Tidal","week_num":52,"streams":30956,"revenue":386.95},{"artist_name":"Watain","artist_type":"independent","genre_name":"Thrash Metal","dsp_name":"YouTube Music","week_num":52,"streams":177335,"revenue":372.4}];
+
+const TABLES = { track_catalog: TRACK_CATALOG, stream_log: STREAM_LOG };
+const SCHEMA = {
+  track_catalog: ['track_title','artist_name','artist_type','genre_name','release_type','duration_sec','is_explicit','label_type'],
+  stream_log: ['artist_name','artist_type','genre_name','dsp_name','week_num','streams','revenue']
+};
+
+/* ============================================================
+   MOTOR SQL — parser y ejecutor propios (sin librerías externas)
+   Cubre el subconjunto de hoy: SELECT / WHERE / AND-OR / LIKE /
+   GROUP BY / HAVING / ORDER BY / LIMIT. Sin JOIN ni subqueries
+   todavía — eso es tema de la próxima clase.
+   ============================================================ */
+
+function SqlError(message){ this.message = message; this.name = 'SqlError'; }
+SqlError.prototype = Object.create(Error.prototype);
+
+function levenshtein(a, b){
+  const m = a.length, n = b.length;
+  const dp = [];
+  for (let i = 0; i <= m; i++){ dp.push(new Array(n + 1).fill(0)); dp[i][0] = i; }
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++){
+    for (let j = 1; j <= n; j++){
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function closestMatch(target, candidates){
+  let best = null, bestDist = Infinity;
+  for (const c of candidates){
+    const d = levenshtein(target.toLowerCase(), c.toLowerCase());
+    if (d < bestDist){ bestDist = d; best = c; }
+  }
+  return bestDist <= 3 ? best : null;
+}
+
+function tokenize(sql){
+  const specs = [
+    ['WS', /^\s+/],
+    ['STRING', /^'([^']*)'/],
+    ['STRING2', /^"([^"]*)"/],
+    ['NUMBER', /^\d+(\.\d+)?/],
+    ['IDENT', /^[A-Za-z_][A-Za-z0-9_]*/],
+    ['OP', /^(>=|<=|<>|!=|=|>|<)/],
+    ['COMMA', /^,/],
+    ['STAR', /^\*/],
+    ['LPAREN', /^\(/],
+    ['RPAREN', /^\)/],
+    ['SEMI', /^;/]
+  ];
+  let pos = 0;
+  const tokens = [];
+  while (pos < sql.length){
+    const s = sql.slice(pos);
+    let matched = false;
+    for (const spec of specs){
+      const type = spec[0], re = spec[1];
+      const m = re.exec(s);
+      if (m){
+        matched = true;
+        if (type !== 'WS'){
+          let value = m[0], ttype = type;
+          if (type === 'STRING' || type === 'STRING2'){ value = m[1]; ttype = 'STRING'; }
+          tokens.push({ type: ttype, value: value });
+        }
+        pos += m[0].length;
+        break;
+      }
+    }
+    if (!matched){
+      throw new SqlError('No reconozco el carácter "' + s[0] + '" cerca de la posición ' + pos + '. Revisa comillas o símbolos raros.');
+    }
+  }
+  tokens.push({ type: 'EOF', value: null });
+  return tokens;
+}
+
+const AGG_FUNCS = ['COUNT','SUM','AVG','MIN','MAX'];
+
+function Parser(tokens){ this.tokens = tokens; this.pos = 0; }
+Parser.prototype.peek = function(o){ return this.tokens[this.pos + (o || 0)]; };
+Parser.prototype.next = function(){ return this.tokens[this.pos++]; };
+Parser.prototype.isKw = function(tok, kw){ return tok.type === 'IDENT' && tok.value.toUpperCase() === kw; };
+Parser.prototype.peekIsKw = function(kw){ return this.isKw(this.peek(), kw); };
+Parser.prototype.describe = function(t){
+  if (t.type === 'EOF') return 'el final de la consulta (¿te faltó algo?)';
+  if (t.type === 'STRING') return '"\'' + t.value + '\'"';
+  return '"' + t.value + '"';
+};
+Parser.prototype.expectKw = function(kw){
+  const t = this.peek();
+  if (!this.isKw(t, kw)) throw new SqlError('Esperaba "' + kw + '" y encontré ' + this.describe(t) + '.');
+  return this.next();
+};
+Parser.prototype.expectIdent = function(){
+  const t = this.next();
+  if (t.type !== 'IDENT') throw new SqlError('Esperaba un nombre (de columna o tabla) y encontré ' + this.describe(t) + '.');
+  return t;
+};
+Parser.prototype.parse = function(){
+  this.expectKw('SELECT');
+  const selectItems = this.parseSelectList();
+  this.expectKw('FROM');
+  const table = this.expectIdent().value;
+  let where = null, groupBy = [], having = null, orderBy = [], limit = null;
+  if (this.peekIsKw('WHERE')){ this.next(); where = this.parseBoolExpr(false); }
+  if (this.peekIsKw('GROUP')){ this.next(); this.expectKw('BY'); groupBy = this.parseColList(); }
+  if (this.peekIsKw('HAVING')){ this.next(); having = this.parseBoolExpr(true); }
+  if (this.peekIsKw('ORDER')){ this.next(); this.expectKw('BY'); orderBy = this.parseOrderList(); }
+  if (this.peekIsKw('LIMIT')){
+    this.next();
+    const n = this.next();
+    if (n.type !== 'NUMBER') throw new SqlError('LIMIT necesita un número, ej: LIMIT 10.');
+    limit = parseInt(n.value, 10);
+  }
+  if (this.peek().type === 'SEMI') this.next();
+  if (this.peek().type !== 'EOF') throw new SqlError('Algo sobra cerca de ' + this.describe(this.peek()) + '. Revisa el orden de las cláusulas: SELECT - FROM - WHERE - GROUP BY - HAVING - ORDER BY - LIMIT.');
+  return { selectItems: selectItems, table: table, where: where, groupBy: groupBy, having: having, orderBy: orderBy, limit: limit };
+};
+Parser.prototype.parseSelectList = function(){
+  if (this.peek().type === 'STAR'){ this.next(); return [{ star: true }]; }
+  const items = [this.parseSelectItem()];
+  while (this.peek().type === 'COMMA'){ this.next(); items.push(this.parseSelectItem()); }
+  return items;
+};
+Parser.prototype.parseSelectItem = function(){
+  const t = this.peek();
+  if (t.type === 'IDENT' && AGG_FUNCS.indexOf(t.value.toUpperCase()) !== -1 && this.peek(1) && this.peek(1).type === 'LPAREN'){
+    const fn = this.next().value.toUpperCase();
+    this.next();
+    let arg;
+    if (this.peek().type === 'STAR'){ this.next(); arg = '*'; }
+    else arg = this.expectIdent().value;
+    if (this.peek().type !== 'RPAREN') throw new SqlError('Falta cerrar el paréntesis en ' + fn + '(...).');
+    this.next();
+    let alias = null;
+    if (this.peekIsKw('AS')){ this.next(); alias = this.expectIdent().value; }
+    const label = alias || (fn + '(' + arg + ')');
+    return { fn: fn, arg: arg, alias: alias, label: label };
+  }
+  const col = this.expectIdent().value;
+  let alias = null;
+  if (this.peekIsKw('AS')){ this.next(); alias = this.expectIdent().value; }
+  return { col: col, alias: alias, label: alias || col };
+};
+Parser.prototype.parseColList = function(){
+  const cols = [this.expectIdent().value];
+  while (this.peek().type === 'COMMA'){ this.next(); cols.push(this.expectIdent().value); }
+  return cols;
+};
+Parser.prototype.parseOrderList = function(){
+  const items = [this.parseOrderItem()];
+  while (this.peek().type === 'COMMA'){ this.next(); items.push(this.parseOrderItem()); }
+  return items;
+};
+Parser.prototype.parseOrderItem = function(){
+  const col = this.expectIdent().value;
+  let dir = 'ASC';
+  if (this.peekIsKw('ASC')){ this.next(); dir = 'ASC'; }
+  else if (this.peekIsKw('DESC')){ this.next(); dir = 'DESC'; }
+  return { col: col, dir: dir };
+};
+Parser.prototype.parseBoolExpr = function(allowAgg){
+  const chain = [{ op: null, cond: this.parseCond(allowAgg) }];
+  while (this.peekIsKw('AND') || this.peekIsKw('OR')){
+    const logic = this.next().value.toUpperCase();
+    chain.push({ op: logic, cond: this.parseCond(allowAgg) });
+  }
+  return chain;
+};
+Parser.prototype.parseCond = function(allowAgg){
+  const t = this.peek();
+  let spec;
+  if (allowAgg && t.type === 'IDENT' && AGG_FUNCS.indexOf(t.value.toUpperCase()) !== -1 && this.peek(1) && this.peek(1).type === 'LPAREN'){
+    const fn = this.next().value.toUpperCase();
+    this.next();
+    let arg;
+    if (this.peek().type === 'STAR'){ this.next(); arg = '*'; }
+    else arg = this.expectIdent().value;
+    if (this.peek().type !== 'RPAREN') throw new SqlError('Falta cerrar el paréntesis en ' + fn + '(...).');
+    this.next();
+    spec = { isAgg: true, fn: fn, arg: arg };
+  } else {
+    const colTok = this.expectIdent();
+    spec = { isAgg: false, col: colTok.value };
+  }
+  const opTok = this.peek();
+  if (this.isKw(opTok, 'LIKE')){
+    this.next();
+    const v = this.next();
+    if (v.type !== 'STRING') throw new SqlError("LIKE necesita un texto entre comillas, ej: LIKE '%metal%'.");
+    spec.op = 'LIKE'; spec.value = v.value;
+    return spec;
+  }
+  if (opTok.type !== 'OP') throw new SqlError('Esperaba un operador (=, >, <, >=, <=, !=) y encontré ' + this.describe(opTok) + '.');
+  this.next();
+  const valTok = this.next();
+  let value;
+  if (valTok.type === 'STRING') value = valTok.value;
+  else if (valTok.type === 'NUMBER') value = parseFloat(valTok.value);
+  else throw new SqlError("Esperaba un valor (número o 'texto') y encontré " + this.describe(valTok) + '.');
+  spec.op = opTok.value; spec.value = value;
+  return spec;
+};
+
+function round2(n){ return Math.round(n * 100) / 100; }
+
+function evalCondAgainst(cond, getPlain, getAgg){
+  const rv = cond.isAgg ? getAgg(cond.fn, cond.arg) : getPlain(cond.col);
+  const v = cond.value;
+  switch (cond.op){
+    case '=': return rv == v;
+    case '!=': case '<>': return rv != v;
+    case '>': return rv > v;
+    case '<': return rv < v;
+    case '>=': return rv >= v;
+    case '<=': return rv <= v;
+    case 'LIKE': {
+      const pattern = '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*').replace(/_/g, '.') + '$';
+      return new RegExp(pattern, 'i').test(String(rv));
+    }
+    default: return false;
+  }
+}
+function evalChainAgainst(chain, getPlain, getAgg){
+  let result = evalCondAgainst(chain[0].cond, getPlain, getAgg);
+  for (let i = 1; i < chain.length; i++){
+    const c = evalCondAgainst(chain[i].cond, getPlain, getAgg);
+    result = chain[i].op === 'AND' ? (result && c) : (result || c);
+  }
+  return result;
+}
+function computeAgg(fn, arg, grp){
+  if (fn === 'COUNT') return arg === '*' ? grp.length : grp.filter(function(r){ return r[arg] !== null && r[arg] !== undefined; }).length;
+  const nums = grp.map(function(r){ return r[arg]; }).filter(function(v){ return typeof v === 'number'; });
+  if (fn === 'SUM') return round2(nums.reduce(function(a,b){ return a+b; }, 0));
+  if (fn === 'AVG') return nums.length ? round2(nums.reduce(function(a,b){ return a+b; }, 0) / nums.length) : 0;
+  if (fn === 'MIN') return nums.length ? Math.min.apply(null, nums) : null;
+  if (fn === 'MAX') return nums.length ? Math.max.apply(null, nums) : null;
+  return null;
+}
+
+function execute(ast){
+  const table = ast.table;
+  if (!TABLES[table]){
+    const sug = closestMatch(table, Object.keys(TABLES));
+    throw new SqlError('No reconozco la tabla "' + table + '".' + (sug ? ' ¿Quisiste decir "' + sug + '"?' : '') + ' Tablas disponibles: ' + Object.keys(TABLES).join(', ') + '.');
+  }
+  let rows = TABLES[table];
+  const cols = SCHEMA[table];
+  function checkCol(c){
+    if (cols.indexOf(c) === -1){
+      const sug = closestMatch(c, cols);
+      throw new SqlError('No reconozco la columna "' + c + '" en ' + table + '.' + (sug ? ' ¿Quisiste decir "' + sug + '"?' : '') + ' Columnas disponibles: ' + cols.join(', ') + '.');
+    }
+  }
+  if (ast.where){
+    ast.where.forEach(function(step){
+      if (step.cond.isAgg) throw new SqlError('WHERE no puede usar funciones como ' + step.cond.fn + '(); eso va en HAVING, después de agrupar con GROUP BY.');
+      checkCol(step.cond.col);
+    });
+    rows = rows.filter(function(r){ return evalChainAgainst(ast.where, function(c){ return r[c]; }, null); });
+  }
+  const hasAgg = ast.selectItems.some(function(i){ return !!i.fn; });
+  let resultGroups;
+  if (ast.groupBy.length > 0 || hasAgg){
+    ast.groupBy.forEach(checkCol);
+    ast.selectItems.forEach(function(item){
+      if (item.star) throw new SqlError('No puedes usar SELECT * junto con GROUP BY o funciones como COUNT()/SUM()/AVG().');
+      if (!item.fn){
+        checkCol(item.col);
+        if (ast.groupBy.indexOf(item.col) === -1) throw new SqlError('La columna "' + item.col + '" debe estar en GROUP BY, o dentro de una función como COUNT()/SUM()/AVG()/MIN()/MAX().');
+      } else if (item.arg !== '*'){
+        checkCol(item.arg);
+      }
+    });
+    const map = new Map();
+    const keys = [];
+    for (const r of rows){
+      const key = ast.groupBy.length ? ast.groupBy.map(function(c){ return r[c]; }).join('|||') : '__all__';
+      if (!map.has(key)){ map.set(key, []); keys.push(key); }
+      map.get(key).push(r);
+    }
+    resultGroups = keys.map(function(key){
+      const grp = map.get(key);
+      const outRow = {};
+      ast.selectItems.forEach(function(item){
+        outRow[item.label] = item.fn ? computeAgg(item.fn, item.arg, grp) : grp[0][item.col];
+      });
+      return { row: outRow, grp: grp };
+    });
+    if (ast.having){
+      resultGroups = resultGroups.filter(function(g){
+        return evalChainAgainst(ast.having,
+          function(c){
+            if (g.row[c] === undefined) throw new SqlError('"' + c + '" no está disponible en HAVING: usa el alias del SELECT o una función como COUNT()/SUM().');
+            return g.row[c];
+          },
+          function(fn, arg){ return computeAgg(fn, arg, g.grp); }
+        );
+      });
+    }
+  } else {
+    if (ast.selectItems.length === 1 && ast.selectItems[0].star){
+      resultGroups = rows.map(function(r){ return { row: Object.assign({}, r), grp: [r] }; });
+    } else {
+      ast.selectItems.forEach(function(item){ checkCol(item.col); });
+      resultGroups = rows.map(function(r){
+        const outRow = {};
+        ast.selectItems.forEach(function(item){ outRow[item.label] = r[item.col]; });
+        return { row: outRow, grp: [r] };
+      });
+    }
+  }
+  let resultRows = resultGroups.map(function(g){ return g.row; });
+  if (ast.orderBy.length > 0){
+    resultRows = resultRows.slice().sort(function(a, b){
+      for (const o of ast.orderBy){
+        if (!(o.col in a)) throw new SqlError('No puedo ordenar por "' + o.col + '": no aparece en el resultado del SELECT. Agrégala a la lista de columnas o usa su alias.');
+        const av = a[o.col], bv = b[o.col];
+        if (av < bv) return o.dir === 'ASC' ? -1 : 1;
+        if (av > bv) return o.dir === 'ASC' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+  if (ast.limit != null) resultRows = resultRows.slice(0, ast.limit);
+  return resultRows;
+}
+
+function runSql(query){
+  const tokens = tokenize(query);
+  const ast = new Parser(tokens).parse();
+  const rows = execute(ast);
+  return { ast: ast, rows: rows };
+}
+
+function normRow(r){
+  return JSON.stringify(Object.keys(r).sort().map(function(k){ return [k, r[k]]; }));
+}
+function sameResult(a, b, orderMatters){
+  if (orderMatters){
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (normRow(a[i]) !== normRow(b[i])) return false;
+    return true;
+  }
+  const na = a.map(normRow).sort();
+  const nb = b.map(normRow).sort();
+  if (na.length !== nb.length) return false;
+  for (let i = 0; i < na.length; i++) if (na[i] !== nb[i]) return false;
+  return true;
+}
+function checkByReference(query, orderMatters){
+  return function(rows){
+    let ref;
+    try { ref = runSql(query).rows; } catch (e) { return { ok: false, message: '(Error interno del ejercicio — avísale al profe)' }; }
+    if (sameResult(rows, ref, !!orderMatters)) return { ok: true, message: '✔ Correcto — ese es el resultado esperado.' };
+    return { ok: false, message: 'La consulta corrió bien, pero el resultado no es el esperado para este ejercicio. Revisa columnas/condición y vuelve a intentar.' };
+  };
+}
+
+/* ============================================================
+   UI — monta cada ejercicio en su contenedor
+   ============================================================ */
+function renderTable(el, rows){
+  if (!rows.length){
+    el.innerHTML = '<p class="ex-empty">0 filas — la consulta corrió bien, pero no hay resultados con esos criterios.</p>';
+    return;
+  }
+  const cols = Object.keys(rows[0]);
+  const shown = rows.slice(0, 15);
+  let html = '<div class="ex-table-wrap"><table class="ex-table"><thead><tr>';
+  cols.forEach(function(c){ html += '<th>' + c + '</th>'; });
+  html += '</tr></thead><tbody>';
+  shown.forEach(function(r){
+    html += '<tr>';
+    cols.forEach(function(c){
+      let v = r[c];
+      if (typeof v === 'boolean') v = v ? '1' : '0';
+      html += '<td>' + (v === null || v === undefined ? '<span class="ex-null">NULL</span>' : String(v)) + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<p class="ex-rowcount">' + rows.length + ' fila' + (rows.length === 1 ? '' : 's') + (rows.length > 15 ? ' (mostrando las primeras 15)' : '') + '</p>';
+  el.innerHTML = html;
+}
+
+function mountExercise(id, opts){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const input = el.querySelector('.ex-input');
+  const output = el.querySelector('.ex-output');
+  const feedback = el.querySelector('.ex-feedback');
+  const runBtn = el.querySelector('.ex-run');
+  const solBtn = el.querySelector('.ex-sol-toggle');
+  const solBox = el.querySelector('.ex-solution');
+  runBtn.addEventListener('click', function(){
+    output.innerHTML = '';
+    feedback.className = 'ex-feedback';
+    feedback.textContent = '';
+    let parsed;
+    try {
+      parsed = runSql(input.value);
+    } catch (e) {
+      feedback.className = 'ex-feedback ex-err';
+      feedback.textContent = e && e.message ? e.message : ('Error inesperado: ' + e);
+      return;
+    }
+    renderTable(output, parsed.rows);
+    if (opts.check){
+      const verdict = opts.check(parsed.rows, parsed.ast);
+      feedback.className = 'ex-feedback ' + (verdict.ok ? 'ex-ok' : 'ex-warn');
+      feedback.textContent = verdict.message;
+    } else {
+      feedback.className = 'ex-feedback ex-ok';
+      feedback.textContent = 'La consulta corrió sin errores.';
+    }
+  });
+  if (solBtn && solBox){
+    solBtn.addEventListener('click', function(){
+      const hidden = solBox.style.display === 'none' || !solBox.style.display;
+      solBox.style.display = hidden ? 'block' : 'none';
+      solBtn.textContent = hidden ? 'Ocultar solución' : 'Ver solución';
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  mountExercise('ex1', {
+    check: function(rows, ast){
+      if (ast.table !== 'track_catalog') return { ok: false, message: 'Usa la tabla track_catalog.' };
+      if (ast.limit !== 10) return { ok: false, message: 'Falta (o está mal) el LIMIT 10 — sin él traerías las ' + TRACK_CATALOG.length + ' filas de la muestra completa.' };
+      return { ok: true, message: '✔ Bien — trajiste una muestra de 10 filas con LIMIT.' };
+    }
+  });
+
+  mountExercise('ex2', {
+    check: function(rows, ast){
+      if (ast.limit !== 5) return { ok: false, message: 'Falta el LIMIT 5.' };
+      const need = ['track_title','artist_name','genre_name'];
+      const got = ast.selectItems.map(function(i){ return i.col; });
+      const ok = need.length === got.length && need.every(function(c){ return got.indexOf(c) !== -1; });
+      if (!ok) return { ok: false, message: 'Revisa la lista de columnas: necesitas exactamente track_title, artist_name y genre_name.' };
+      return { ok: true, message: '✔ Bien.' };
+    }
+  });
+
+  mountExercise('ex3', { check: checkByReference("SELECT track_title, artist_name FROM track_catalog WHERE genre_name = 'Doom Metal'", false) });
+  mountExercise('ex4', { check: checkByReference('SELECT track_title, duration_sec FROM track_catalog WHERE duration_sec > 240', false) });
+  mountExercise('ex5', { check: checkByReference("SELECT track_title, artist_name FROM track_catalog WHERE track_title LIKE '%Iron%'", false) });
+  mountExercise('ex6', { check: checkByReference("SELECT track_title, artist_name FROM track_catalog WHERE artist_type = 'mainstream' AND is_explicit = 1", false) });
+  mountExercise('ex7', { check: checkByReference("SELECT track_title, genre_name FROM track_catalog WHERE genre_name = 'Black Metal' OR genre_name = 'Death Metal'", false) });
+  mountExercise('ex8', { check: checkByReference('SELECT track_title, duration_sec FROM track_catalog ORDER BY duration_sec DESC LIMIT 5', true) });
+  mountExercise('ex9', { check: checkByReference('SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name ORDER BY total DESC', true) });
+  mountExercise('ex10', { check: checkByReference('SELECT artist_name, SUM(streams) AS total_streams FROM stream_log GROUP BY artist_name ORDER BY total_streams DESC LIMIT 5', true) });
+  mountExercise('ex11', { check: checkByReference('SELECT release_type, COUNT(*) AS total, AVG(duration_sec) AS duracion_prom FROM track_catalog GROUP BY release_type ORDER BY total DESC', true) });
+  mountExercise('ex12', { check: checkByReference('SELECT genre_name, COUNT(*) AS total FROM track_catalog GROUP BY genre_name HAVING total > 5', false) });
+});
+</script>
+</body>
+</html>

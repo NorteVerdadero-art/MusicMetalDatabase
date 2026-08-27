@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 3 — Limpieza y Calidad de Datos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --black:#0a0a0a;--ink:#1a1a2e;--teal:#00897B;--teal-light:#e0f2f1;
+    --gold:#D4A017;--gold-light:#FFF8E1;--red:#C62828;--red-light:#FFEBEE;
+    --gray:#6B7280;--light:#F8F9FA;--border:#E5E7EB;--white:#ffffff;
+    --purple:#6B21A8;--purple-light:#F3E8FF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:#ffffff!important;color:#0a0a0a!important;}
+  body{font-family:'DM Sans',sans-serif;line-height:1.6;}
+  @media(prefers-color-scheme:dark){
+    html,body{background-color:#ffffff!important;color:#0a0a0a!important;}
+    .header,section,footer,.hero,.progress-section,.closing,
+    .hook-box,.card,.sim-container,.insight-box,.warning-box,
+    .next-class,.hero-sidebar,.error-card,.sql-card,.outlier-card{background-color:#ffffff!important;}
+  }
+
+  /* LAYOUT */
+  .header{border-bottom:1px solid var(--border);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+  .header-logo{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+  .header-meta{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+  .header-badge{background:var(--teal);color:white;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+  .hero{padding:6rem 4rem 4rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:4rem;align-items:start;}
+  .hero-eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+  .hero-eyebrow::before{content:'';display:inline-block;width:24px;height:2px;background:var(--teal);}
+  .hero h1{font-family:'Playfair Display',serif;font-size:3.5rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+  .hero h1 em{font-style:italic;color:var(--teal);}
+  .hero-desc{font-size:1.05rem;color:var(--gray);max-width:520px;line-height:1.75;font-weight:300;}
+  .hero-sidebar{border:1px solid var(--border);border-top:3px solid var(--teal);padding:1.8rem;background:#fff;}
+  .sidebar-title{font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;}
+  .sidebar-item{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.85rem;}
+  .sidebar-item:last-child{border-bottom:none;}
+  .sidebar-label{color:var(--gray);}
+  .sidebar-value{font-weight:600;color:var(--ink);}
+  .sidebar-value.teal{color:var(--teal);}
+  .progress-section{max-width:1100px;margin:0 auto;padding:0 4rem 4rem;}
+  .progress-track{display:flex;gap:3px;margin-bottom:.6rem;}
+  .progress-step{flex:1;height:4px;background:var(--border);}
+  .progress-step.active{background:var(--teal);}
+  .progress-step.current{background:linear-gradient(90deg,var(--teal) 60%,var(--border) 60%);}
+  .progress-label{font-size:.7rem;color:var(--gray);font-weight:500;}
+  section{max-width:1100px;margin:0 auto;padding:4rem;border-top:1px solid var(--border);}
+  .section-number{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+  .section-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+  .section-subtitle{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+  .time-pill{display:inline-flex;align-items:center;gap:.4rem;background:#fff;border:1px solid var(--border);padding:.3rem .8rem;border-radius:20px;font-size:.72rem;color:var(--gray);font-weight:500;margin-bottom:2rem;}
+  .time-pill::before{content:'⏱';}
+
+  /* BOXES */
+  .hook-box{background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);padding:2rem 2.5rem;margin-bottom:3rem;}
+  .hook-label{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.8rem;}
+  .hook-box h3{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+  .hook-box p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+  .insight-box{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+  .insight-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+  .insight-box p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+  .insight-box strong{color:#9A7208;}
+  .warning-box{background:#fff;border:1px solid #FFCDD2;border-left:4px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;}
+  .warning-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+  .warning-box p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+  .warning-box strong{color:var(--red);}
+
+  /* CARDS */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem;}
+  .card{border:1px solid var(--border);padding:2rem;position:relative;background:#fff;}
+  .card-accent{position:absolute;top:0;left:0;width:100%;height:3px;}
+  .card h4{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;margin-bottom:.7rem;color:var(--ink);margin-top:.8rem;}
+  .card p{font-size:.87rem;color:var(--gray);line-height:1.7;}
+
+  /* SIM CONTAINERS */
+  .sim-container{border:1px solid var(--border);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+  .sim-header{background:#fff;border-bottom:1px solid var(--border);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+  .sim-header-title{font-size:.85rem;font-weight:600;color:var(--ink);}
+  .sim-header-sub{font-size:.75rem;color:var(--gray);}
+  .sim-tag{color:white;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+  .tag-teal{background:var(--teal);}
+  .tag-gold{background:var(--gold);}
+  .tag-red{background:var(--red);}
+  .tag-purple{background:var(--purple);}
+
+  /* SPREADSHEET */
+  .spreadsheet{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.79rem;}
+  .spreadsheet th{background:#fff;border:1px solid var(--border);padding:.4rem .8rem;font-weight:600;color:var(--gray);text-align:center;font-size:.72rem;}
+  .spreadsheet td{border:1px solid #E8E8E8;padding:.38rem .8rem;color:var(--ink);background:#fff;}
+  .spreadsheet td.row-hdr{background:var(--light);color:var(--gray);text-align:center;font-weight:600;font-size:.72rem;}
+  .spreadsheet td.col-hdr{background:#fff;color:var(--teal);font-weight:700;font-size:.78rem;font-family:'DM Sans',sans-serif;border-bottom:2px solid var(--teal);}
+  .spreadsheet td.cell-error{background:var(--red-light);color:var(--red);font-weight:600;cursor:pointer;}
+  .spreadsheet td.cell-ok{background:var(--teal-light);}
+  .spreadsheet td.cell-fixed{background:var(--teal-light);color:var(--teal);font-weight:600;}
+  .spreadsheet td.cell-deleted{background:var(--light);color:var(--gray);font-style:italic;font-size:.72rem;}
+  .spreadsheet td[data-err]:not(.row-hdr):not(.col-hdr){cursor:pointer;transition:background .15s;}
+  .spreadsheet td[data-err]:not(.row-hdr):not(.col-hdr):not(.cell-revealed):hover{background:var(--gold-light);}
+
+  /* AUDIT SCORE */
+  .audit-bar{background:#fff;border-bottom:1px solid var(--border);padding:.8rem 1.5rem;display:flex;align-items:center;gap:.8rem;font-size:.82rem;}
+  .audit-num{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--teal);}
+  .audit-hint{font-size:.75rem;color:var(--gray);font-style:italic;margin-left:auto;}
+  .audit-msg{padding:.8rem 1.5rem;background:#fff;border-top:1px solid var(--border);font-size:.82rem;color:var(--gray);min-height:44px;line-height:1.5;}
+
+  /* TOOLTIP on revealed cells */
+  .cell-tooltip{position:relative;}
+  .cell-tooltip .tt{display:none;position:absolute;left:0;top:100%;z-index:50;background:var(--ink);color:#fff;font-size:.72rem;padding:.5rem .8rem;border-radius:3px;width:260px;font-family:'DM Sans',sans-serif;line-height:1.5;white-space:normal;}
+  .cell-tooltip:hover .tt{display:block;}
+
+  /* TOGGLE BUTTONS — isolated by prefix to avoid conflicts */
+  .tab-btn{border:1px solid var(--border);background:#fff;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray);transition:all .15s;border-radius:2px;}
+  .tab-btn.on{background:var(--teal);color:white;border-color:var(--teal);}
+  .tab-btn:hover:not(.on){border-color:var(--teal);color:var(--teal);}
+  .tab-btn.gold-on{background:var(--gold);color:white;border-color:var(--gold);}
+
+  /* CLEAN STEP PANELS */
+  .clean-panels{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);}
+  .clean-panel-box{padding:1.2rem 1.5rem;}
+  .clean-panel-box+.clean-panel-box{border-left:1px solid var(--border);}
+  .cpb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem;}
+  .cpb-cell{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:600;padding:.7rem;min-height:48px;}
+
+  /* OUTLIER CARDS */
+  .outlier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+  .outlier-card{border:1px solid var(--border);padding:1.5rem;background:#fff;}
+
+  /* VALIDATION */
+  .val-cols{display:grid;grid-template-columns:1fr 1fr;}
+  .val-col{padding:1.5rem;background:#fff;}
+  .val-col+.val-col{border-left:1px solid var(--border);}
+  .val-col-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;}
+  .val-row{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start;}
+  .val-row:last-child{border-bottom:none;}
+  .val-chk{width:20px;height:20px;border:2px solid var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;transition:all .15s;margin-top:.1rem;}
+  .val-row.done .val-chk{background:var(--teal);border-color:var(--teal);color:white;}
+  .val-row.done .val-txt{color:var(--teal);text-decoration:line-through;}
+  .val-txt{font-size:.83rem;color:var(--gray);line-height:1.5;}
+  .val-progress{height:6px;background:var(--light);border-radius:3px;overflow:hidden;margin:1rem 1.5rem .4rem;border:1px solid var(--border);}
+  .val-progress-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .4s;}
+  .val-progress-lbl{padding:0 1.5rem .8rem;font-size:.75rem;color:var(--gray);display:flex;justify-content:space-between;}
+
+  /* SQL CARDS */
+  .sql-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+  .sql-card{border:1px solid var(--border);background:#fff;overflow:hidden;}
+  .sql-card-hdr{background:#fff;border-bottom:2px solid var(--teal);padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;}
+  .sql-func{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:600;color:var(--teal);}
+  .sql-equiv{font-size:.7rem;color:var(--gray);font-style:italic;}
+  .sql-card-body{padding:1.2rem;}
+  .sql-what{font-size:.8rem;font-weight:600;color:var(--ink);margin-bottom:.5rem;}
+  .sql-code{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--light);border:1px solid var(--border);border-left:3px solid var(--teal);padding:.6rem .9rem;margin-bottom:.7rem;color:var(--ink);line-height:1.7;white-space:pre;overflow-x:auto;}
+  .sql-result{font-size:.78rem;color:var(--gray);line-height:1.6;}
+  .sql-music{font-size:.75rem;color:var(--teal);font-style:italic;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);}
+  .sql-sim-body{display:grid;grid-template-columns:1fr 1fr;}
+  .sql-panel{padding:1.5rem;background:#fff;}
+  .sql-panel+.sql-panel{border-left:1px solid var(--border);}
+  .sql-query-box{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--light);border:1px solid var(--border);border-left:3px solid var(--teal);padding:.8rem 1rem;margin-bottom:1rem;color:var(--ink);line-height:1.8;white-space:pre;overflow-x:auto;}
+  .kw{color:var(--teal);font-weight:600;}
+  .fn{color:var(--purple);font-weight:600;}
+  .str{color:var(--red);}
+  .cm{color:var(--gray);font-style:italic;}
+
+  /* CLOSING */
+  .closing{background:#fff;border-top:1px solid var(--border);padding:4rem;}
+  .closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+  .closing h3{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+  .closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+  .next-class{border:1px solid var(--border);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+  .nc-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+  .nc-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+  .nc-items{list-style:none;font-size:.82rem;color:var(--gray);}
+  .nc-items li{padding:.3rem 0;padding-left:1rem;position:relative;}
+  .nc-items li::before{content:'→';position:absolute;left:0;color:var(--gold);}
+  .key-takeaways{list-style:none;}
+  .key-takeaways li{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:.88rem;align-items:flex-start;line-height:1.5;}
+  .key-takeaways li:last-child{border-bottom:none;}
+  .kt-check{color:var(--teal);flex-shrink:0;margin-top:.1rem;}
+  footer{border-top:1px solid var(--border);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+  footer span{font-size:.75rem;color:var(--gray);}
+  .footer-nav{display:flex;gap:1.5rem;}
+  .footer-nav a{font-size:.75rem;color:var(--gray);text-decoration:none;font-weight:500;}
+  .footer-nav a:hover{color:var(--teal);}
+
+  @media(max-width:768px){
+    .hero,.two-col,.sql-grid,.outlier-grid,.sql-sim-body,.val-cols,.closing-inner,.clean-panels{grid-template-columns:1fr;}
+    .header,section,footer,.progress-section,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+    .hero{padding:3rem 1.5rem 2rem;}
+    .hero h1{font-size:2.4rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">De los Datos al Criterio</div>
+  <div class="header-meta">
+    <span>Industria Musical</span>
+    <span class="header-badge">Clase 03 / 08</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">Bloque 3 · Calidad</div>
+    <h1>Limpieza y<br><em>Calidad</em><br>de Datos</h1>
+    <p class="hero-desc">Antes de analizar hay que confiar en los datos. Un analista que no limpia sus datos no analiza — reportea basura con buena presentación.</p>
+  </div>
+  <div class="hero-sidebar">
+    <div class="sidebar-title">Ficha de la clase</div>
+    <div class="sidebar-item"><span class="sidebar-label">Duración</span><span class="sidebar-value">2 horas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Bloques</span><span class="sidebar-value">6</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Dataset</span><span class="sidebar-value">Sello 3 artistas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Demos</span><span class="sidebar-value teal">6 interactivas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">SQL</span><span class="sidebar-value">Referencia</span></div>
+  </div>
+</div>
+
+<div class="progress-section">
+  <div class="progress-track">
+    <div class="progress-step active"></div>
+    <div class="progress-step active"></div>
+    <div class="progress-step current"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+  </div>
+  <div class="progress-label">Clase 3 de 8 · Limpieza y Calidad de Datos</div>
+</div>
+
+
+<!-- THEORY 1 — Por qué importa la calidad de datos -->
+<section>
+  <div class="section-number">00 · Marco Teórico</div>
+  <div class="section-title">¿Qué es la calidad de datos y por qué destruye análisis?</div>
+  <div class="section-subtitle">El fundamento que todo analista debe tener antes de tocar cualquier herramienta</div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:3rem;margin-bottom:2.5rem;">
+    <div>
+      <p style="font-size:1rem;color:var(--ink);line-height:1.85;margin-bottom:1.5rem;">
+        La calidad de datos es el grado en que los datos son <strong>correctos, completos, consistentes y confiables</strong> para el uso que se les dará. No es un concepto absoluto — un dato puede ser de alta calidad para un propósito y completamente inútil para otro.
+      </p>
+      <p style="font-size:.95rem;color:var(--gray);line-height:1.85;margin-bottom:1.5rem;">
+        En la industria musical, los datos provienen de docenas de fuentes distintas: Spotify, Apple Music, YouTube, distribuidoras, plataformas de tickets, reportes de campañas, hojas de merch. Cada una tiene su propio formato, su propia convención de nombres, sus propios errores sistemáticos. Cuando consolidas todo eso, los problemas de calidad se multiplican.
+      </p>
+      <p style="font-size:.95rem;color:var(--gray);line-height:1.85;">
+        El principio que gobierna esta clase es <strong>GIGO: Garbage In, Garbage Out</strong>. Si entras con datos sucios, el análisis más sofisticado del mundo producirá conclusiones incorrectas. Un artista puede parecer que creció 40% en un mes cuando en realidad había datos duplicados. Una campaña puede parecer fallida cuando en realidad los streams llegaron como texto y el SUMAR.SI los ignoró silenciosamente.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div style="border:1px solid var(--border);border-top:3px solid var(--teal);padding:1.2rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.5rem;">Principio GIGO</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);font-style:italic;line-height:1.4;">"Garbage In,<br>Garbage Out"</div>
+        <div style="font-size:.78rem;color:var(--gray);margin-top:.5rem;line-height:1.5;">Datos sucios producen conclusiones incorrectas, independientemente de qué tan buena sea la herramienta o el analista.</div>
+      </div>
+      <div style="border:1px solid var(--border);border-top:3px solid var(--gold);padding:1.2rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.5rem;">Regla del 70/30</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);font-style:italic;line-height:1.4;">70% limpieza,<br>30% análisis</div>
+        <div style="font-size:.78rem;color:var(--gray);margin-top:.5rem;line-height:1.5;">En proyectos de datos reales, la mayoría del tiempo se gasta preparando y limpiando datos, no analizándolos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem;">
+    <div style="border:1px solid var(--border);padding:1.2rem;border-left:3px solid var(--teal);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:.5rem;">Correctos</div>
+      <div style="font-size:.83rem;color:var(--ink);font-weight:600;margin-bottom:.3rem;">Los valores son verdaderos</div>
+      <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">Un save rate de 340% no es correcto. Streams negativos no son correctos. Los valores deben existir en el mundo real.</div>
+    </div>
+    <div style="border:1px solid var(--border);padding:1.2rem;border-left:3px solid var(--gold);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:.5rem;">Completos</div>
+      <div style="font-size:.83rem;color:var(--ink);font-weight:600;margin-bottom:.3rem;">No faltan datos críticos</div>
+      <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">Si el 30% de las filas no tiene revenue, cualquier suma de ingresos será incompleta y engañosa sin la nota correcta.</div>
+    </div>
+    <div style="border:1px solid var(--border);padding:1.2rem;border-left:3px solid var(--purple);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:.5rem;">Consistentes</div>
+      <div style="font-size:.83rem;color:var(--ink);font-weight:600;margin-bottom:.3rem;">El mismo valor siempre igual</div>
+      <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">"Norte Verdadero", "NORTE VERDADERO" y " Norte Verdadero" son tres artistas para Sheets. Consistencia es unificarlos.</div>
+    </div>
+    <div style="border:1px solid var(--border);padding:1.2rem;border-left:3px solid var(--red);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:.5rem;">Confiables</div>
+      <div style="font-size:.83rem;color:var(--ink);font-weight:600;margin-bottom:.3rem;">La fuente es verificable</div>
+      <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">Un dato sin fuente identificada no se puede validar. Si no sabes de dónde vino, no puedes confiar en él para decisiones.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">La pregunta que debes hacerte siempre</div>
+    <p>Antes de analizar cualquier dataset: <strong>¿Confío en estos datos lo suficiente como para tomar una decisión basada en ellos?</strong> Si la respuesta no es un sí rotundo, primero auditas y limpias. El análisis puede esperar. Las decisiones incorrectas no se deshacen fácilmente.</p>
+  </div>
+</section>
+
+<!-- B1 TAXONOMÍA -->
+<section>
+  <div class="section-number">01 · Taxonomía de Errores</div>
+  <div class="section-title">Los tipos de errores que viven en tus datos</div>
+  <div class="section-subtitle">20 min · Si no sabes nombrar el error, no sabes cómo resolverlo</div>
+
+  <div class="hook-box">
+    <div class="hook-label">Dataset de la clase</div>
+    <h3>Un sello pequeño consolida 6 meses de reportes de 3 artistas. El archivo tiene 847 filas. A primera vista se ve bien.</h3>
+    <p>Toda la clase trabajamos sobre ese dataset. Cada bloque descubre una capa distinta de problemas — exactamente como pasa en la realidad.</p>
+  </div>
+
+  <div class="time-pill">Haz clic en cada tarjeta para ver ejemplo y solución</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;" id="error-tax-grid">
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Regla de los 3 tipos</div>
+    <p>Los errores de <strong>estructura</strong> se detectan fácil (vacíos, duplicados). Los de <strong>contenido</strong> requieren revisar formato y consistencia. Los de <strong>lógica</strong> requieren conocer el negocio — ninguna fórmula los detecta sola.</p>
+  </div>
+</section>
+
+
+<!-- THEORY 2 — Cómo auditar un dataset -->
+<section>
+  <div class="section-number">01b · Marco Teórico</div>
+  <div class="section-title">El proceso de auditoría de datos</div>
+  <div class="section-subtitle">Auditar no es buscar errores al azar — es un proceso sistemático con pasos definidos</div>
+
+  <div style="margin-bottom:2.5rem;">
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;margin-bottom:1.2rem;">
+      La auditoría de datos es la inspección sistemática de un dataset para identificar problemas antes de analizarlo. No se trata de abrir el archivo y "ver cómo se ve" — se trata de seguir una secuencia de verificaciones que cubra todos los tipos de error posibles.
+    </p>
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;">
+      Existe una diferencia fundamental entre <strong>exploración</strong> y <strong>auditoría</strong>. Explorar es navegar los datos sin dirección para entender qué hay. Auditar es verificar sistemáticamente que los datos cumplen con criterios de calidad definidos. Ambas son necesarias, pero en ese orden: exploras para entender la estructura, luego auditas para verificar la calidad.
+    </p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:0;margin-bottom:2.5rem;border:1px solid var(--border);">
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--teal);flex-shrink:0;">1</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Perfil del dataset</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">Cuántas filas, cuántas columnas, de dónde viene cada campo. Antes de buscar errores necesitas entender qué debería contener el dataset y qué significa cada columna.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);background:var(--teal-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">¿Cuántas filas espero? ¿Cuántas hay?</div>
+      </div>
+    </div>
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--teal);flex-shrink:0;">2</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Verificación de estructura</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">¿Los encabezados están bien? ¿Hay columnas completamente vacías? ¿Hay filas de totales mezcladas con datos? ¿Cada columna tiene un solo tipo de dato?</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);background:var(--teal-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">Revisa antes de abrir fórmulas</div>
+      </div>
+    </div>
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--teal);flex-shrink:0;">3</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Detección de nulos y vacíos</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">¿Cuántas celdas vacías hay por columna? ¿Son aceptables o representan pérdida de información crítica? Un 5% de nulos en revenue es muy diferente a un 40%.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);background:var(--teal-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">=CONTAR.BLANCO(A:A)</div>
+      </div>
+    </div>
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--teal);flex-shrink:0;">4</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Verificación de tipos de dato</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">¿Los números son realmente números? ¿Las fechas son realmente fechas? En Sheets: los números reales se alinean a la derecha. Los textos a la izquierda. Una columna mezclada es señal de alerta inmediata.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);background:var(--teal-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">=ESNUMERO(A2) → debe dar VERDADERO</div>
+      </div>
+    </div>
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--teal);flex-shrink:0;">5</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Búsqueda de duplicados</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">¿Hay filas idénticas o casi idénticas? Los duplicados exactos son fáciles. Los parciales requieren criterio: ¿es el mismo registro con un error o son dos eventos legítimos?</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--teal);background:var(--teal-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">Datos → Limpieza → Eliminar duplicados</div>
+      </div>
+    </div>
+    <div style="padding:1.2rem 1.5rem;display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:#fff;">
+      <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;color:var(--gold);flex-shrink:0;">6</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.3rem;">Validación de lógica de negocio</div>
+        <div style="font-size:.82rem;color:var(--gray);line-height:1.6;">¿Los valores tienen sentido para este negocio? Este paso no lo puede hacer una fórmula sola — requiere que el analista conozca el contexto. Un save rate de 340% es una fórmula que no detecta automáticamente como error.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--gold);background:var(--gold-light);padding:.25rem .6rem;border-radius:2px;display:inline-block;margin-top:.4rem;">Requiere criterio de negocio, no solo fórmulas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-label">El error más común en auditoría</div>
+    <p>Saltar directo al paso 6 (validación de lógica) sin hacer los pasos 1-5 primero. La lógica de negocio no puede validarse sobre datos estructuralmente corruptos. <strong>El proceso es secuencial y no tiene atajos.</strong></p>
+  </div>
+</section>
+
+<!-- B2 AUDITORÍA 1 -->
+<section>
+  <div class="section-number">02 · Auditoría — Nivel 1</div>
+  <div class="section-title">Encuentra los errores ocultos</div>
+  <div class="section-subtitle">20 min · Haz clic en cada celda que creas que tiene un error. Hay 8 errores. Usa el toggle para ver las respuestas.</div>
+
+  <div class="sim-container" id="audit1-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Reporte mensual del sello — 8 errores ocultos</div>
+        <div class="sim-header-sub">Haz clic en celdas sospechosas · Revela las respuestas con el toggle</div>
+      </div>
+      <span class="sim-tag tag-red">8 ERRORES</span>
+    </div>
+    <div class="audit-bar">
+      <span style="color:var(--gray);font-size:.82rem;">Encontrados:</span>
+      <span class="audit-num" id="a1-found">0</span>
+      <span style="color:var(--gray);font-size:.82rem;">de 8</span>
+      <div style="display:flex;gap:.5rem;margin-left:auto;">
+        <button class="tab-btn on" id="a1-mode-find" onclick="setAuditMode(1,'find')">🔍 Buscar</button>
+        <button class="tab-btn" id="a1-mode-show" onclick="setAuditMode(1,'show')">👁 Ver respuestas</button>
+      </div>
+    </div>
+    <div style="padding:1.5rem;overflow-x:auto;">
+      <table class="spreadsheet" id="a1-table"></table>
+    </div>
+    <div class="audit-msg" id="a1-msg">👆 Haz clic en una celda para ver si tiene un error</div>
+  </div>
+</section>
+
+<!-- B2b AUDITORÍA 2 -->
+<section>
+  <div class="section-number">02b · Auditoría — Nivel 2</div>
+  <div class="section-title">Dataset multi-distribuidora — 10 errores</div>
+  <div class="section-subtitle">Reporte consolidado de 3 distribuidoras distintas. Algunos errores son obvios, otros requieren criterio.</div>
+
+  <div class="sim-container" id="audit2-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Reporte multi-distribuidora — 10 errores ocultos</div>
+        <div class="sim-header-sub">Haz clic en celdas sospechosas · Revela las respuestas con el toggle</div>
+      </div>
+      <span class="sim-tag tag-red">10 ERRORES</span>
+    </div>
+    <div class="audit-bar">
+      <span style="color:var(--gray);font-size:.82rem;">Encontrados:</span>
+      <span class="audit-num" id="a2-found">0</span>
+      <span style="color:var(--gray);font-size:.82rem;">de 10</span>
+      <div style="display:flex;gap:.5rem;margin-left:auto;">
+        <button class="tab-btn on" id="a2-mode-find" onclick="setAuditMode(2,'find')">🔍 Buscar</button>
+        <button class="tab-btn" id="a2-mode-show" onclick="setAuditMode(2,'show')">👁 Ver respuestas</button>
+      </div>
+    </div>
+    <div style="padding:1.5rem;overflow-x:auto;">
+      <table class="spreadsheet" id="a2-table"></table>
+    </div>
+    <div class="audit-msg" id="a2-msg">👆 Haz clic en una celda para ver si tiene un error</div>
+  </div>
+</section>
+
+
+<!-- THEORY 3 — Principios de limpieza -->
+<section>
+  <div class="section-number">02b · Marco Teórico</div>
+  <div class="section-title">Principios de limpieza de datos</div>
+  <div class="section-subtitle">Reglas que todo analista aplica antes de escribir una sola fórmula de limpieza</div>
+
+  <div style="margin-bottom:2.5rem;">
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;margin-bottom:1.2rem;">
+      Limpiar datos no es corregir errores al azar — es transformar sistemáticamente un dataset para que cumpla con estándares de calidad definidos. Cada acción de limpieza debe ser <strong>documentada, reversible y verificable</strong>.
+    </p>
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;">
+      En la práctica, la limpieza siempre involucra una decisión: ¿corrijo el dato, lo elimino, o lo marco como incierto? La decisión depende del impacto que ese dato tiene en el análisis final y de si puedes verificar su valor correcto. No existe una respuesta única para todos los casos.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;margin-bottom:2.5rem;">
+    <div style="border:1px solid var(--border);padding:1.5rem;border-top:3px solid var(--teal);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.8rem;">Principio 1</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.7rem;">Nunca modificar el original</div>
+      <div style="font-size:.83rem;color:var(--gray);line-height:1.6;">Siempre trabaja en una columna nueva o una hoja separada. Si algo sale mal puedes volver al punto de partida. En Sheets: duplica la hoja antes de limpiar.</div>
+    </div>
+    <div style="border:1px solid var(--border);padding:1.5rem;border-top:3px solid var(--gold);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.8rem;">Principio 2</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.7rem;">Documentar cada decisión</div>
+      <div style="font-size:.83rem;color:var(--gray);line-height:1.6;">¿Por qué eliminaste esa fila? ¿Por qué rellenaste ese nulo con 0? Si no lo documentas, en 3 semanas no sabrás por qué los datos se ven distintos a la fuente original.</div>
+    </div>
+    <div style="border:1px solid var(--border);padding:1.5rem;border-top:3px solid var(--purple);">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);margin-bottom:.8rem;">Principio 3</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.7rem;">Verificar después de limpiar</div>
+      <div style="font-size:.83rem;color:var(--gray);line-height:1.6;">Después de aplicar cada limpieza, verifica que el resultado es el esperado. =ESNUMERO(), =ESBLANCO(), contar filas antes y después. La limpieza no termina con la fórmula — termina con la verificación.</div>
+    </div>
+  </div>
+
+  <div style="border:1px solid var(--border);overflow:hidden;margin-bottom:2rem;">
+    <div style="background:#fff;border-bottom:1px solid var(--border);padding:.8rem 1.5rem;">
+      <div style="font-size:.8rem;font-weight:600;color:var(--ink);">Las 3 acciones de limpieza y cuándo aplicar cada una</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.83rem;">
+      <thead>
+        <tr>
+          <th style="background:#fff;border:1px solid var(--border);padding:.6rem 1rem;text-align:left;font-size:.75rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);">Acción</th>
+          <th style="background:#fff;border:1px solid var(--border);padding:.6rem 1rem;text-align:left;font-size:.75rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);">Cuándo aplicarla</th>
+          <th style="background:#fff;border:1px solid var(--border);padding:.6rem 1rem;text-align:left;font-size:.75rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);">Cuándo NO aplicarla</th>
+          <th style="background:#fff;border:1px solid var(--border);padding:.6rem 1rem;text-align:left;font-size:.75rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);">Ejemplo musical</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;font-weight:700;color:var(--teal);">Corregir</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">Conoces el valor correcto o puedes verificarlo con la fuente</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">No sabes cuál es el valor correcto — corregir sin saber es inventar datos</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">"Spotfy" → "Spotify" · "NORTE VERDADERO" → "Norte Verdadero"</td>
+        </tr>
+        <tr style="background:var(--light);">
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;font-weight:700;color:var(--gold);">Eliminar</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">El registro es un duplicado exacto, o el error lo hace completamente inservible para el análisis</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">Hay un outlier que no entiendes — eliminar sin investigar puede borrar el insight más importante</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">Fila duplicada exacta · Fecha imposible (2019-02-30)</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;font-weight:700;color:var(--purple);">Marcar como incierto</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">No puedes corregir ni es seguro eliminar. El dato puede ser válido pero no puedes confirmarlo ahora</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">Cuando tienes tiempo para investigar — marcar es temporal, no solución final</td>
+          <td style="border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);">Save rate de 340% — puede ser error de escala (3.40%) · Marcar "⚠ REVISAR" y continuar</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- B3 LIMPIEZA PASO A PASO -->
+<section>
+  <div class="section-number">03 · Limpieza Paso a Paso</div>
+  <div class="section-title">Aplica la corrección y ve el resultado al instante</div>
+  <div class="section-subtitle">25 min · 6 tipos de error — antes, fórmula y resultado en vivo</div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Simulador de limpieza — Google Sheets</div>
+        <div class="sim-header-sub">Selecciona el tipo de error para ver cómo se resuelve</div>
+      </div>
+      <span class="sim-tag tag-gold">PASO A PASO</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:.72rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Tipo de error:</span>
+      <button class="tab-btn on" id="cb-espacios" onclick="showClean('espacios')">Espacios extra</button>
+      <button class="tab-btn" id="cb-mojibake" onclick="showClean('mojibake')">Mojibake / encoding</button>
+      <button class="tab-btn" id="cb-nulos" onclick="showClean('nulos')">Celda vacía / null</button>
+      <button class="tab-btn" id="cb-texto_numero" onclick="showClean('texto_numero')">Número con coma</button>
+      <button class="tab-btn" id="cb-numero_letra" onclick="showClean('numero_letra')">Número con texto</button>
+      <button class="tab-btn" id="cb-mayus" onclick="showClean('mayus')">Mayúsculas</button>
+    </div>
+    <div class="clean-panels">
+      <div class="clean-panel-box">
+        <div class="cpb-label" style="color:var(--red);">❌ Celda original</div>
+        <div class="cpb-cell" style="background:var(--red-light);border:1px solid #FFCDD2;color:var(--red);" id="cp-before"></div>
+      </div>
+      <div class="clean-panel-box">
+        <div class="cpb-label" style="color:var(--teal);">Fórmula aplicada</div>
+        <div class="cpb-cell" style="background:var(--light);border:1px solid var(--border);border-left:3px solid var(--teal);color:var(--teal);font-size:.78rem;line-height:1.6;" id="cp-formula"></div>
+      </div>
+      <div class="clean-panel-box">
+        <div class="cpb-label" style="color:var(--teal);">✓ Resultado</div>
+        <div class="cpb-cell" style="background:var(--teal-light);border:1px solid var(--teal);color:var(--teal);" id="cp-after"></div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);font-size:.83rem;color:var(--gray);line-height:1.6;" id="cp-explain"></div>
+    <div style="padding:.6rem 1.5rem 1rem;font-size:.78rem;color:var(--teal);font-style:italic;" id="cp-music"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--teal)"></div>
+      <h4>Regla de columnas auxiliares</h4>
+      <p>Nunca limpies la celda original directamente. Crea una columna nueva con la fórmula de limpieza. Así puedes comparar original vs limpio y revertir si algo sale mal.<br><br>Cuando el resultado sea correcto, copia la columna nueva y pega como <strong>valores</strong> sobre la original.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--gold)"></div>
+      <h4>Verificar con ESNUMERO()</h4>
+      <p>Después de limpiar una columna numérica, verifica que Sheets realmente la reconoce como número:<br><br><code style="font-family:'DM Mono',monospace;font-size:.85em;background:var(--light);padding:.1rem .4rem">=ESNUMERO(A2)</code><br><br>Si da VERDADERO, el dato está listo. Si da FALSO, sigue siendo texto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- B3b TOGGLE ANTES/DESPUÉS -->
+<section>
+  <div class="section-number">03b · Antes y Después</div>
+  <div class="section-title">El mismo dataset — sucio vs limpio</div>
+  <div class="section-subtitle">Alterna entre las dos versiones para ver exactamente qué cambió y por qué</div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Toggle — Reporte del sello antes y después de limpieza</div>
+        <div class="sim-header-sub">Las celdas en verde son las que fueron corregidas</div>
+      </div>
+      <span class="sim-tag tag-teal">COMPARATIVA</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:.8rem;align-items:center;">
+      <button class="tab-btn on" id="tv-dirty" onclick="toggleView('dirty')">❌ Datos sucios</button>
+      <button class="tab-btn" id="tv-clean" onclick="toggleView('clean')">✓ Datos limpios</button>
+      <span id="tv-note" style="font-size:.75rem;color:var(--gray);margin-left:auto;font-style:italic;"></span>
+    </div>
+    <div style="padding:1.5rem;overflow-x:auto;">
+      <table class="spreadsheet" id="tv-table"></table>
+    </div>
+    <div id="tv-legend" style="padding:.8rem 1.5rem;font-size:.75rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:.8rem;"></div>
+  </div>
+</section>
+
+<!-- B3c DUPLICADOS PARCIALES -->
+<section>
+  <div class="section-number">03c · Duplicados Parciales</div>
+  <div class="section-title">Los duplicados que no se ven a simple vista</div>
+  <div class="section-subtitle">Los duplicados exactos son fáciles. Los parciales requieren criterio de negocio.</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--red)"></div>
+      <h4>Duplicado exacto</h4>
+      <p>Todas las columnas idénticas. Google Sheets lo detecta con <em>Datos → Limpieza de datos → Eliminar duplicados</em>. Fácil.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:.75rem;background:var(--light);border:1px solid var(--border);padding:.6rem .8rem;margin-top:.8rem;line-height:1.8;border-left:3px solid var(--red);">
+        Norte Verdadero | Montaña | 2026-03-15 | 412,000<br>
+        <span style="color:var(--red)">Norte Verdadero | Montaña | 2026-03-15 | 412,000</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--gold)"></div>
+      <h4>Duplicado parcial</h4>
+      <p>Mismo artista y canción, pero algún campo ligeramente distinto. ¿Es el mismo registro con error, o dos reportes legítimos? Solo el contexto lo dice.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:.75rem;background:var(--light);border:1px solid var(--border);padding:.6rem .8rem;margin-top:.8rem;line-height:1.8;border-left:3px solid var(--gold);">
+        Norte Verdadero | Montaña | Spotify | 2026-03-15 | 412,000<br>
+        <span style="color:var(--gold)">Norte Verdadero | Montaña | Apple Music | 2026-03-15 | 412,000</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Simulador — ¿Duplicado real o registros distintos?</div>
+        <div class="sim-header-sub">Haz clic en cada fila que creas que es un duplicado. Usa el toggle para ver las respuestas.</div>
+      </div>
+      <span class="sim-tag tag-red">CRITERIO</span>
+    </div>
+    <div class="audit-bar">
+      <span style="color:var(--gray);font-size:.82rem;">Duplicados identificados:</span>
+      <span class="audit-num" id="dup-found">0</span>
+      <span style="color:var(--gray);font-size:.82rem;">de 3</span>
+      <div style="display:flex;gap:.5rem;margin-left:auto;">
+        <button class="tab-btn on" id="dup-mode-find" onclick="setDupMode('find')">🔍 Buscar</button>
+        <button class="tab-btn" id="dup-mode-show" onclick="setDupMode('show')">👁 Ver respuestas</button>
+      </div>
+    </div>
+    <div style="padding:1.5rem;overflow-x:auto;">
+      <table class="spreadsheet" id="dup-table"></table>
+    </div>
+    <div class="audit-msg" id="dup-msg">👆 Haz clic en una fila para marcarla como duplicado</div>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-label">La pregunta clave antes de eliminar</div>
+    <p>¿Pueden existir dos registros legítimos con estos valores? Una canción puede tener 412,000 streams en Spotify Y 412,000 en Apple Music el mismo día. <strong>Eso no es duplicado — son plataformas distintas.</strong></p>
+  </div>
+</section>
+
+<!-- B3d VALIDADOR FECHAS -->
+<section>
+  <div class="section-number">03d · Validador de Fechas</div>
+  <div class="section-title">¿Google Sheets reconoce esta fecha?</div>
+  <div class="section-subtitle">El campo más problemático en reportes musicales — cada plataforma exporta diferente</div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Validador interactivo de fechas</div>
+        <div class="sim-header-sub">Escribe o elige un formato y descubre si Sheets lo reconoce</div>
+      </div>
+      <span class="sim-tag tag-teal">INTERACTIVO</span>
+    </div>
+    <div style="padding:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+      <div>
+        <div style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:.8rem;">Escribe la fecha como viene en tu reporte</div>
+        <input id="date-input" type="text" placeholder="Ej: abril 2026, Apr-26, 04/15/2026..."
+          style="width:100%;border:1px solid var(--border);padding:.6rem .9rem;font-family:'DM Mono',monospace;font-size:.9rem;border-radius:3px;outline:none;margin-bottom:.8rem;"
+          oninput="validateDate(this.value)">
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;">
+          <span style="font-size:.7rem;color:var(--gray);align-self:center;">Prueba:</span>
+          <button onclick="testDate('abril 2026')" class="tab-btn" style="font-size:.72rem;">abril 2026</button>
+          <button onclick="testDate('Apr-26')" class="tab-btn" style="font-size:.72rem;">Apr-26</button>
+          <button onclick="testDate('04/15/2026')" class="tab-btn" style="font-size:.72rem;">04/15/2026</button>
+          <button onclick="testDate('2026-04-15')" class="tab-btn" style="font-size:.72rem;">2026-04-15</button>
+          <button onclick="testDate('15/04/2026')" class="tab-btn" style="font-size:.72rem;">15/04/2026</button>
+          <button onclick="testDate('Q1 2026')" class="tab-btn" style="font-size:.72rem;">Q1 2026</button>
+        </div>
+        <div id="date-result-box" style="padding:1rem;border:1px solid var(--border);min-height:80px;font-size:.83rem;line-height:1.6;"></div>
+      </div>
+      <div>
+        <div style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:.8rem;">Referencia rápida</div>
+        <div id="date-ref-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B4 SQL -->
+<section>
+  <div class="section-number">04 · SQL para Limpieza</div>
+  <div class="section-title">La misma lógica que Sheets, pero en SQL</div>
+  <div class="section-subtitle">20 min · Si entiendes Sheets, ya entiendes la mitad de SQL</div>
+
+  <div class="hook-box">
+    <div class="hook-label">La analogía clave</div>
+    <h3>Todo lo que hace Sheets con fórmulas, SQL lo hace dentro de la consulta. La lógica es idéntica.</h3>
+    <p>ESPACIOS() en Sheets = TRIM() en SQL. VALOR() en Sheets = CAST() en SQL. SI.ERROR() en Sheets = COALESCE() en SQL.</p>
+  </div>
+
+  <div class="sql-grid">
+    <div class="sql-card">
+      <div class="sql-card-hdr"><span class="sql-func">TRIM()</span><span class="sql-equiv">= ESPACIOS() en Sheets</span></div>
+      <div class="sql-card-body">
+        <div class="sql-what">Elimina espacios al inicio y al final</div>
+        <div class="sql-code"><span class="kw">SELECT</span> <span class="fn">TRIM</span>(artista) <span class="kw">AS</span> artista_limpio
+<span class="kw">FROM</span> reportes_streaming;</div>
+        <div class="sql-music">🎵 Nombres de artistas con espacios invisibles desde Spotify</div>
+      </div>
+    </div>
+    <div class="sql-card">
+      <div class="sql-card-hdr"><span class="sql-func">COALESCE()</span><span class="sql-equiv">= SI.ERROR(...; 0) en Sheets</span></div>
+      <div class="sql-card-body">
+        <div class="sql-what">Reemplaza nulos con un valor por defecto</div>
+        <div class="sql-code"><span class="kw">SELECT</span> artista,
+  <span class="fn">COALESCE</span>(revenue, 0) <span class="kw">AS</span> revenue
+<span class="kw">FROM</span> reportes_streaming;</div>
+        <div class="sql-music">🎵 Revenue vacío aparece como $0 en lugar de romper totales</div>
+      </div>
+    </div>
+    <div class="sql-card">
+      <div class="sql-card-hdr"><span class="sql-func">CAST()</span><span class="sql-equiv">= VALOR() en Sheets</span></div>
+      <div class="sql-card-body">
+        <div class="sql-what">Convierte texto a número o fecha</div>
+        <div class="sql-code"><span class="kw">SELECT</span>
+  <span class="fn">CAST</span>(streams <span class="kw">AS</span> INT) <span class="kw">AS</span> streams,
+  <span class="fn">CAST</span>(fecha <span class="kw">AS</span> DATE) <span class="kw">AS</span> fecha
+<span class="kw">FROM</span> reportes_streaming;</div>
+        <div class="sql-music">🎵 Reportes de distribuidoras donde streams llega como texto</div>
+      </div>
+    </div>
+    <div class="sql-card">
+      <div class="sql-card-hdr"><span class="sql-func">CASE WHEN</span><span class="sql-equiv">= SI() anidado en Sheets</span></div>
+      <div class="sql-card-body">
+        <div class="sql-what">Evalúa condiciones y devuelve categorías</div>
+        <div class="sql-code"><span class="kw">SELECT</span> artista,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> streams &gt;= 1000000 <span class="kw">THEN</span> <span class="str">'Viral'</span>
+    <span class="kw">WHEN</span> streams &gt;= 100000  <span class="kw">THEN</span> <span class="str">'Alto'</span>
+    <span class="kw">ELSE</span> <span class="str">'Medio/Bajo'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> nivel
+<span class="kw">FROM</span> reportes_streaming;</div>
+        <div class="sql-music">🎵 Clasificar canciones por nivel de streams automáticamente</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- THEORY 4 — Outliers -->
+<section>
+  <div class="section-number">04b · Marco Teórico</div>
+  <div class="section-title">Outliers: definición y métodos de detección</div>
+  <div class="section-subtitle">Un outlier mal manejado puede destruir un análisis o hacer desaparecer el insight más valioso</div>
+
+  <div style="margin-bottom:2rem;">
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;margin-bottom:1.2rem;">
+      Un <strong>outlier</strong> es un valor que se desvía significativamente del patrón del resto de los datos. Estadísticamente, se define de varias formas — la más común es cualquier valor que esté a más de 1.5 veces el rango intercuartílico (IQR) por encima o por debajo del tercer y primer cuartil, respectivamente.
+    </p>
+    <p style="font-size:.95rem;color:var(--gray);line-height:1.85;">
+      Pero en el análisis práctico de la industria musical, la definición estadística es solo el punto de partida. <strong>Lo que importa es la explicación</strong>. Un artista con 2 millones de streams en un mes donde el promedio es 100,000 es un outlier estadístico — pero si ese mes lanzó un sencillo con campaña pagada y entró a una playlist editorial, el dato es completamente válido y es el hallazgo más importante del análisis.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;">
+    <div>
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">3 causas de outliers</div>
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:.8rem;padding:.8rem;border:1px solid var(--border);align-items:start;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--red-light);display:flex;align-items:center;justify-content:center;font-size:.8rem;">1</div>
+          <div>
+            <div style="font-weight:600;font-size:.85rem;color:var(--ink);margin-bottom:.2rem;">Error de medición o captura</div>
+            <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">El dato es incorrecto. Revenue de $999,999 cuando el promedio es $500. Streams de -5,000. Se debe investigar y corregir o eliminar.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:.8rem;padding:.8rem;border:1px solid var(--border);align-items:start;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:.8rem;">2</div>
+          <div>
+            <div style="font-weight:600;font-size:.85rem;color:var(--ink);margin-bottom:.2rem;">Evento real excepcional</div>
+            <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">El dato es correcto pero refleja un evento inusual: viral orgánico, playlist editorial, aparición en medios, campaña intensiva. Es el insight más valioso.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:.8rem;padding:.8rem;border:1px solid var(--border);align-items:start;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:.8rem;">3</div>
+          <div>
+            <div style="font-weight:600;font-size:.85rem;color:var(--ink);margin-bottom:.2rem;">Variabilidad natural del sistema</div>
+            <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">En industrias creativas, la distribución de éxito no es normal — es de cola larga. Un artista puede tener 100x más streams que el promedio sin que sea un error.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Métodos de detección en Sheets</div>
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div style="padding:.8rem;border:1px solid var(--border);border-left:3px solid var(--teal);">
+          <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--teal);margin-bottom:.3rem;">Regla del ±3 desviaciones estándar</div>
+          <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">Un valor es outlier si se aleja más de 3 desviaciones del promedio. En Sheets: <code style="font-family:'DM Mono',monospace;background:var(--light);padding:.1rem .3rem">=ABS(A2-PROMEDIO($A$2:$A$100))/DESVEST($A$2:$A$100)>3</code></div>
+        </div>
+        <div style="padding:.8rem;border:1px solid var(--border);border-left:3px solid var(--gold);">
+          <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--gold);margin-bottom:.3rem;">Formato condicional visual</div>
+          <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">En Sheets: Formato → Formato condicional → Mayor que [promedio + 2x desviación]. Los outliers se colorean automáticamente para revisión visual rápida.</div>
+        </div>
+        <div style="padding:.8rem;border:1px solid var(--border);border-left:3px solid var(--purple);">
+          <div style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--purple);margin-bottom:.3rem;">Ordenar y revisar extremos</div>
+          <div style="font-size:.78rem;color:var(--gray);line-height:1.5;">El método más simple: ordenar la columna de mayor a menor y revisar el top 5 y el bottom 5. Para datasets pequeños (&lt;1,000 filas) es suficiente y más rápido que cualquier fórmula.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B5 OUTLIERS -->
+<section>
+  <div class="section-number">05 · Outliers</div>
+  <div class="section-title">¿Cuándo eliminar y cuándo investigar?</div>
+  <div class="section-subtitle">15 min · El error más caro: eliminar un outlier real</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--red)"></div>
+      <h4>¿Qué es un outlier?</h4>
+      <p>Un valor que se aleja significativamente del resto. Puede ser un error de datos — o el insight más importante del análisis.<br><br>La clave es <strong>investigar antes de decidir</strong>. Nunca eliminar automáticamente.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--teal)"></div>
+      <h4>La pregunta correcta</h4>
+      <p>No es "¿debo eliminarlo?" sino "¿tiene una explicación?".<br><br>Un outlier con explicación es un insight. Un outlier sin explicación es un error. La diferencia la da el contexto del negocio.</p>
+    </div>
+  </div>
+
+  <div class="outlier-grid">
+    <div class="outlier-card">
+      <div style="font-size:1.4rem;margin-bottom:.6rem;">🔴</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:.5rem;">Outlier → Eliminar</div>
+      <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.5rem;">Error de captura</div>
+      <div style="font-size:.8rem;color:var(--gray);line-height:1.6;margin-bottom:.6rem;">Revenue de $999,999 cuando el promedio es $500. Streams de 10M en artista emergente sin historial ni campaña. El dato es claramente incorrecto.</div>
+      <div style="font-size:.78rem;font-weight:600;padding-top:.6rem;border-top:1px solid var(--border);color:var(--red);">→ Verificar fuente y corregir o eliminar</div>
+    </div>
+    <div class="outlier-card">
+      <div style="font-size:1.4rem;margin-bottom:.6rem;">🟡</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:.5rem;">Outlier → Conservar</div>
+      <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.5rem;">Evento real</div>
+      <div style="font-size:.8rem;color:var(--gray);line-height:1.6;margin-bottom:.6rem;">La canción entró a una playlist editorial de Spotify ese mes. O salió en TV. O hubo campaña pagada intensa. El pico es real y es el insight más importante.</div>
+      <div style="font-size:.78rem;font-weight:600;padding-top:.6rem;border-top:1px solid var(--border);color:var(--teal);">→ Conservar y documentar la causa</div>
+    </div>
+    <div class="outlier-card">
+      <div style="font-size:1.4rem;margin-bottom:.6rem;">⚪</div>
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.5rem;">Outlier → Investigar</div>
+      <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.5rem;">Caída súbita</div>
+      <div style="font-size:.8rem;color:var(--gray);line-height:1.6;margin-bottom:.6rem;">Un mes casi en cero con historial sólido. Puede ser que la plataforma no reportó, problema técnico, o la canción fue removida temporalmente.</div>
+      <div style="font-size:.78rem;font-weight:600;padding-top:.6rem;border-top:1px solid var(--border);color:var(--gold);">→ Verificar si el dato es real antes de analizar</div>
+    </div>
+  </div>
+</section>
+
+<!-- B6 VALIDACIÓN -->
+<section>
+  <div class="section-number">06 · Validación Final</div>
+  <div class="section-title">¿Cómo saber que tu dataset está listo?</div>
+  <div class="section-subtitle">15 min · Completa el checklist antes de hacer cualquier análisis</div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Checklist de validación — Dataset listo para análisis</div>
+        <div class="sim-header-sub">Marca cada punto al completarlo</div>
+      </div>
+      <span class="sim-tag tag-teal">INTERACTIVO</span>
+    </div>
+    <div class="val-progress"><div class="val-progress-fill" id="val-fill" style="width:0%"></div></div>
+    <div class="val-progress-lbl"><span id="val-count-lbl">0 de 12 completadas</span><span id="val-pct-lbl">0%</span></div>
+    <div class="val-cols">
+      <div class="val-col">
+        <div class="val-col-title">Estructura</div>
+        <div id="val-col-left"></div>
+      </div>
+      <div class="val-col">
+        <div class="val-col-title">Contenido y Lógica</div>
+        <div id="val-col-right"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Cuándo estás listo</div>
+    <p>No existe un dataset perfectamente limpio. El objetivo es <strong>conocer los problemas que quedan</strong> y documentarlos. Un analista que conoce los límites de sus datos es más confiable que uno que asume que son perfectos.</p>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="key-takeaways">
+        <li><span class="kt-check">✓</span> 3 tipos de error: estructura, contenido y lógica. Los de lógica requieren criterio de negocio.</li>
+        <li><span class="kt-check">✓</span> Auditar primero, limpiar después — nunca al revés.</li>
+        <li><span class="kt-check">✓</span> Nunca limpies el original — trabaja en columnas auxiliares.</li>
+        <li><span class="kt-check">✓</span> SQL es la misma lógica que Sheets: TRIM=ESPACIOS, COALESCE=SI.ERROR, CAST=VALOR.</li>
+        <li><span class="kt-check">✓</span> Un outlier no se elimina — se investiga primero.</li>
+        <li><span class="kt-check">✓</span> Conocer los límites de tus datos es parte del análisis.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="next-class">
+        <div class="nc-label">Próxima clase</div>
+        <div class="nc-title">Clase 4 — SQL con Criterio de Negocio</div>
+        <ul class="nc-items">
+          <li>SELECT, JOIN y GROUP BY con enfoque analítico</li>
+          <li>CTEs para queries legibles y reutilizables</li>
+          <li>Consultas de catálogo: canciones, álbumes, revenue</li>
+          <li>Casos reales del sello discográfico en SQL</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Clase 03 · Limpieza y Calidad de Datos</span>
+  <nav class="footer-nav"><a href="#">← Clase 02</a><a href="#">Clase 04 →</a></nav>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════════
+
+const TAX_DATA = [
+  {icon:'🕳️', name:'Valores nulos / vacíos', type:'estructura', typeLabel:'Estructura',
+   desc:'Celdas vacías donde debería haber un dato. Vienen de exports incompletos, campos opcionales no llenados, o joins fallidos entre tablas.',
+   ex:'Artista         | Streams | Revenue\nNorte Verdadero |  412000 |         ← vacío\nThell Barrio    |         |   930   ← vacío',
+   fix:'Sheets: =SI(A1="";"Sin dato";A1)  ·  SQL: COALESCE(revenue, 0)'},
+  {icon:'👯', name:'Duplicados', type:'estructura', typeLabel:'Estructura',
+   desc:'La misma fila más de una vez. Causa totales inflados y métricas incorrectas. Frecuente al consolidar reportes de varias fuentes.',
+   ex:'Fecha      | Artista         | Streams\n2026-04-01 | Norte Verdadero |  95000\n2026-04-01 | Norte Verdadero |  95000  ← igual\n2026-04-01 | Norte Verdadero |  95000  ← igual',
+   fix:'Sheets: Datos → Limpieza → Eliminar duplicados  ·  SQL: SELECT DISTINCT'},
+  {icon:'🔤', name:'Texto inconsistente', type:'contenido', typeLabel:'Contenido',
+   desc:'El mismo valor escrito de formas distintas. Sheets los trata como categorías separadas, arruinando tablas dinámicas.',
+   ex:'norte verdadero    minúsculas\nNORTE VERDADERO    mayúsculas\n Norte Verdadero   espacio al inicio\nNorte verdadero    capitalización mixta',
+   fix:'Sheets: =NOMPROPIO(ESPACIOS(A1))  ·  SQL: TRIM(UPPER(artista))'},
+  {icon:'📅', name:'Fechas inconsistentes', type:'contenido', typeLabel:'Contenido',
+   desc:'El error más frecuente en reportes de música. Cada plataforma exporta en formato distinto. Sheets puede confundir día y mes.',
+   ex:'15/04/2026   formato MX\n2026-04-15   formato ISO\nabril 2026   texto sin día\nApr-26       abreviatura inglesa\n04/15/26     formato USA',
+   fix:'Sheets: =TEXTO(A1;"AAAA-MM-DD")  ·  SQL: CAST(fecha AS DATE)'},
+  {icon:'🔢', name:'Números como texto', type:'contenido', typeLabel:'Contenido',
+   desc:'Sheets almacena el valor pero lo trata como texto. Los SUMAR.SI dan 0. Se reconoce porque los números se alinean a la izquierda.',
+   ex:'Streams\n"412,000"    comas, es texto\n"$1,236"     símbolo $, texto\n"1.2M"       letra M, texto\n 95000       número real ✓',
+   fix:'Sheets: =VALOR(SUSTITUIR(A1;",";""))  ·  SQL: CAST(streams AS INT)'},
+  {icon:'🧮', name:'Errores de lógica', type:'logica', typeLabel:'Lógica',
+   desc:'Los datos son técnicamente válidos pero imposibles o inconsistentes. No se detectan con fórmulas solas, requieren criterio de negocio.',
+   ex:'Save rate: 340%    imposible (máx 100%)\nStreams: -5,000    negativo sin sentido\nRevenue: $0 con 2M streams\nFecha: 2019-02-30  no existe ese día',
+   fix:'Sheets: =SI(O(A1<0;A1>100);"REVISAR";"OK")  ·  SQL: WHERE save_rate BETWEEN 0 AND 100'},
+];
+
+const TAX_COLORS = {estructura:'var(--red)',contenido:'var(--gold)',logica:'var(--purple)'};
+const TAX_BG = {estructura:'var(--red-light)',contenido:'var(--gold-light)',logica:'var(--purple-light)'};
+
+// Audit data — messages stored in arrays indexed by [row][col]
+const A1_HEADERS = ['Artista','Canción','Fecha','Streams','Save Rate','Revenue'];
+const A1_CELLS = [
+  [{v:'Norte Verdadero',e:0},{v:'Montaña',e:0},{v:'2026-01-15',e:0},{v:'95,000',e:0},{v:'6.2%',e:0},{v:'$285',e:0}],
+  [{v:' Norte Verdadero',e:1},{v:'Montaña',e:0},{v:'2026-02-15',e:0},{v:'112,000',e:0},{v:'6.8%',e:0},{v:'$336',e:0}],
+  [{v:'Thell Barrio',e:0},{v:'Canción Demo B',e:0},{v:'04/15/2026',e:1},{v:'310,000',e:0},{v:'5.1%',e:0},{v:'$930',e:0}],
+  [{v:'Artista Demo A',e:0},{v:'Canción Demo C',e:0},{v:'2026-01-20',e:0},{v:'"820,000"',e:1},{v:'7.4%',e:0},{v:'$2,460',e:0}],
+  [{v:'Artista Demo A',e:0},{v:'Canción Demo C',e:0},{v:'2026-02-20',e:0},{v:'950,000',e:0},{v:'340%',e:1},{v:'$2,850',e:0}],
+  [{v:'Thell Barrio',e:0},{v:'Canción Demo D',e:0},{v:'2026-03-01',e:0},{v:'290,000',e:0},{v:'4.9%',e:0},{v:'',e:1}],
+  [{v:'NORTE VERDADERO',e:1},{v:'Montaña',e:0},{v:'2026-03-15',e:0},{v:'205,000',e:0},{v:'7.1%',e:0},{v:'$615',e:0}],
+  [{v:'Norte Verdadero',e:0},{v:'Montaña',e:0},{v:'2026-03-15',e:0},{v:'205,000',e:0},{v:'7.1%',e:0},{v:'$615',e:1}],
+  [{v:'Artista Demo B',e:0},{v:'Canción Demo E',e:0},{v:'abril 2026',e:1},{v:'1,900,000',e:0},{v:'8.2%',e:0},{v:'$5,700',e:0}],
+];
+const A1_MSGS = {
+  '1-0':'Espacio invisible al inicio. ESPACIOS() lo elimina. Sheets cuenta este artista como diferente al de la fila 1.',
+  '2-2':'Formato USA (mes/día/año). Puede confundir día y mes. Estandarizar a AAAA-MM-DD.',
+  '3-3':'Número entre comillas — Sheets lo lee como texto. SUMAR.SI lo ignora. Usar VALOR(SUSTITUIR(D5)).',
+  '4-4':'Save rate de 340% es imposible. El máximo es 100%. Revisar — puede ser 3.40% mal ingresado.',
+  '5-5':'Celda vacía en Revenue. ¿Es $0 o falta el dato? Investigar con la distribuidora antes de asumir.',
+  '6-0':'Nombre en mayúsculas. Sheets lo cuenta como artista distinto. Usar =NOMPROPIO(ESPACIOS(A8)).',
+  '7-5':'Fila duplicada exacta de la anterior. Usar Datos → Limpieza de datos → Eliminar duplicados.',
+  '8-2':'Fecha como texto: "abril 2026" no tiene día. Sheets no puede ordenar ni filtrar por rango.',
+};
+
+const A2_HEADERS = ['Distribuidora','Artista','Canción','Plataforma','Streams','Revenue USD','Fecha pago'];
+const A2_CELLS = [
+  [{v:'DistroKid',e:0},{v:'Norte Verdadero',e:0},{v:'Montaña',e:0},{v:'Spotify',e:0},{v:'412,000',e:0},{v:'$1,236',e:0},{v:'2026-03-15',e:0}],
+  [{v:'DistroKid',e:0},{v:'Norte',e:1},{v:'Verdadero',e:1},{v:'Apple Music',e:0},{v:'38,000',e:0},{v:'$114',e:0},{v:'2026-03-15',e:0}],
+  [{v:'TuneCore',e:0},{v:'Thell Barrio',e:0},{v:'Canción Demo B',e:0},{v:'Spotify',e:0},{v:'-5,000',e:1},{v:'$0',e:0},{v:'2026-03-20',e:0}],
+  [{v:'CD Baby',e:0},{v:'Artista Demo A',e:0},{v:'Canción Demo C',e:0},{v:'Spotfy',e:1},{v:'820,000',e:0},{v:'$2,460',e:0},{v:'2026-02-28',e:0}],
+  [{v:'TuneCore',e:0},{v:'Artista Demo B',e:0},{v:'Canción Demo D',e:0},{v:'YouTube Music',e:0},{v:'290,000',e:0},{v:'$8,700 MXN',e:1},{v:'2026-03-01',e:0}],
+  [{v:'DistroKid',e:0},{v:'Norte Verdadero',e:0},{v:'Montaña',e:0},{v:'Spotify',e:0},{v:'412,000',e:0},{v:'$1,236',e:0},{v:'2027-08-15',e:1}],
+  [{v:'CD Baby',e:0},{v:'Thell Barrio',e:0},{v:'Canción Demo E',e:0},{v:'Deezer',e:0},{v:'1.2K',e:1},{v:'$3.60',e:0},{v:'2026-03-10',e:0}],
+  [{v:'TuneCore',e:0},{v:'Artista Demo A',e:0},{v:'Canción Demo C',e:0},{v:'Spotify',e:0},{v:'950,000',e:0},{v:'$2,850',e:0},{v:'2026-02-20',e:0}],
+  [{v:'',e:1},{v:'Artista Demo B',e:0},{v:'Canción Demo F',e:0},{v:'Amazon Music',e:0},{v:'180,000',e:0},{v:'$540',e:0},{v:'2026-03-05',e:0}],
+  [{v:'DistroKid',e:0},{v:'Norte Verdadero',e:0},{v:'Montaña',e:0},{v:'Spotify',e:0},{v:'412,000',e:0},{v:'$1,236',e:0},{v:'2026-03-15',e:1}],
+];
+const A2_MSGS = {
+  '1-1':'Nombre partido en dos columnas: "Norte" en B, "Verdadero" en C. Ocurre al importar CSV con coma en el nombre. Concatenar con =B3&" "&C3.',
+  '1-2':'Apellido del artista en columna Canción. Ver celda B3 para el contexto. Usar =B3&" "&C3 para unir.',
+  '2-4':'Streams negativos: -5,000 es imposible. Probable ajuste de reporte. Investigar con TuneCore antes de eliminar.',
+  '3-3':'Typo: "Spotfy" en lugar de "Spotify". Sheets lo trata como plataforma distinta. Usar Edición → Buscar y reemplazar.',
+  '4-5':'Moneda mezclada: $8,700 MXN son pesos, el resto está en USD. No son comparables. Separar en columnas Revenue y Moneda.',
+  '5-6':'Fecha futura: 2027-08-15 no ha ocurrido. Probable error de año. Verificar si es 2026-08-15.',
+  '6-4':'"1.2K" es texto, no número. Sheets no puede sumar esto. Convertir con =VALOR(SUSTITUIR(E8;"K";""))*1000.',
+  '8-0':'Distribuidora en blanco: sin fuente no puedes validar el dato ni cruzarlo con estados de cuenta.',
+  '9-6':'Fila duplicada exacta de la fila 1. Triple duplicado junto con la fila 6 — inflaría totales x3.',
+};
+
+const CLEAN_DATA = {
+  espacios:{before:' Norte Verdadero ', formula:'=ESPACIOS(A2)', after:'Norte Verdadero',
+    explain:'ESPACIOS() elimina espacios extra al inicio, al final y dobles internos. Sin esto, Sheets trata " Norte Verdadero" y "Norte Verdadero" como dos artistas distintos — tus tablas dinámicas quedarán mal agrupadas.',
+    music:'🎵 Los espacios invisibles son el error #1 en reportes de streaming — vienen así casi siempre de Spotify for Artists y DistroKid'},
+  mojibake:{before:'Canci\u00f3n Dem\u00f3', formula:'No hay fórmula — se previene al importar', after:'Canción Demo',
+    explain:'Mojibake son los caracteres raros (Ã³, â€™) que aparecen cuando el archivo se guarda en un encoding y se abre en otro. La solución es importar con el encoding correcto: Archivo → Importar → UTF-8. Si ya tienes el problema, usa Edición → Buscar y reemplazar para corregir cada carácter raro.',
+    music:'🎵 Muy común en títulos con acentos (é, ó, ü) cuando la distribuidora exporta en Latin-1 y abres en Sheets con UTF-8'},
+  nulos:{before:'(celda vacía)', formula:'=SI(A2="";"Sin dato";A2)', after:'Sin dato',
+    explain:'Una celda vacía en Sheets no es cero — es ausencia de valor. Los SUMAR.SI la ignoran silenciosamente. Con SI() decides qué mostrar cuando falta el dato: "Sin dato", 0, o cualquier valor por defecto que tenga sentido para tu análisis.',
+    music:'🎵 Pasa cuando una distribuidora no reporta el revenue de una canción — la celda queda vacía y tu SUMAR.SI la omite sin avisar'},
+  texto_numero:{before:'412,000', formula:'=VALOR(SUSTITUIR(A2;",";""))', after:'412000',
+    explain:'Cuando un número llega con coma de miles, Sheets lo lee como texto — los números de texto se alinean a la izquierda. SUSTITUIR quita la coma y VALOR() convierte el resultado a número real. Verifica después con =ESNUMERO(B2) que devuelva VERDADERO.',
+    music:'🎵 DistroKid y Apple Music exportan streams como "412,000" con coma — parece número pero no lo es, y SUMAR.SI da 0'},
+  numero_letra:{before:'412000 streams', formula:'=VALOR(IZQUIERDA(A2;ENCONTRAR(" ";A2)-1))', after:'412000',
+    explain:'ENCONTRAR(" ";A2) encuentra la posición del espacio. Restamos 1 para quedarnos con los dígitos anteriores. IZQUIERDA() extrae ese fragmento y VALOR() lo convierte a número. Es el patrón para separar número de texto en una celda.',
+    music:'🎵 Algunos reportes exportan la unidad junto al valor: "412000 streams", "8.4% save rate" — todo en una celda que no puedes sumar'},
+  mayus:{before:'NORTE VERDADERO', formula:'=NOMPROPIO(ESPACIOS(A2))', after:'Norte Verdadero',
+    explain:'NOMPROPIO() capitaliza la primera letra de cada palabra. Lo combinamos con ESPACIOS() por si también hay espacios extra. Sin esto, "NORTE VERDADERO" y "Norte Verdadero" son artistas distintos para las tablas dinámicas.',
+    music:'🎵 TuneCore exporta nombres de artistas en mayúsculas completas — muy fácil de limpiar con esta combinación'},
+};
+
+const TV_HEADERS = ['Distribuidora','Artista','Canción','Plataforma','Streams','Revenue','Fecha'];
+const TV_DIRTY = [
+  ['DistroKid',' Norte Verdadero ','Montaña','Spotify','"412,000"','$1,236','15/04/2026'],
+  ['TuneCore','THELL BARRIO','Canción Demo B','Spotify','310,000','$930','2026-04-20'],
+  ['CD Baby','Artista Demo A','Canción Demo C','Spotfy','820,000','$2,460 USD','abril 2026'],
+  ['DistroKid',' Norte Verdadero ','Montaña','Spotify','"412,000"','$1,236','15/04/2026'],
+  ['TuneCore','artista demo b','Canción Demo D','YouTube Music','290,000','$870','2026-03-01'],
+];
+const TV_DIRTY_ERR = [
+  [0,1,0,0,1,0,1],[0,1,0,0,0,0,0],[0,0,0,1,0,1,1],[0,1,0,0,1,0,1],[0,1,0,0,0,0,0],
+];
+const TV_CLEAN = [
+  ['DistroKid','Norte Verdadero','Montaña','Spotify','412000','$1,236','2026-04-15'],
+  ['TuneCore','Thell Barrio','Canción Demo B','Spotify','310,000','$930','2026-04-20'],
+  ['CD Baby','Artista Demo A','Canción Demo C','Spotify','820,000','$2,460','2026-04-01'],
+  ['(fila eliminada — duplicado exacto de fila 1)','','','','','',''],
+  ['TuneCore','Artista Demo B','Canción Demo D','YouTube Music','290,000','$870','2026-03-01'],
+];
+const TV_CLEAN_FIX = [
+  [0,1,0,0,1,0,1],[0,1,0,0,0,0,0],[0,0,0,1,0,1,1],[1,0,0,0,0,0,0],[0,1,0,0,0,0,0],
+];
+const TV_CHANGES = [
+  '=ESPACIOS() — espacios invisibles removidos',
+  '=VALOR(SUSTITUIR()) — texto a número',
+  '=TEXTO(FECHANUMERO()) — fecha estandarizada',
+  '=NOMPROPIO() — capitalización correcta',
+  'Typo corregido (Spotfy → Spotify)',
+  '=SUSTITUIR() — símbolo moneda removido',
+  'Datos → Limpieza → Eliminar duplicados',
+];
+
+const DUP_ROWS = [
+  {a:'Norte Verdadero',c:'Montaña',p:'Spotify',s:'412,000',f:'2026-03-15',isDup:false,
+   note:'No es duplicado — este es el registro original de referencia.'},
+  {a:'Norte Verdadero',c:'Montaña',p:'Spotify',s:'412,000',f:'2026-03-15',isDup:true,
+   note:'Duplicado exacto de la fila 1 — misma plataforma, mismos streams, misma fecha. Eliminar.'},
+  {a:'Thell Barrio',c:'Demo B',p:'Spotify',s:'310,000',f:'2026-03-20',isDup:false,
+   note:'No es duplicado — artista diferente.'},
+  {a:'Thell Barrio',c:'Demo B',p:'Apple Music',s:'310,000',f:'2026-03-20',isDup:false,
+   note:'No es duplicado — misma canción pero plataforma diferente (Apple Music vs Spotify). Son dos registros legítimos.'},
+  {a:'Norte Verdadero',c:'Montaña',p:'Spotify',s:'412,001',f:'2026-03-15',isDup:true,
+   note:'Duplicado parcial — un stream de diferencia es error de redondeo al exportar. Conservar solo uno.'},
+  {a:'Artista Demo A',c:'Demo C',p:'Spotify',s:'820,000',f:'2026-02-28',isDup:false,
+   note:'No es duplicado — mes diferente al de la siguiente fila.'},
+  {a:'Artista Demo A',c:'Demo C',p:'Spotify',s:'820,000',f:'2026-03-01',isDup:false,
+   note:'No es duplicado — misma canción y plataforma pero mes diferente (marzo vs febrero).'},
+  {a:'Norte Verdadero',c:'Montaña',p:'Spotify',s:'412,000',f:'2026-04-15',isDup:true,
+   note:'Duplicado parcial — mismos datos que fila 1 pero mes diferente. Puede ser reporte del mes siguiente o error. Investigar.'},
+];
+
+const DATE_FORMATS = [
+  {f:'2026-04-15',ok:true,warn:false,label:'ISO 8601',tip:'El más recomendado. Ordena y filtra perfectamente en cualquier configuración.'},
+  {f:'15/04/2026',ok:true,warn:false,label:'Día/Mes/Año (MX)',tip:'Funciona si Sheets está en español MX.'},
+  {f:'04/15/2026',ok:false,warn:true,label:'Mes/Día/Año (USA)',tip:'Puede confundir día y mes con Sheets en español MX. Verificar con =ESNUMERO(A1).'},
+  {f:'15 abril 2026',ok:true,warn:false,label:'Español largo',tip:'Reconocido con Sheets en español.'},
+  {f:'April 15, 2026',ok:false,warn:true,label:'Inglés largo',tip:'Solo si Sheets está configurado en inglés.'},
+  {f:'abril 2026',ok:false,warn:false,label:'Mes-Año texto',tip:'Sin día — Sheets lo lee como texto. Necesitas FECHANUMERO().'},
+  {f:'Apr-26',ok:false,warn:false,label:'Abrev. inglesa',tip:'Texto puro. Necesitas SUSTITUIR() + FECHANUMERO().'},
+  {f:'Q1 2026',ok:false,warn:false,label:'Trimestre',tip:'No es una fecha. Convertir manualmente a fecha de inicio del trimestre.'},
+];
+
+const VAL_LEFT = [
+  'El número de filas coincide con lo esperado de la fuente',
+  'Los encabezados están en la primera fila sin fusiones',
+  'No hay columnas completamente vacías',
+  'No hay filas duplicadas exactas',
+  'El identificador principal es único por registro',
+  'No hay filas de totales mezcladas con los datos',
+];
+const VAL_RIGHT = [
+  'Columnas numéricas no tienen texto, símbolos ($, ,) ni abreviaturas (K, M)',
+  'Fechas están en un solo formato consistente',
+  'No hay valores imposibles (save rate >100%, streams negativos)',
+  'Nombres de artistas estandarizados (mayúsculas, sin espacios)',
+  'Valores nulos en columnas críticas han sido investigados',
+  'Outliers identificados y documentados con explicación',
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const auditState = {1:{found:0,mode:'find'}, 2:{found:0,mode:'find'}};
+let dupFoundCount = 0;
+let valChecked = 0;
+const valTotal = VAL_LEFT.length + VAL_RIGHT.length;
+
+// ═══════════════════════════════════════════════════════
+// TAXONOMY
+// ═══════════════════════════════════════════════════════
+function renderTaxonomy() {
+  const grid = document.getElementById('error-tax-grid');
+  if (!grid) return;
+  taxData.forEach(function(t, i) {
+    var card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border);background:#fff;overflow:hidden;cursor:pointer;transition:box-shadow .2s;border-radius:2px;';
+    card.innerHTML =
+      '<div style="padding:1rem 1.2rem .8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;">' +
+        '<span style="font-size:1.3rem;">' + t.icon + '</span>' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:.88rem;color:var(--ink);margin-bottom:.25rem;">' + t.name + '</div>' +
+          '<span style="font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .4rem;border-radius:2px;background:' + TAX_BG[t.type] + ';color:' + TAX_COLORS[t.type] + '">' + t.typeLabel + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div id="tax-body-' + i + '" style="display:none;padding:1rem 1.2rem;">' +
+        '<div style="font-size:.82rem;color:var(--gray);line-height:1.6;margin-bottom:.8rem;">' + t.desc + '</div>' +
+        '<pre style="font-family:\'DM Mono\',monospace;font-size:.72rem;background:var(--light);border:1px solid var(--border);padding:.5rem .8rem;margin-bottom:.7rem;color:var(--ink);white-space:pre-wrap;overflow-x:auto;">' + t.ex + '</pre>' +
+        '<div style="font-size:.78rem;color:var(--teal);font-weight:600;">✓ ' + t.fix + '</div>' +
+      '</div>';
+    card.addEventListener('click', function() {
+      var body = document.getElementById('tax-body-' + i);
+      var isOpen = body.style.display !== 'none';
+      // close all
+      for (var j = 0; j < TAX_DATA.length; j++) {
+        var b = document.getElementById('tax-body-' + j);
+        if (b) b.style.display = 'none';
+      }
+      if (!isOpen) {
+        body.style.display = 'block';
+        card.style.boxShadow = '0 4px 16px rgba(0,0,0,.08)';
+        card.style.borderColor = 'var(--teal)';
+      } else {
+        card.style.boxShadow = '';
+        card.style.borderColor = 'var(--border)';
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+// Alias for backward compat
+var taxData = TAX_DATA;
+
+// ═══════════════════════════════════════════════════════
+// AUDIT TABLES
+// ═══════════════════════════════════════════════════════
+function buildAuditTable(tableId, headers, rows, msgs, auditNum) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var html = '<thead><tr><th></th>';
+  headers.forEach(function(h) { html += '<th>' + h + '</th>'; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(function(row, ri) {
+    html += '<tr><td class="row-hdr">' + (ri + 2) + '</td>';
+    row.forEach(function(cell, ci) {
+      var key = ri + '-' + ci;
+      var isErr = cell.e === 1;
+      html += '<td class="audit-cell' + (isErr ? ' has-error' : '') + '" data-audit="' + auditNum + '" data-key="' + key + '">' + (cell.v || '') + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  table.querySelectorAll('.audit-cell').forEach(function(td) {
+    td.style.cursor = 'pointer';
+    td.style.transition = 'background .15s';
+    td.addEventListener('mouseenter', function() {
+      if (!this.dataset.done && auditState[auditNum].mode === 'find') {
+        this.style.background = 'var(--gold-light)';
+      }
+    });
+    td.addEventListener('mouseleave', function() {
+      if (!this.dataset.done) this.style.background = '';
+    });
+    td.addEventListener('click', function() {
+      if (auditState[auditNum].mode !== 'find') return;
+      if (this.dataset.done) return;
+      this.dataset.done = '1';
+      var key = this.dataset.key;
+      var isErr = this.classList.contains('has-error');
+      if (isErr) {
+        this.style.background = 'var(--red-light)';
+        this.style.color = 'var(--red)';
+        this.style.fontWeight = '600';
+        auditState[auditNum].found++;
+        document.getElementById('a' + auditNum + '-found').textContent = auditState[auditNum].found;
+        var msg = msgs[key] || 'Error encontrado.';
+        document.getElementById('a' + auditNum + '-msg').innerHTML = '🔴 <strong>¡Error encontrado!</strong> ' + msg;
+      } else {
+        this.style.background = 'var(--teal-light)';
+        var self = this;
+        setTimeout(function() {
+          self.style.background = '';
+          self.dataset.done = '';
+        }, 1000);
+        document.getElementById('a' + auditNum + '-msg').innerHTML = '✅ Celda limpia. Sigue buscando.';
+      }
+    });
+  });
+}
+
+function setAuditMode(auditNum, mode) {
+  auditState[auditNum].mode = mode;
+  var findBtn = document.getElementById('a' + auditNum + '-mode-find');
+  var showBtn = document.getElementById('a' + auditNum + '-mode-show');
+  if (findBtn) findBtn.classList.toggle('on', mode === 'find');
+  if (showBtn) showBtn.classList.toggle('on', mode === 'show');
+  var table = document.getElementById('a' + auditNum + '-table');
+  if (!table) return;
+  if (mode === 'show') {
+    table.querySelectorAll('.has-error').forEach(function(td) {
+      td.style.background = 'var(--red-light)';
+      td.style.color = 'var(--red)';
+      td.style.fontWeight = '600';
+      // Show tooltip on hover
+      var key = td.dataset.key;
+      var msgs = auditNum === 1 ? A1_MSGS : A2_MSGS;
+      td.title = msgs[key] || '';
+      td.dataset.done = '1';
+    });
+    document.getElementById('a' + auditNum + '-msg').innerHTML =
+      '👁 Celdas con error resaltadas en rojo. <strong>Pasa el cursor</strong> sobre cada una para ver la explicación.';
+  } else {
+    table.querySelectorAll('.audit-cell').forEach(function(td) {
+      td.style.background = '';
+      td.style.color = '';
+      td.style.fontWeight = '';
+      td.removeAttribute('title');
+      td.dataset.done = '';
+    });
+    auditState[auditNum].found = 0;
+    document.getElementById('a' + auditNum + '-found').textContent = '0';
+    document.getElementById('a' + auditNum + '-msg').innerHTML = '👆 Haz clic en una celda para ver si tiene un error';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CLEAN STEP
+// ═══════════════════════════════════════════════════════
+var cleanKeys = ['espacios','mojibake','nulos','texto_numero','numero_letra','mayus'];
+
+function showClean(key) {
+  cleanKeys.forEach(function(k) {
+    var btn = document.getElementById('cb-' + k);
+    if (btn) btn.classList.remove('on');
+  });
+  var activeBtn = document.getElementById('cb-' + key);
+  if (activeBtn) activeBtn.classList.add('on');
+  var d = CLEAN_DATA[key];
+  if (!d) return;
+  document.getElementById('cp-before').textContent = d.before;
+  document.getElementById('cp-formula').textContent = d.formula;
+  document.getElementById('cp-after').textContent = d.after;
+  document.getElementById('cp-explain').textContent = d.explain;
+  document.getElementById('cp-music').textContent = d.music;
+}
+
+// ═══════════════════════════════════════════════════════
+// TOGGLE VIEW
+// ═══════════════════════════════════════════════════════
+function toggleView(mode) {
+  var dirtyBtn = document.getElementById('tv-dirty');
+  var cleanBtn = document.getElementById('tv-clean');
+  if (dirtyBtn) dirtyBtn.classList.toggle('on', mode === 'dirty');
+  if (cleanBtn) cleanBtn.classList.toggle('on', mode === 'clean');
+  var rows = mode === 'dirty' ? TV_DIRTY : TV_CLEAN;
+  var flags = mode === 'dirty' ? TV_DIRTY_ERR : TV_CLEAN_FIX;
+  var html = '<thead><tr><th></th>';
+  TV_HEADERS.forEach(function(h) { html += '<th>' + h + '</th>'; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(function(row, ri) {
+    var isDel = row[0].indexOf('(fila') === 0;
+    html += '<tr><td class="row-hdr">' + (ri + 2) + '</td>';
+    if (isDel) {
+      html += '<td colspan="7" style="color:var(--gray);font-style:italic;font-size:.72rem;">' + row[0] + '</td>';
+    } else {
+      row.forEach(function(cell, ci) {
+        var flag = flags[ri] && flags[ri][ci];
+        var bg = flag ? (mode === 'clean' ? 'background:var(--teal-light);color:var(--teal);font-weight:600;' : 'background:var(--red-light);color:var(--red);') : '';
+        html += '<td style="' + bg + '">' + cell + '</td>';
+      });
+    }
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  var table = document.getElementById('tv-table');
+  if (table) table.innerHTML = html;
+  var note = document.getElementById('tv-note');
+  if (note) note.textContent = mode === 'clean' ? TV_CHANGES.length + ' correcciones aplicadas' : 'Dataset original sin limpiar';
+  var legend = document.getElementById('tv-legend');
+  if (legend) {
+    if (mode === 'clean') {
+      legend.innerHTML = TV_CHANGES.map(function(c) {
+        return '<span style="color:var(--teal);font-size:.75rem;">✓ ' + c + '</span>';
+      }).join('');
+    } else {
+      legend.innerHTML = '<span style="color:var(--red);font-size:.75rem;">Celdas en rojo necesitan limpieza</span>';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// DUPLICATES
+// ═══════════════════════════════════════════════════════
+function buildDupTable() {
+  var table = document.getElementById('dup-table');
+  if (!table) return;
+  var html = '<thead><tr><th></th><th>Artista</th><th>Canción</th><th>Plataforma</th><th>Streams</th><th>Fecha</th><th style="width:30px;text-align:center;">?</th></tr></thead><tbody>';
+  DUP_ROWS.forEach(function(row, i) {
+    html += '<tr id="dup-row-' + i + '" style="cursor:pointer;">' +
+      '<td class="row-hdr">' + (i + 1) + '</td>' +
+      '<td>' + row.a + '</td><td>' + row.c + '</td><td>' + row.p + '</td>' +
+      '<td>' + row.s + '</td><td>' + row.f + '</td>' +
+      '<td style="text-align:center;font-size:.85rem;" id="dup-icon-' + i + '">—</td>' +
+      '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+  DUP_ROWS.forEach(function(row, i) {
+    var tr = document.getElementById('dup-row-' + i);
+    if (tr) tr.addEventListener('click', function() { checkDup(i); });
+  });
+}
+
+function checkDup(i) {
+  var mode = document.getElementById('dup-mode-find').classList.contains('on') ? 'find' : 'show';
+  if (mode !== 'find') return;
+  var tr = document.getElementById('dup-row-' + i);
+  if (!tr || tr.dataset.checked) return;
+  tr.dataset.checked = '1';
+  var row = DUP_ROWS[i];
+  var icon = document.getElementById('dup-icon-' + i);
+  if (row.isDup) {
+    tr.style.background = 'var(--red-light)';
+    if (icon) { icon.textContent = '✗'; icon.style.color = 'var(--red)'; }
+    dupFoundCount++;
+    document.getElementById('dup-found').textContent = dupFoundCount;
+    document.getElementById('dup-msg').innerHTML = '🔴 <strong>Duplicado correcto.</strong> ' + row.note;
+  } else {
+    tr.style.background = 'var(--teal-light)';
+    if (icon) { icon.textContent = '✓'; icon.style.color = 'var(--teal)'; }
+    setTimeout(function() {
+      tr.style.background = '';
+      tr.dataset.checked = '';
+      if (icon) { icon.textContent = '—'; icon.style.color = ''; }
+    }, 1800);
+    document.getElementById('dup-msg').innerHTML = '✅ <strong>Correcto — no es duplicado.</strong> ' + row.note;
+  }
+}
+
+function setDupMode(mode) {
+  var findBtn = document.getElementById('dup-mode-find');
+  var showBtn = document.getElementById('dup-mode-show');
+  if (findBtn) findBtn.classList.toggle('on', mode === 'find');
+  if (showBtn) showBtn.classList.toggle('on', mode === 'show');
+  if (mode === 'show') {
+    DUP_ROWS.forEach(function(row, i) {
+      var tr = document.getElementById('dup-row-' + i);
+      var icon = document.getElementById('dup-icon-' + i);
+      if (!tr) return;
+      tr.style.background = row.isDup ? 'var(--red-light)' : 'var(--teal-light)';
+      tr.title = row.note;
+      if (icon) {
+        icon.textContent = row.isDup ? '✗' : '✓';
+        icon.style.color = row.isDup ? 'var(--red)' : 'var(--teal)';
+      }
+    });
+    document.getElementById('dup-msg').innerHTML = '👁 Verde = legítimo · Rojo = duplicado. <strong>Pasa el cursor</strong> sobre cada fila para ver el motivo.';
+  } else {
+    DUP_ROWS.forEach(function(row, i) {
+      var tr = document.getElementById('dup-row-' + i);
+      var icon = document.getElementById('dup-icon-' + i);
+      if (!tr) return;
+      tr.style.background = '';
+      tr.title = '';
+      tr.dataset.checked = '';
+      if (icon) { icon.textContent = '—'; icon.style.color = ''; }
+    });
+    dupFoundCount = 0;
+    document.getElementById('dup-found').textContent = '0';
+    document.getElementById('dup-msg').innerHTML = '👆 Haz clic en una fila para marcarla como duplicado';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// DATE VALIDATOR
+// ═══════════════════════════════════════════════════════
+function buildDateRef() {
+  var el = document.getElementById('date-ref-list');
+  if (!el) return;
+  el.innerHTML = DATE_FORMATS.map(function(f) {
+    var color = f.ok ? 'var(--teal)' : f.warn ? 'var(--gold)' : 'var(--red)';
+    var label = f.ok ? '✓ Reconocido' : f.warn ? '⚠ Depende' : '✗ No reconocido';
+    return '<div title="' + f.tip + '" style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.78rem;gap:.5rem;cursor:help;">' +
+      '<span style="font-family:\'DM Mono\',monospace;color:var(--ink);flex:1">' + f.f + '</span>' +
+      '<span style="color:' + color + ';font-weight:600;flex-shrink:0">' + label + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function validateDate(val) {
+  var box = document.getElementById('date-result-box');
+  if (!box) return;
+  if (!val.trim()) { box.innerHTML = ''; return; }
+  var v = val.trim().toLowerCase();
+  var match = null;
+  for (var i = 0; i < DATE_FORMATS.length; i++) {
+    if (DATE_FORMATS[i].f.toLowerCase() === v) { match = DATE_FORMATS[i]; break; }
+  }
+  var status, color, tip, fix;
+  if (match) {
+    color = match.ok ? 'var(--teal)' : match.warn ? 'var(--gold)' : 'var(--red)';
+    status = match.ok ? '✓ Reconocido por Sheets' : match.warn ? '⚠ Depende de la configuración regional' : '✗ No reconocido como fecha';
+    tip = match.tip;
+    fix = (!match.ok && !match.warn) ? 'Fórmula sugerida: =FECHANUMERO(A1) — si da error, la fecha es texto puro.' : '';
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(val.trim())) {
+    color='var(--teal)'; status='✓ Reconocido (ISO 8601)'; tip='Formato ideal.'; fix='';
+  } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(val.trim())) {
+    color='var(--gold)'; status='⚠ Depende de configuración regional';
+    tip='Puede ser día/mes o mes/día. Verifica con =ESNUMERO(A1).'; fix='';
+  } else {
+    color='var(--red)'; status='✗ Posiblemente no reconocido';
+    tip='Sheets puede leerlo como texto.';
+    fix='Prueba: =FECHANUMERO(A1) — si da error, es texto.';
+  }
+  box.innerHTML =
+    '<div style="font-size:1rem;font-weight:700;color:' + color + ';margin-bottom:.5rem;">' + status + '</div>' +
+    '<div style="font-size:.82rem;color:var(--gray);margin-bottom:.5rem;">' + tip + '</div>' +
+    (fix ? '<div style="font-size:.78rem;margin-top:.5rem;font-family:\'DM Mono\',monospace;color:var(--teal);">' + fix + '</div>' : '') +
+    '<div style="font-size:.75rem;color:var(--gray);margin-top:.7rem;font-style:italic;">Verifica en Sheets: escribe la fecha en A1 y en B1 escribe =ESNUMERO(A1). VERDADERO = fecha real.</div>';
+}
+
+function testDate(val) {
+  var input = document.getElementById('date-input');
+  if (input) input.value = val;
+  validateDate(val);
+}
+
+// ═══════════════════════════════════════════════════════
+// VALIDATION CHECKLIST
+// ═══════════════════════════════════════════════════════
+function buildValCol(items, containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  items.forEach(function(text) {
+    var row = document.createElement('div');
+    row.className = 'val-row';
+    row.innerHTML = '<div class="val-chk"></div><span class="val-txt">' + text + '</span>';
+    row.addEventListener('click', function() {
+      var isDone = this.classList.contains('done');
+      this.classList.toggle('done');
+      var chk = this.querySelector('.val-chk');
+      if (chk) chk.textContent = isDone ? '' : '✓';
+      valChecked += isDone ? -1 : 1;
+      var pct = Math.round(valChecked / valTotal * 100);
+      var fill = document.getElementById('val-fill');
+      var countLbl = document.getElementById('val-count-lbl');
+      var pctLbl = document.getElementById('val-pct-lbl');
+      if (fill) fill.style.width = pct + '%';
+      if (countLbl) countLbl.textContent = valChecked + ' de ' + valTotal + ' completadas';
+      if (pctLbl) pctLbl.textContent = pct + '%';
+    });
+    el.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  renderTaxonomy();
+  buildAuditTable('a1-table', A1_HEADERS, A1_CELLS, A1_MSGS, 1);
+  buildAuditTable('a2-table', A2_HEADERS, A2_CELLS, A2_MSGS, 2);
+  showClean('espacios');
+  toggleView('dirty');
+  buildDupTable();
+  buildDateRef();
+  buildValCol(VAL_LEFT, 'val-col-left');
+  buildValCol(VAL_RIGHT, 'val-col-right');
+});
+</script>
+</body>
+</html>

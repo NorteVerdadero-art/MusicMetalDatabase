@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 2 — Herramientas Analíticas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --black: #0a0a0a; --ink: #1a1a2e; --teal: #00897B; --teal-light: #e0f2f1;
+    --gold: #D4A017; --gold-light: #FFF8E1; --red: #C62828; --red-light: #FFEBEE;
+    --gray: #6B7280; --light: #F8F9FA; --border: #E5E7EB; --white: #ffffff;
+    --purple: #6B21A8; --purple-light: #F3E8FF;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { background:#ffffff !important; color:#0a0a0a !important; }
+  body { font-family:'DM Sans',sans-serif; line-height:1.6; }
+
+  @media (prefers-color-scheme: dark) {
+    html, body { background-color:#ffffff !important; color:#0a0a0a !important; }
+    * { background-color: inherit; color: inherit; }
+    .header { background:#ffffff !important; }
+    section, footer, .hero, .progress-section, .closing,
+    .hook-box, .card, .sim-container, .formula-card,
+    .insight-box, .next-class, .hero-sidebar,
+    .stack-card, .formula-demo, .pq-step, .llm-card,
+    .case-final { background-color:#ffffff !important; }
+  }
+
+  /* HEADER */
+  .header { border-bottom:1px solid var(--border); padding:0 4rem; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; background:#ffffff; z-index:100; }
+  .header-logo { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; }
+  .header-meta { display:flex; gap:2rem; font-size:0.75rem; color:var(--gray); font-weight:500; letter-spacing:0.08em; text-transform:uppercase; align-items:center; }
+  .header-badge { background:var(--teal); color:white; padding:0.2rem 0.7rem; border-radius:2px; font-size:0.65rem; font-weight:600; letter-spacing:0.1em; }
+
+  /* HERO */
+  .hero { padding:6rem 4rem 4rem; max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 320px; gap:4rem; align-items:start; }
+  .hero-eyebrow { font-size:0.7rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--teal); margin-bottom:1.2rem; display:flex; align-items:center; gap:0.6rem; }
+  .hero-eyebrow::before { content:''; display:inline-block; width:24px; height:2px; background:var(--teal); }
+  .hero h1 { font-family:'Playfair Display',serif; font-size:3.5rem; line-height:1.1; font-weight:900; color:var(--ink); margin-bottom:1.5rem; }
+  .hero h1 em { font-style:italic; color:var(--teal); }
+  .hero-desc { font-size:1.05rem; color:var(--gray); max-width:520px; line-height:1.75; font-weight:300; }
+  .hero-sidebar { border:1px solid var(--border); border-top:3px solid var(--teal); padding:1.8rem; }
+  .sidebar-title { font-size:0.65rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); margin-bottom:1.2rem; }
+  .sidebar-item { display:flex; justify-content:space-between; align-items:center; padding:0.65rem 0; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .sidebar-item:last-child { border-bottom:none; }
+  .sidebar-label { color:var(--gray); }
+  .sidebar-value { font-weight:600; color:var(--ink); }
+  .sidebar-value.teal { color:var(--teal); }
+
+  /* PROGRESS */
+  .progress-section { max-width:1100px; margin:0 auto; padding:0 4rem 4rem; }
+  .progress-track { display:flex; gap:3px; margin-bottom:0.6rem; }
+  .progress-step { flex:1; height:4px; background:var(--border); }
+  .progress-step.active { background:var(--teal); }
+  .progress-step.current { background:linear-gradient(90deg,var(--teal) 60%,var(--border) 60%); }
+  .progress-label { font-size:0.7rem; color:var(--gray); font-weight:500; }
+
+  /* SECTIONS */
+  section { max-width:1100px; margin:0 auto; padding:4rem; border-top:1px solid var(--border); }
+  .section-number { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--gray); letter-spacing:0.1em; margin-bottom:0.4rem; }
+  .section-title { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:var(--ink); margin-bottom:0.5rem; }
+  .section-subtitle { font-size:0.9rem; color:var(--gray); margin-bottom:2.5rem; }
+  .time-pill { display:inline-flex; align-items:center; gap:0.4rem; background:var(--light); border:1px solid var(--border); padding:0.3rem 0.8rem; border-radius:20px; font-size:0.72rem; color:var(--gray); font-weight:500; margin-bottom:2rem; }
+  .time-pill::before { content:'⏱'; }
+
+  /* HOOK */
+  .hook-box { background:#ffffff; border:1px solid var(--border); border-left:4px solid var(--teal); padding:2rem 2.5rem; margin-bottom:3rem; }
+  .hook-label { font-size:0.65rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--teal); margin-bottom:0.8rem; }
+  .hook-box h3 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; line-height:1.3; margin-bottom:0.8rem; color:var(--ink); }
+  .hook-box p { font-size:0.93rem; color:var(--gray); line-height:1.75; }
+
+  /* INSIGHT */
+  .insight-box { background:#ffffff; border:1px solid #FFE082; border-left:4px solid var(--gold); padding:1.5rem 2rem; margin:2rem 0; }
+  .insight-label { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:0.4rem; }
+  .insight-box p { font-size:0.9rem; color:var(--ink); line-height:1.7; }
+  .insight-box strong { color:#9A7208; }
+
+  /* WARNING */
+  .warning-box { background:#ffffff; border:1px solid #FFCDD2; border-left:4px solid var(--red); padding:1.5rem 2rem; margin:2rem 0; }
+  .warning-label { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--red); margin-bottom:0.4rem; }
+  .warning-box p { font-size:0.9rem; color:var(--ink); line-height:1.7; }
+
+  /* CARDS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; }
+  .three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2.5rem; }
+  .card { border:1px solid var(--border); padding:2rem; position:relative; background:#ffffff; }
+  .card-accent { position:absolute; top:0; left:0; width:100%; height:3px; }
+  .card h4 { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; margin-bottom:0.7rem; color:var(--ink); margin-top:0.8rem; }
+  .card p { font-size:0.87rem; color:var(--gray); line-height:1.7; }
+
+  /* STACK CARDS */
+  .stack-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2.5rem; }
+  .stack-card { border:1px solid var(--border); padding:1.5rem; background:#ffffff; }
+  .stack-icon { font-size:1.6rem; margin-bottom:0.8rem; }
+  .stack-name { font-weight:700; font-size:0.95rem; color:var(--ink); margin-bottom:0.3rem; }
+  .stack-when { font-size:0.78rem; color:var(--teal); font-weight:600; margin-bottom:0.5rem; }
+  .stack-desc { font-size:0.78rem; color:var(--gray); line-height:1.6; }
+  .stack-tag { display:inline-block; font-size:0.62rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:0.15rem 0.5rem; border-radius:2px; margin-bottom:0.6rem; }
+  .stack-tag.fundacion { background:var(--teal-light); color:var(--teal); }
+  .stack-tag.consulta { background:var(--gold-light); color:#9A7208; }
+  .stack-tag.auto { background:var(--purple-light); color:var(--purple); }
+  .stack-tag.ai { background:var(--red-light); color:var(--red); }
+
+  /* SIM CONTAINER */
+  .sim-container { border:1px solid var(--border); overflow:hidden; margin-bottom:2.5rem; background:#ffffff; }
+  .sim-header { background:#ffffff; border-bottom:1px solid var(--border); padding:0.9rem 1.5rem; display:flex; align-items:center; gap:0.8rem; }
+  .sim-header-title { font-size:0.85rem; font-weight:600; color:var(--ink); }
+  .sim-header-sub { font-size:0.75rem; color:var(--gray); }
+  .sim-tag { background:var(--teal); color:white; font-size:0.65rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px; letter-spacing:0.08em; margin-left:auto; flex-shrink:0; }
+
+  /* FORMULA BAR */
+  .formula-bar { background:#ffffff; border-bottom:1px solid var(--border); padding:0.5rem 1rem; display:flex; align-items:center; gap:0.8rem; font-family:'DM Mono',monospace; font-size:0.8rem; }
+  .formula-bar-label { color:var(--gray); font-size:0.72rem; background:var(--border); padding:0.1rem 0.5rem; border-radius:2px; font-weight:600; }
+  .formula-bar-content { color:var(--teal); flex:1; }
+
+  /* SPREADSHEET */
+  .spreadsheet { width:100%; border-collapse:collapse; font-family:'DM Mono',monospace; font-size:0.8rem; }
+  .spreadsheet th { background:#ffffff; border:1px solid var(--border); padding:0.4rem 0.8rem; font-weight:600; color:var(--gray); text-align:center; font-size:0.72rem; }
+  .spreadsheet td { border:1px solid #E8E8E8; padding:0.35rem 0.8rem; color:var(--ink); background:#ffffff; }
+  .spreadsheet td.row-header { background:var(--light); color:var(--gray); text-align:center; font-weight:600; font-size:0.72rem; }
+  .spreadsheet td.col-header { background:#ffffff; color:var(--teal); font-weight:700; font-size:0.78rem; font-family:'DM Sans',sans-serif; border-bottom:2px solid var(--teal); }
+  .spreadsheet td.highlight { background:var(--teal-light); font-weight:600; color:var(--teal); }
+  .spreadsheet td.result { background:var(--gold-light); font-weight:700; color:#9A7208; }
+  .spreadsheet td.error { background:var(--red-light); color:var(--red); font-weight:600; }
+
+  /* FORMULA CARDS */
+  .formula-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-bottom:2.5rem; }
+  .formula-card { border:1px solid var(--border); overflow:hidden; background:#ffffff; }
+  .fc-header { background:#ffffff; border-bottom:2px solid var(--teal); padding:0.75rem 1.2rem; }
+  .fc-name { font-family:'DM Mono',monospace; font-size:0.85rem; font-weight:600; color:var(--teal); }
+  .fc-body { padding:1.2rem; }
+  .fc-question { font-size:0.8rem; font-weight:600; color:var(--ink); margin-bottom:0.5rem; }
+  .fc-syntax { font-family:'DM Mono',monospace; font-size:0.75rem; background:var(--light); border:1px solid var(--border); padding:0.4rem 0.7rem; color:var(--teal); margin-bottom:0.7rem; display:block; }
+  .fc-example { font-size:0.78rem; color:var(--gray); line-height:1.6; }
+  .fc-music { font-size:0.75rem; color:var(--teal); font-style:italic; margin-top:0.6rem; padding-top:0.6rem; border-top:1px solid var(--border); }
+
+  /* FORMULA SIMULATOR */
+  .formula-demo { padding:1.5rem; background:#ffffff; }
+  .fd-controls { display:flex; gap:0.7rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+  .fd-btn { border:1px solid var(--border); background:#ffffff; padding:0.35rem 0.9rem; font-size:0.78rem; cursor:pointer; font-family:'DM Mono',monospace; color:var(--gray); transition:all 0.15s; }
+  .fd-btn.active { background:var(--teal); color:white; border-color:var(--teal); }
+  .fd-btn:hover:not(.active) { border-color:var(--teal); color:var(--teal); }
+  .fd-result { border:1px solid var(--border); padding:1.2rem; background:#ffffff; }
+  .fd-formula { font-family:'DM Mono',monospace; font-size:0.82rem; color:var(--teal); margin-bottom:0.8rem; padding:0.5rem 0.8rem; background:var(--light); border-left:3px solid var(--teal); }
+  .fd-explanation { font-size:0.85rem; color:var(--gray); margin-bottom:0.8rem; line-height:1.6; }
+  .fd-output { font-family:'DM Mono',monospace; font-size:0.9rem; font-weight:700; color:var(--ink); padding:0.5rem 0.8rem; background:var(--gold-light); border:1px solid #FFE082; display:inline-block; }
+  .fd-music { font-size:0.78rem; color:var(--teal); font-style:italic; margin-top:0.8rem; }
+
+  /* CLEAN COMPARISON */
+  .clean-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .clean-panel { padding:1.5rem; background:#ffffff; }
+  .clean-panel+.clean-panel { border-left:1px solid var(--border); }
+  .clean-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+  .clean-list { list-style:none; font-size:0.8rem; color:var(--gray); line-height:2; }
+  .clean-list.bad li::before { content:'✗  '; color:var(--red); font-weight:700; }
+  .clean-list.good li::before { content:'✓  '; color:var(--teal); font-weight:700; }
+
+  /* POWER QUERY STEPS */
+  .pq-flow { display:flex; flex-direction:column; gap:0; margin-bottom:2rem; }
+  .pq-step { display:grid; grid-template-columns:48px 1fr; gap:1.2rem; padding:1.2rem 1.5rem; background:#ffffff; border:1px solid var(--border); border-top:none; align-items:start; }
+  .pq-step:first-child { border-top:1px solid var(--border); }
+  .pq-step:hover { background:var(--light); }
+  .pq-num { width:36px; height:36px; border-radius:50%; border:2px solid var(--teal); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:0.8rem; font-weight:700; color:var(--teal); flex-shrink:0; }
+  .pq-content h5 { font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.3rem; }
+  .pq-content p { font-size:0.82rem; color:var(--gray); line-height:1.6; }
+  .pq-action { font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--teal); background:var(--teal-light); padding:0.2rem 0.5rem; border-radius:2px; display:inline-block; margin-top:0.4rem; }
+
+  /* LLM CARDS */
+  .llm-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem; }
+  .llm-card { border:1px solid var(--border); padding:1.5rem; background:#ffffff; }
+  .llm-type { font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--purple); margin-bottom:0.6rem; }
+  .llm-card h5 { font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.8rem; }
+  .llm-prompt { background:var(--light); border:1px solid var(--border); border-left:3px solid var(--purple); padding:0.8rem 1rem; font-size:0.8rem; color:var(--ink); line-height:1.6; margin-bottom:0.8rem; font-style:italic; }
+  .llm-prompt::before { content:'"'; color:var(--purple); font-size:1.2rem; line-height:0; vertical-align:-0.3rem; }
+  .llm-prompt::after { content:'"'; color:var(--purple); font-size:1.2rem; line-height:0; vertical-align:-0.3rem; }
+  .llm-result { font-size:0.78rem; color:var(--gray); line-height:1.6; }
+  .llm-result strong { color:var(--teal); }
+
+  /* DECISION TABLE */
+  .decision-table { width:100%; border-collapse:collapse; font-size:0.83rem; margin-bottom:2rem; }
+  .decision-table th { background:#ffffff; border:1px solid var(--border); padding:0.7rem 1rem; text-align:left; font-size:0.75rem; color:var(--gray); font-weight:600; border-bottom:2px solid var(--teal); }
+  .decision-table td { border:1px solid #ECECEC; padding:0.65rem 1rem; color:var(--ink); background:#ffffff; }
+  .decision-table tr:nth-child(even) td { background:var(--light); }
+  .decision-table td:first-child { font-weight:600; color:var(--teal); }
+  .check { color:var(--teal); font-weight:700; }
+  .cross { color:var(--red); }
+
+  /* CASE FINAL */
+  .case-final { border:1px solid var(--border); background:#ffffff; overflow:hidden; margin-bottom:2rem; }
+  .case-final-header { background:#ffffff; border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem; }
+  .case-final-title { font-weight:700; font-size:0.95rem; color:var(--ink); }
+  .case-final-body { padding:1.5rem; }
+  .case-step { display:flex; gap:1rem; padding:0.8rem 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .case-step:last-child { border-bottom:none; }
+  .cs-num { width:28px; height:28px; border:2px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:var(--gold); flex-shrink:0; }
+  .cs-tool { font-size:0.72rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.2rem; }
+  .cs-action { font-size:0.85rem; color:var(--ink); line-height:1.5; }
+
+  /* CLOSING */
+  .closing { background:#ffffff; border-top:1px solid var(--border); padding:4rem; }
+  .closing-inner { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:4rem; }
+  .closing h3 { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--ink); margin-bottom:0.5rem; }
+  .closing p { font-size:0.9rem; color:var(--gray); line-height:1.7; margin-bottom:1.5rem; }
+  .next-class { border:1px solid var(--border); border-top:3px solid var(--gold); padding:1.5rem; background:#ffffff; }
+  .nc-label { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:0.5rem; }
+  .nc-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--ink); margin-bottom:0.8rem; }
+  .nc-items { list-style:none; font-size:0.82rem; color:var(--gray); }
+  .nc-items li { padding:0.3rem 0; padding-left:1rem; position:relative; }
+  .nc-items li::before { content:'→'; position:absolute; left:0; color:var(--gold); }
+  .key-takeaways { list-style:none; }
+  .key-takeaways li { display:flex; gap:0.8rem; padding:0.8rem 0; border-bottom:1px solid var(--border); font-size:0.88rem; align-items:flex-start; line-height:1.5; }
+  .key-takeaways li:last-child { border-bottom:none; }
+  .kt-check { color:var(--teal); flex-shrink:0; margin-top:0.1rem; }
+
+  footer { border-top:1px solid var(--border); padding:1.5rem 4rem; display:flex; justify-content:space-between; align-items:center; }
+  footer span { font-size:0.75rem; color:var(--gray); }
+  .footer-nav { display:flex; gap:1.5rem; }
+  .footer-nav a { font-size:0.75rem; color:var(--gray); text-decoration:none; font-weight:500; }
+  .footer-nav a:hover { color:var(--teal); }
+
+  @media(max-width:768px){
+    .hero,.two-col,.three-col,.formula-grid,.llm-grid,.clean-grid,.closing-inner,.stack-grid{grid-template-columns:1fr;}
+    .header,section,footer,.progress-section,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+    .hero{padding:3rem 1.5rem 2rem;}
+    .hero h1{font-size:2.4rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">De los Datos al Criterio</div>
+  <div class="header-meta">
+    <span>Industria Musical</span>
+    <span class="header-badge">Clase 02 / 08</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">Bloque 2 · Fundamentos</div>
+    <h1>Herramientas<br><em>Analíticas</em></h1>
+    <p class="hero-desc">El analista no domina una sola herramienta. Sabe cuál usar según el problema. Esta clase construye ese criterio desde Excel hasta los LLMs modernos.</p>
+  </div>
+  <div class="hero-sidebar">
+    <div class="sidebar-title">Ficha de la clase</div>
+    <div class="sidebar-item"><span class="sidebar-label">Duración</span><span class="sidebar-value">2 horas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Bloques</span><span class="sidebar-value">6</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Herramientas</span><span class="sidebar-value">4 cubiertas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Demos</span><span class="sidebar-value teal">5 interactivas</span></div>
+    <div class="sidebar-item"><span class="sidebar-label">Contexto</span><span class="sidebar-value">Catálogo musical</span></div>
+  </div>
+</div>
+
+<div class="progress-section">
+  <div class="progress-track">
+    <div class="progress-step active"></div>
+    <div class="progress-step current"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+  </div>
+  <div class="progress-label">Clase 2 de 8 · Herramientas Analíticas</div>
+</div>
+
+<!-- BLOQUE 1 — EL STACK -->
+<section>
+  <div class="section-number">01 · El Stack Analítico</div>
+  <div class="section-title">¿Qué herramienta para qué problema?</div>
+  <div class="section-subtitle">20 min · El error más común: usar la herramienta favorita, no la correcta</div>
+
+  <div class="hook-box">
+    <div class="hook-label">Pregunta de arranque</div>
+    <h3>Te llega el reporte mensual de regalías en un PDF de 40 páginas. ¿Por dónde empiezas?</h3>
+    <p>La respuesta revela inmediatamente qué tan ordenado está tu stack analítico. Un analista sin criterio de herramientas pierde horas antes de siquiera ver un dato útil.</p>
+  </div>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-tag fundacion">Fundación</div>
+      <div class="stack-icon">📊</div>
+      <div class="stack-name">Excel / Sheets</div>
+      <div class="stack-when">Cuándo usarlo</div>
+      <div class="stack-desc">Exploración inicial, tablas dinámicas, reportes para stakeholders no técnicos, datasets menores a 100K filas. La primera capa de todo análisis.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-tag consulta">Consulta</div>
+      <div class="stack-icon">🗄️</div>
+      <div class="stack-name">SQL</div>
+      <div class="stack-when">Cuándo usarlo</div>
+      <div class="stack-desc">Cuando los datos viven en una base de datos. Joins entre tablas, filtros complejos, agregaciones sobre millones de registros. Más rápido y preciso que Excel para eso.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-tag auto">Automatización</div>
+      <div class="stack-icon">⚡</div>
+      <div class="stack-name">Power Query</div>
+      <div class="stack-when">Cuándo usarlo</div>
+      <div class="stack-desc">Cuando recibes el mismo reporte cada mes y lo limpias manualmente. Power Query lo automatiza con un clic. Vive dentro de Excel, no requiere código.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-tag ai">IA / LLMs</div>
+      <div class="stack-icon">🤖</div>
+      <div class="stack-name">Claude / ChatGPT</div>
+      <div class="stack-when">Cuándo usarlo</div>
+      <div class="stack-desc">Para generar fórmulas, explicar errores, limpiar datos con instrucciones en lenguaje natural, entender un dataset nuevo en segundos. El copiloto analítico.</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Regla de esta clase</div>
+    <p>El stack no es una jerarquía. No hay herramienta superior. Hay <strong>herramienta correcta para el problema correcto.</strong> Un analista experto sabe cuándo cada una entra al juego — y cuándo combinarlas.</p>
+  </div>
+</section>
+
+<!-- BLOQUE 2 — FÓRMULAS -->
+<section>
+  <div class="section-number">02 · Fórmulas Esenciales</div>
+  <div class="section-title">Las fórmulas que responden preguntas de negocio</div>
+  <div class="section-subtitle">25 min · No son todas las fórmulas — son las que un analista musical usa de verdad</div>
+  <div class="time-pill">Elige una fórmula para ver cómo funciona en contexto musical</div>
+
+  <div class="formula-grid">
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">SUMAR.SI / SUMAR.SI.CONJUNTO</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Cuánto bajo una condición?</div>
+        <code class="fc-syntax">=SUMAR.SI(rango; criterio; suma)</code>
+        <div class="fc-example">Suma selectiva. El SUMIFS permite múltiples condiciones simultáneas — más poderoso para análisis reales.</div>
+        <div class="fc-music">🎵 Revenue total solo de canciones del género urbano en Q1</div>
+      </div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">CONTAR.SI / CONTAR.SI.CONJUNTO</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Cuántas veces ocurre algo?</div>
+        <code class="fc-syntax">=CONTAR.SI(rango; criterio)</code>
+        <div class="fc-example">Cuenta registros que cumplen una condición. Esencial para frecuencias, rankings y detección de patrones.</div>
+        <div class="fc-music">🎵 ¿Cuántas canciones del catálogo superaron 50K streams este mes?</div>
+      </div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">BUSCARV / BUSCARX</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Qué dato tiene este registro en otra tabla?</div>
+        <code class="fc-syntax">=BUSCARV(valor; tabla; col; 0)</code>
+        <div class="fc-example">Conecta tablas. XLOOKUP es más moderno y flexible — busca en cualquier dirección y maneja errores solo.</div>
+        <div class="fc-music">🎵 Traer el género de cada canción desde el catálogo maestro</div>
+      </div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">PROMEDIO.SI</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Cuál es el promedio de un segmento?</div>
+        <code class="fc-syntax">=PROMEDIO.SI(rango; criterio; promedio)</code>
+        <div class="fc-example">El promedio global puede esconder diferencias importantes entre segmentos. PROMEDIO.SI las expone.</div>
+        <div class="fc-music">🎵 Save rate promedio: canciones lanzadas con campaña vs sin campaña</div>
+      </div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">SI.ERROR</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Qué mostrar cuando algo falla?</div>
+        <code class="fc-syntax">=SI.ERROR(formula; "N/D")</code>
+        <div class="fc-example">Los datos reales tienen huecos. SI.ERROR evita que un error rompa toda la hoja. Señal de análisis robusto y defensivo.</div>
+        <div class="fc-music">🎵 Si no hay dato de revenue para una canción, mostrar "N/D" en lugar de #N/A</div>
+      </div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-header"><div class="fc-name">TEXTO / FECHANUMERO</div></div>
+      <div class="fc-body">
+        <div class="fc-question">¿Cómo estandarizar fechas y texto?</div>
+        <code class="fc-syntax">=TEXTO(fecha; "AAAA-MM")</code>
+        <div class="fc-example">Las fechas son el campo más sucio en reportes musicales. Llegan en 5 formatos distintos. TEXT y DATEVALUE las unifican.</div>
+        <div class="fc-music">🎵 Estandarizar "abril 2026", "04/2026" y "2026-04" en un solo formato</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULADOR INTERACTIVO -->
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Simulador de Fórmulas — Catálogo Musical</div>
+        <div class="sim-header-sub">Selecciona una fórmula para ver cómo opera sobre datos reales</div>
+      </div>
+      <span class="sim-tag">INTERACTIVO</span>
+    </div>
+    <div class="formula-bar">
+      <span class="formula-bar-label">fx</span>
+      <span class="formula-bar-content" id="sim-formula-display">=SUMAR.SI(Género; "Urbano"; Revenue)</span>
+    </div>
+    <div class="formula-demo">
+      
+  <div style="font-size:0.72rem; color:var(--gray); background:var(--light); border:1px solid var(--border); border-left:3px solid var(--gold); padding:0.5rem 1rem; margin-bottom:1rem;">
+    <strong style="color:#9A7208;">⚠️ Excel en español MX:</strong> El separador de argumentos es <code style="font-family:'DM Mono',monospace; color:var(--teal);">;</code> (punto y coma), no coma. En Google Sheets funciona con ambos.
+  </div>
+      <div class="fd-controls">
+        <button class="fd-btn active" onclick="showFormula('sumif',this)">SUMAR.SI</button>
+        <button class="fd-btn" onclick="showFormula('countif',this)">CONTAR.SI</button>
+        <button class="fd-btn" onclick="showFormula('vlookup',this)">BUSCARV</button>
+        <button class="fd-btn" onclick="showFormula('averageif',this)">PROMEDIO.SI</button>
+        <button class="fd-btn" onclick="showFormula('iferror',this)">SI.ERROR</button>
+        <button class="fd-btn" onclick="showFormula('large',this)">K.ESIMO.MAYOR</button>
+      </div>
+      <div class="fd-result" id="fd-result"></div>
+    </div>
+    <div style="padding:0 1.5rem 1.5rem; overflow-x:auto;">
+      <table class="spreadsheet" id="formula-table">
+        <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead>
+        <tbody>
+          <tr><td class="row-header">1</td><td class="col-header">Canción</td><td class="col-header">Artista</td><td class="col-header">Género</td><td class="col-header">Streams</td><td class="col-header">Revenue USD</td></tr>
+          <tr><td class="row-header">2</td><td>Montaña</td><td>Norte Verdadero</td><td>Metalcore</td><td>412,000</td><td>$1,236</td></tr>
+          <tr><td class="row-header">3</td><td>Canción Demo A</td><td>Artista Demo A</td><td>Urbano</td><td>2,100,000</td><td>$6,300</td></tr>
+          <tr><td class="row-header">4</td><td>Canción Demo B</td><td>Artista Demo B</td><td>Pop</td><td>820,000</td><td>$2,460</td></tr>
+          <tr><td class="row-header">5</td><td>Canción Demo C</td><td>Artista Demo C</td><td>Urbano</td><td>1,900,000</td><td>$5,700</td></tr>
+          <tr><td class="row-header">6</td><td>Canción Demo D</td><td>Thell Barrio</td><td>Latincore</td><td>310,000</td><td>$930</td></tr>
+          <tr><td class="row-header">7</td><td>Canción Demo E</td><td>Artista Demo D</td><td>Pop</td><td>950,000</td><td>$2,850</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- BLOQUE 3 — LIMPIEZA -->
+<section>
+  <div class="section-number">03 · Limpieza de Datos en Excel</div>
+  <div class="section-title">El 70% del trabajo analítico real</div>
+  <div class="section-subtitle">25 min · Los errores más frecuentes en reportes musicales y cómo resolverlos</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--red)"></div>
+      <h4>Por qué los datos llegan sucios</h4>
+      <p>Los reportes de Spotify, Apple Music, distribuidoras y plataformas de tickets no tienen un estándar unificado. Cada fuente exporta fechas, nombres y números en formatos distintos. Cuando los consolidas, el caos aparece solo.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--teal)"></div>
+      <h4>La regla de oro</h4>
+      <p>Nunca analices datos que no hayas auditado primero. Un dato sucio produce un insight falso. En la industria musical eso se traduce en decisiones incorrectas: campañas mal dirigidas, presupuestos mal asignados, lanzamientos mal programados.</p>
+    </div>
+  </div>
+
+  <!-- DEMO DATOS SUCIOS vs LIMPIOS -->
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Demo — Reporte de streaming sucio vs limpio</div>
+        <div class="sim-header-sub">Dataset real de consolidación mensual con todos los errores comunes</div>
+      </div>
+      <span class="sim-tag">COMPARATIVA</span>
+    </div>
+    <div class="clean-grid">
+      <div class="clean-panel">
+        <div class="clean-label" style="color:var(--red)">❌ Dataset original</div>
+        <div style="overflow-x:auto; margin-bottom:1.2rem;">
+          <table class="spreadsheet" style="font-size:0.75rem;">
+            <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+            <tbody>
+              <tr><td class="row-header">1</td><td class="col-header">artista</td><td class="col-header">streams</td><td class="col-header">Fecha</td><td class="col-header">Revenue</td></tr>
+              <tr><td class="row-header">2</td><td style="color:var(--red)"> Norte Verdadero </td><td>412000</td><td>15/04/2026</td><td>1236</td></tr>
+              <tr><td class="row-header">3</td><td style="color:var(--red)">thell barrio</td><td style="color:var(--red)">310,000</td><td style="color:var(--red)">2026-04-20</td><td>930</td></tr>
+              <tr><td class="row-header">4</td><td style="color:var(--red)">ARTISTA DEMO A</td><td style="color:var(--red)"></td><td style="color:var(--red)">abril 2026</td><td style="color:var(--red)">N/A</td></tr>
+              <tr><td class="row-header">5</td><td style="color:var(--red)">Norte verdadero</td><td>412000</td><td>15/04/2026</td><td>1236</td></tr>
+              <tr><td class="row-header">6</td><td>Artista Demo B</td><td>820000</td><td style="color:var(--red)">Apr-26</td><td style="color:var(--red)">2,460.00 USD</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="clean-list bad">
+          <li>Espacios al inicio/final del nombre (fila 2)</li>
+          <li>Mayúsculas inconsistentes (filas 3, 4)</li>
+          <li>Número con coma — Excel lo lee como texto (fila 3)</li>
+          <li>Celda vacía en streams (fila 4)</li>
+          <li>4 formatos de fecha distintos</li>
+          <li>Fila duplicada (filas 2 y 5 idénticas)</li>
+          <li>Revenue con texto "USD" — no calculable (fila 6)</li>
+        </ul>
+      </div>
+      <div class="clean-panel">
+        <div class="clean-label" style="color:var(--teal)">✓ Dataset limpio</div>
+        <div style="overflow-x:auto; margin-bottom:1.2rem;">
+          <table class="spreadsheet" style="font-size:0.75rem;">
+            <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+            <tbody>
+              <tr><td class="row-header">1</td><td class="col-header">Artista</td><td class="col-header">Streams</td><td class="col-header">Fecha</td><td class="col-header">Revenue</td></tr>
+              <tr><td class="row-header">2</td><td class="highlight">Norte Verdadero</td><td>412,000</td><td class="highlight">2026-04-15</td><td>1,236</td></tr>
+              <tr><td class="row-header">3</td><td class="highlight">Thell Barrio</td><td class="highlight">310,000</td><td class="highlight">2026-04-20</td><td>930</td></tr>
+              <tr><td class="row-header">4</td><td>Artista Demo A</td><td class="highlight">0</td><td class="highlight">2026-04-01</td><td class="highlight">0</td></tr>
+              <tr><td class="row-header" colspan="5" style="font-style:italic;color:var(--gray);font-size:0.72rem;text-align:left;padding-left:0.8rem; background:var(--light);">→ fila 5 eliminada (duplicado exacto de fila 2)</td></tr>
+              <tr><td class="row-header">5</td><td>Artista Demo B</td><td>820,000</td><td class="highlight">2026-04-01</td><td class="highlight">2,460</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="clean-list good">
+          <li>=ESPACIOS() — elimina espacios extra</li>
+          <li>=NOMPROPIO() — capitalización uniforme</li>
+          <li>=VALOR() — convierte texto a número</li>
+          <li>=SI.ERROR(..., 0) — reemplaza vacíos</li>
+          <li>=FECHANUMERO() — unifica formato de fechas</li>
+          <li>Datos → Quitar duplicados (nativo Excel)</li>
+          <li>=SUSTITUIR(D6;" USD";"") + VALUE()</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST DE AUDITORÍA -->
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Checklist de Auditoría de Datos</div>
+        <div class="sim-header-sub">Revisa esto antes de analizar cualquier dataset</div>
+      </div>
+      <span class="sim-tag">REFERENCIA</span>
+    </div>
+    <div style="padding:1.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+      <div>
+        <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:1rem;">Estructura</div>
+        <div id="checklist-left"></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:1rem;">Contenido</div>
+        <div id="checklist-right"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOQUE 4 — POWER QUERY -->
+<section>
+  <div class="section-number">04 · Power Query</div>
+  <div class="section-title">Automatizar lo que hacías a mano</div>
+  <div class="section-subtitle">20 min · Cuando el mismo reporte llega cada mes, no lo limpies dos veces</div>
+
+  <div class="hook-box">
+    <div class="hook-label">El problema que resuelve</div>
+    <h3>Recibes el reporte de Spotify cada primer lunes del mes. Y cada mes haces los mismos 12 pasos de limpieza.</h3>
+    <p>Power Query graba esos pasos como una secuencia reutilizable. El segundo mes solo abres el archivo y haces clic en "Actualizar". Eso es automatización sin código.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--purple)"></div>
+      <h4>¿Qué es Power Query?</h4>
+      <p>Una herramienta de transformación de datos que vive dentro de Excel y Google Sheets. No requiere programar. Cada transformación se registra como un paso visible y editable.<br><br>Es el paso entre "limpiar a mano" y "programar en Python".</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--gold)"></div>
+      <h4>Cuándo NO usarlo</h4>
+      <p>Si el dataset cambia de estructura cada mes (columnas distintas, fuentes distintas), Power Query requiere mantenimiento constante.<br><br>Para datasets únicos o de estructura variable, la limpieza manual con fórmulas es más rápida.</p>
+    </div>
+  </div>
+
+  <div class="sim-container">
+    <div class="sim-header">
+      <div>
+        <div class="sim-header-title">Flujo Power Query — Consolidación mensual de streaming</div>
+        <div class="sim-header-sub">Así se ve la secuencia de pasos en el editor de Power Query</div>
+      </div>
+      <span class="sim-tag">FLUJO VISUAL</span>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="pq-flow">
+        <div class="pq-step">
+          <div class="pq-num">1</div>
+          <div class="pq-content">
+            <h5>Importar fuente</h5>
+            <p>Conectas el archivo .xlsx o .csv de la distribuidora. Power Query lo lee sin abrirlo en Excel primero.</p>
+            <span class="pq-action">Datos → Obtener datos → Desde archivo</span>
+          </div>
+        </div>
+        <div class="pq-step">
+          <div class="pq-num">2</div>
+          <div class="pq-content">
+            <h5>Promover encabezados</h5>
+            <p>Si la primera fila tiene los nombres de columna, los conviertes en encabezados reales con un clic.</p>
+            <span class="pq-action">Inicio → Usar la primera fila como encabezado</span>
+          </div>
+        </div>
+        <div class="pq-step">
+          <div class="pq-num">3</div>
+          <div class="pq-content">
+            <h5>Cambiar tipos de dato</h5>
+            <p>Defines explícitamente qué columnas son números, fechas o texto. Power Query detecta automáticamente pero siempre hay que verificar.</p>
+            <span class="pq-action">Seleccionar columna → Tipo de dato → Número entero / Fecha</span>
+          </div>
+        </div>
+        <div class="pq-step">
+          <div class="pq-num">4</div>
+          <div class="pq-content">
+            <h5>Limpiar texto</h5>
+            <p>Eliminas espacios, estandarizas mayúsculas y reemplazas valores inconsistentes en columnas de texto como nombres de artistas o géneros.</p>
+            <span class="pq-action">Transformar → Formato → Recortar / Poner en mayúsculas</span>
+          </div>
+        </div>
+        <div class="pq-step">
+          <div class="pq-num">5</div>
+          <div class="pq-content">
+            <h5>Filtrar y eliminar duplicados</h5>
+            <p>Eliminas filas vacías, registros duplicados y valores fuera de rango. Todo queda registrado como paso reversible.</p>
+            <span class="pq-action">Inicio → Quitar filas → Quitar duplicados</span>
+          </div>
+        </div>
+        <div class="pq-step">
+          <div class="pq-num">6</div>
+          <div class="pq-content">
+            <h5>Cargar a Excel</h5>
+            <p>El resultado limpio se carga como tabla en tu hoja. El mes siguiente, con el mismo archivo actualizado, solo haces clic en "Actualizar todo".</p>
+            <span class="pq-action">Inicio → Cerrar y cargar → Como tabla</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Valor real de Power Query</div>
+    <p>No es que te ahorre 20 minutos el primer mes. Es que te ahorra <strong>20 minutos × 12 meses × todos los reportes que manejas.</strong> Y elimina el error humano de repetir los mismos pasos a mano.</p>
+  </div>
+</section>
+
+<!-- BLOQUE 5 — LLMs -->
+<section>
+  <div class="section-number">05 · LLMs como Copiloto Analítico</div>
+  <div class="section-title">Claude y ChatGPT como herramientas de análisis</div>
+  <div class="section-subtitle">20 min · No son sustitutos del analista — son multiplicadores de velocidad</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-accent" style="background:var(--purple)"></div>
+      <h4>Qué pueden hacer por ti</h4>
+      <p>Generar fórmulas en segundos. Explicar por qué una fórmula da error. Limpiar datos con instrucciones en español. Sugerir qué análisis aplicar a un dataset. Escribir queries SQL. Interpretar resultados.<br><br>Todo sin salir de tu flujo de trabajo.</p>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--red)"></div>
+      <h4>Qué NO pueden hacer</h4>
+      <p>Tomar decisiones por ti. Conocer el contexto de tu negocio sin que se los expliques. Garantizar que el resultado es correcto sin que lo valides.<br><br>El LLM es tan bueno como el prompt que le das — y tan confiable como tu criterio para verificar.</p>
+    </div>
+  </div>
+
+  <div class="llm-grid">
+    <div class="llm-card">
+      <div class="llm-type">Caso de uso 1 — Generar fórmula</div>
+      <h5>Tienes el problema, no la fórmula</h5>
+      <div class="llm-prompt">Tengo una tabla en Excel con columnas: Canción (A), Género (B), Streams (C), Revenue (D). Necesito una fórmula que sume el revenue total solo de las canciones del género Urbano y que tengan más de 500,000 streams.</div>
+      <div class="llm-result">
+        El LLM genera en segundos:<br><br>
+        <strong>=SUMAR.SI.CONJUNTO(D2:D100; B2:B100; "Urbano"; C2:C100; ">"&500000)</strong><br><br>
+        Con explicación paso a paso de cada argumento. Lo que antes tomaba 10 minutos buscando en Google.
+      </div>
+    </div>
+    <div class="llm-card">
+      <div class="llm-type">Caso de uso 2 — Diagnosticar error</div>
+      <h5>Tu fórmula da #VALUE! y no sabes por qué</h5>
+      <div class="llm-prompt">Esta fórmula me da error #VALUE!: =SUMAR.SI(B2:B50; "Urbano"; C2:C50). La columna C tiene números pero algunos tienen comas como separador de miles. ¿Cuál es el problema?</div>
+      <div class="llm-result">
+        El LLM diagnostica: los números con coma se leen como texto, no como números. Solución:<br><br>
+        <strong>=SUMAPRODUCTO((B2:B50="Urbano")*VALOR(SUSTITUIR(C2:C50;",";"")))</strong><br><br>
+        O bien: seleccionar columna C → Datos → Texto en columnas para convertir.
+      </div>
+    </div>
+    <div class="llm-card">
+      <div class="llm-type">Caso de uso 3 — Limpiar con instrucciones</div>
+      <h5>Tienes texto inconsistente y no sabes por dónde empezar</h5>
+      <div class="llm-prompt">Tengo una columna con nombres de artistas: "norte verdadero", " Norte Verdadero ", "NORTE VERDADERO", "Norte verdadero". ¿Qué fórmulas de Excel uso para estandarizarlos todos a "Norte Verdadero"?</div>
+      <div class="llm-result">
+        Respuesta inmediata:<br><br>
+        <strong>=NOMPROPIO(ESPACIOS(A2))</strong><br><br>
+        TRIM elimina espacios. PROPER capitaliza la primera letra de cada palabra. Para casos especiales como "DJ" o "MC", instrucciones adicionales con SUBSTITUTE.
+      </div>
+    </div>
+    <div class="llm-card">
+      <div class="llm-type">Caso de uso 4 — Entender un dataset nuevo</div>
+      <h5>Te llega un reporte que nunca habías visto</h5>
+      <div class="llm-prompt">Aquí está la primera fila de un reporte de Spotify for Artists: [pegas el encabezado]. ¿Qué significa cada columna y cuáles son las más importantes para analizar el crecimiento de un artista emergente?</div>
+      <div class="llm-result">
+        El LLM explica cada campo, prioriza las columnas más relevantes y sugiere qué preguntas puedes responder con ese dataset. <strong>5 minutos de orientación vs 1 hora de exploración a ciegas.</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-label">Advertencia crítica</div>
+    <p>Un LLM puede generar una fórmula incorrecta con total confianza. <strong>Siempre verifica el resultado contra un caso donde ya sabes la respuesta.</strong> El criterio analítico es tuyo — el LLM solo acelera la ejecución.</p>
+  </div>
+</section>
+
+<!-- BLOQUE 6 — CRITERIO INTEGRADOR -->
+<section>
+  <div class="section-number">06 · Criterio Integrador</div>
+  <div class="section-title">¿Cuándo usar cada herramienta?</div>
+  <div class="section-subtitle">10 min · La tabla de decisión que deberías memorizar</div>
+
+  <table class="decision-table">
+    <thead>
+      <tr>
+        <th>Situación</th>
+        <th>Excel</th>
+        <th>Power Query</th>
+        <th>SQL</th>
+        <th>LLM</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Exploración inicial de un dataset nuevo</td>
+        <td class="check">✓ Primera opción</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td>✓ Para entender columnas</td>
+      </tr>
+      <tr>
+        <td>Reporte mensual que se repite igual</td>
+        <td>✓ Primera vez</td>
+        <td class="check">✓ Desde el segundo mes</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Consulta sobre base de datos de la empresa</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="check">✓ Primera opción</td>
+        <td>✓ Para escribir la query</td>
+      </tr>
+      <tr>
+        <td>No sé qué fórmula usar para X</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="check">✓ Primera opción</td>
+      </tr>
+      <tr>
+        <td>Dataset de más de 500,000 filas</td>
+        <td class="cross">⚠️ Lento</td>
+        <td>✓ Puede manejarlo</td>
+        <td class="check">✓ Primera opción</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Presentación para stakeholder no técnico</td>
+        <td class="check">✓ Gráficas y tablas</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td>✓ Para redactar insights</td>
+      </tr>
+      <tr>
+        <td>Limpieza de datos con errores complejos</td>
+        <td>✓ Si es puntual</td>
+        <td class="check">✓ Si se repite</td>
+        <td>✓ Si está en BD</td>
+        <td>✓ Para generar las fórmulas</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CASO INTEGRADOR FINAL -->
+  <div class="case-final">
+    <div class="case-final-header">
+      <span style="font-size:1.2rem;">🎵</span>
+      <div>
+        <div class="case-final-title">Caso integrador — Llega un nuevo reporte de regalías</div>
+        <div style="font-size:0.78rem; color:var(--gray);">¿Por dónde empiezas y qué herramienta usas en cada paso?</div>
+      </div>
+    </div>
+    <div class="case-final-body">
+      <div class="case-step">
+        <div class="cs-num">1</div>
+        <div>
+          <div class="cs-tool">LLM — Claude / ChatGPT</div>
+          <div class="cs-action">Pegas el encabezado del reporte y preguntas: "¿Qué significa cada columna y cuáles son las más relevantes para analizar revenue por canción?"</div>
+        </div>
+      </div>
+      <div class="case-step">
+        <div class="cs-num">2</div>
+        <div>
+          <div class="cs-tool">Excel — Exploración</div>
+          <div class="cs-action">Abres el archivo, revisas estructura, detectas visualmente problemas: columnas vacías, formatos inconsistentes, filas de totales que debes excluir.</div>
+        </div>
+      </div>
+      <div class="case-step">
+        <div class="cs-num">3</div>
+        <div>
+          <div class="cs-tool">Excel — Limpieza con fórmulas</div>
+          <div class="cs-action">Aplicas TRIM, PROPER, VALUE, SI.ERROR según lo que encontraste. Si no sabes la fórmula exacta, la pides al LLM describiendo el problema.</div>
+        </div>
+      </div>
+      <div class="case-step">
+        <div class="cs-num">4</div>
+        <div>
+          <div class="cs-tool">Power Query — Si el reporte se repite mensualmente</div>
+          <div class="cs-action">Grabas los pasos de limpieza como flujo reutilizable. El próximo mes: actualizas la fuente y haces clic en "Actualizar todo".</div>
+        </div>
+      </div>
+      <div class="case-step">
+        <div class="cs-num">5</div>
+        <div>
+          <div class="cs-tool">Excel — Análisis con fórmulas y tabla dinámica</div>
+          <div class="cs-action">SUMIF por artista, COUNTIF por género, tabla dinámica de revenue por mes. Construyes la vista que responde tu pregunta original.</div>
+        </div>
+      </div>
+      <div class="case-step">
+        <div class="cs-num">6</div>
+        <div>
+          <div class="cs-tool">LLM — Redacción de insight</div>
+          <div class="cs-action">"Aquí están mis resultados: [pegas los números]. ¿Cómo redactaría esto como insight para presentar a un manager no técnico?" El LLM te da el lenguaje. Tú validas la lógica.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="key-takeaways">
+        <li><span class="kt-check">✓</span> El stack analítico: Excel, Power Query, SQL y LLMs — cada uno tiene su momento.</li>
+        <li><span class="kt-check">✓</span> Las fórmulas esenciales responden preguntas de negocio, no solo calculan.</li>
+        <li><span class="kt-check">✓</span> Un dato sucio produce un insight falso — auditar antes de analizar.</li>
+        <li><span class="kt-check">✓</span> Power Query automatiza la limpieza repetitiva sin código.</li>
+        <li><span class="kt-check">✓</span> Los LLMs aceleran la ejecución. El criterio analítico sigue siendo tuyo.</li>
+        <li><span class="kt-check">✓</span> La herramienta correcta depende del problema, no de la preferencia.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="next-class">
+        <div class="nc-label">Próxima clase</div>
+        <div class="nc-title">Clase 3 — Limpieza y Calidad de Datos</div>
+        <ul class="nc-items">
+          <li>Tipos de errores de datos y cómo detectarlos</li>
+          <li>Limpieza avanzada con SQL: COALESCE, TRIM, CAST</li>
+          <li>Outliers: cuándo eliminarlos y cuándo investigarlos</li>
+          <li>Validación: cómo saber que tu dataset está listo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Clase 02 · Herramientas Analíticas</span>
+  <nav class="footer-nav"><a href="#">← Clase 01</a><a href="#">Clase 03 →</a></nav>
+</footer>
+
+<script>
+// ── CHECKLIST ──
+const checkLeft = [
+  "¿Cuántas filas y columnas tiene el dataset?",
+  "¿Los encabezados están en la primera fila?",
+  "¿Hay filas de totales que debo excluir del análisis?",
+  "¿Hay columnas completamente vacías?",
+  "¿El dataset tiene una sola tabla o varias pegadas?"
+];
+const checkRight = [
+  "¿Hay celdas vacías en columnas críticas?",
+  "¿Los números están en formato número (no texto)?",
+  "¿Las fechas tienen un solo formato consistente?",
+  "¿Hay valores duplicados en el identificador principal?",
+  "¿Los valores de texto tienen mayúsculas inconsistentes o espacios extra?"
+];
+
+function buildChecklist(items, containerId) {
+  const el = document.getElementById(containerId);
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:flex-start;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--border);cursor:pointer;';
+    div.innerHTML = `
+      <div class="chk" style="width:18px;height:18px;border:2px solid var(--border);border-radius:2px;flex-shrink:0;margin-top:0.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;"></div>
+      <span style="font-size:0.82rem;color:var(--gray);line-height:1.5;">${item}</span>
+    `;
+    div.addEventListener('click', function() {
+      const chk = this.querySelector('.chk');
+      const txt = this.querySelector('span');
+      if (chk.innerHTML === '') {
+        chk.innerHTML = '✓';
+        chk.style.background = 'var(--teal)';
+        chk.style.borderColor = 'var(--teal)';
+        chk.style.color = 'white';
+        chk.style.fontSize = '0.7rem';
+        txt.style.color = 'var(--teal)';
+        txt.style.textDecoration = 'line-through';
+      } else {
+        chk.innerHTML = '';
+        chk.style.background = '';
+        chk.style.borderColor = 'var(--border)';
+        txt.style.color = 'var(--gray)';
+        txt.style.textDecoration = '';
+      }
+    });
+    el.appendChild(div);
+  });
+}
+buildChecklist(checkLeft, 'checklist-left');
+buildChecklist(checkRight, 'checklist-right');
+
+// ── FORMULA SIMULATOR ──
+const formulas = {
+  sumif: {
+    formula: '=SUMAR.SI(C2:C7; "Urbano"; E2:E7)',
+    explanation: 'Suma el Revenue (columna E) de todas las canciones donde el Género (columna C) sea "Urbano". Recorre cada fila, verifica la condición, y suma solo las que cumplen.',
+    output: '$12,000 USD',
+    music: '🎵 Revenue total de canciones urbanas: Canción Demo A ($6,300) + Canción Demo C ($5,700) = $12,000'
+  },
+  countif: {
+    formula: '=CONTAR.SI(D2:D7; ">"&500000)',
+    explanation: 'Cuenta cuántas canciones tienen más de 500,000 streams (columna D). El criterio ">"&500000 combina el operador con el número de referencia.',
+    output: '4 canciones',
+    music: '🎵 Canciones con +500K streams: Demo A (2.1M), Demo B (820K), Demo C (1.9M), Demo E (950K)'
+  },
+  vlookup: {
+    formula: '=BUSCARV("Montaña"; A2:E7; 3; 0)',
+    explanation: 'Busca "Montaña" en la columna A, y cuando la encuentra devuelve el valor de la columna 3 (Género) de esa misma fila. El 0 final significa búsqueda exacta.',
+    output: '"Metalcore"',
+    music: '🎵 Buscar el género de Montaña en la tabla para cruzarlo con métricas de otras plataformas'
+  },
+  averageif: {
+    formula: '=PROMEDIO.SI(C2:C7, "Pop", D2:D7)',
+    explanation: 'Calcula el promedio de Streams (columna D) solo para las canciones cuyo Género (columna C) sea "Pop". Excluye automáticamente los demás géneros.',
+    output: '885,000 streams',
+    music: '🎵 Promedio de streams en canciones Pop: Demo B (820K) + Demo E (950K) ÷ 2 = 885,000'
+  },
+  iferror: {
+    formula: '=SI.ERROR(VLOOKUP("Artista X",A2:E7,4,0), "Sin datos")',
+    explanation: 'Intenta hacer el VLOOKUP. Si el artista no existe en la tabla y devuelve #N/A, SI.ERROR captura el error y muestra "Sin datos" en lugar de romper la hoja.',
+    output: '"Sin datos"',
+    music: '🎵 Protege los reportes de distribuidoras donde no todas las canciones tienen datos completos'
+  },
+  large: {
+    formula: '=K.ESIMO.MAYOR(D2:D7; 1)',
+    explanation: 'Devuelve el valor más alto (posición 1) del rango de Streams. Cambiar 1 por 2 da el segundo más alto, por 3 el tercero, etc. Ideal para rankings sin ordenar la tabla.',
+    output: '2,100,000 streams',
+    music: '🎵 Top 1 de streams del catálogo: Canción Demo A con 2.1M. Cambiar a K.ESIMO.MAYOR(D2:D7;2) = 1.9M'
+  }
+};
+
+function showFormula(key, btn) {
+  document.querySelectorAll('.fd-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = formulas[key];
+  document.getElementById('sim-formula-display').textContent = f.formula;
+  document.getElementById('fd-result').innerHTML = `
+    <div class="fd-formula">${f.formula}</div>
+    <div class="fd-explanation">${f.explanation}</div>
+    <div>Resultado: <span class="fd-output">${f.output}</span></div>
+    <div class="fd-music">${f.music}</div>
+  `;
+}
+showFormula('sumif', document.querySelector('.fd-btn'));
+</script>
+</body>
+</html>

@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 4 — SQL integrado a Google Sheets</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --ink:#1a1a2e;--teal:#00897B;--teal-l:#e0f2f1;
+  --gold:#D4A017;--gold-l:#FFF8E1;--red:#C62828;--red-l:#FFEBEE;
+  --gray:#6B7280;--light:#F8F9FA;--bd:#E5E7EB;
+  --sh:#0F9D58;--sh-l:#E8F5E9;--sq:#1565C0;--sq-l:#E3F2FD;
+  --pu:#6B21A8;--pu-l:#F3E8FF;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#fff!important;color:#0a0a0a!important;}
+body{font-family:"DM Sans",sans-serif;line-height:1.6;}
+@media(prefers-color-scheme:dark){html,body{background:#fff!important;color:#0a0a0a!important;}}
+
+.header{border-bottom:1px solid var(--bd);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+.hl{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;}
+.hm{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+.hb{background:var(--teal);color:#fff;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+
+.hero{padding:6rem 4rem 4rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:"";display:inline-block;width:24px;height:2px;background:var(--teal);}
+.hero h1{font-family:"Playfair Display",serif;font-size:3.2rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;color:var(--teal);}
+.hero-desc{font-size:1rem;color:var(--gray);line-height:1.75;font-weight:300;}
+.sidebar{border:1px solid var(--bd);border-top:3px solid var(--teal);padding:1.5rem;background:#fff;}
+.si{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.85rem;}
+.si:last-child{border-bottom:none;}
+.si-l{color:var(--gray);}
+.si-v{font-weight:600;color:var(--ink);}
+.si-v.t{color:var(--teal);}
+
+.prog{max-width:1100px;margin:0 auto;padding:0 4rem 4rem;}
+.pt{display:flex;gap:3px;margin-bottom:.5rem;}
+.ps{flex:1;height:4px;background:var(--bd);}
+.ps.a{background:var(--teal);}
+.ps.c{background:linear-gradient(90deg,var(--teal) 60%,var(--bd) 60%);}
+.pl{font-size:.7rem;color:var(--gray);}
+
+section{max-width:1100px;margin:0 auto;padding:4rem;border-top:1px solid var(--bd);}
+.sn{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+.st{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.ss{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+
+.hook{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--teal);padding:2rem 2.5rem;margin-bottom:2.5rem;}
+.hook-lbl{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.8rem;}
+.hook h3{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+.hook p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+
+.ibox{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+.ibox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.ibox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+.ibox strong{color:#9A7208;}
+
+.wbox{background:#fff;border:1px solid #FFCDD2;border-left:4px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;}
+.wbox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+.wbox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.card{border:1px solid var(--bd);padding:2rem;position:relative;background:#fff;}
+.ca{position:absolute;top:0;left:0;width:100%;height:3px;}
+.card h4{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--ink);margin-top:.7rem;}
+.card p{font-size:.87rem;color:var(--gray);line-height:1.7;}
+
+.sim{border:1px solid var(--bd);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+.sim-h{background:#fff;border-bottom:1px solid var(--bd);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+.sim-ht{font-size:.85rem;font-weight:600;color:var(--ink);}
+.sim-hs{font-size:.75rem;color:var(--gray);}
+.tag{color:#fff;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+.tag-t{background:var(--teal);}
+.tag-g{background:var(--gold);}
+.tag-sh{background:var(--sh);}
+.tag-sq{background:var(--sq);}
+
+.sql{font-family:"DM Mono",monospace;font-size:.79rem;background:var(--sq-l);border:1px solid #BBDEFB;border-left:3px solid var(--sq);padding:.9rem 1.2rem;line-height:1.9;overflow-x:auto;white-space:pre;margin-bottom:.8rem;}
+.shf{font-family:"DM Mono",monospace;font-size:.79rem;background:var(--sh-l);border:1px solid #A5D6A7;border-left:3px solid var(--sh);padding:.9rem 1.2rem;line-height:1.9;overflow-x:auto;white-space:pre;margin-bottom:.8rem;}
+.kw{color:var(--sq);font-weight:600;}
+.fn{color:var(--pu);font-weight:600;}
+.st2{color:var(--red);}
+.cm{color:var(--gray);font-style:italic;}
+.nm{color:var(--gold);}
+.ic{font-family:"DM Mono",monospace;font-size:.85em;background:var(--light);border:1px solid var(--bd);padding:.1rem .4rem;border-radius:2px;color:var(--teal);}
+
+.badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:700;padding:.2rem .6rem;border-radius:2px;letter-spacing:.05em;}
+.bsh{background:var(--sh-l);color:var(--sh);}
+.bsq{background:var(--sq-l);color:var(--sq);}
+.bt{background:var(--teal-l);color:var(--teal);}
+
+.tab{border:1px solid var(--bd);background:#fff;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--gray);transition:all .15s;border-radius:2px;}
+.tab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.tab:hover:not(.on){border-color:var(--teal);color:var(--teal);}
+
+.rtbl{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.78rem;}
+.rtbl th{background:#fff;border:1px solid var(--bd);padding:.4rem .8rem;font-weight:600;color:var(--gray);text-align:left;font-size:.72rem;border-bottom:2px solid var(--teal);}
+.rtbl td{border:1px solid #ECECEC;padding:.38rem .8rem;color:var(--ink);background:#fff;}
+.rtbl tr:nth-child(even) td{background:var(--light);}
+.rtbl td.nc{text-align:right;color:var(--teal);font-weight:600;}
+.rtbl td.hl{background:var(--red-l);color:var(--red);font-weight:600;}
+
+.err-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.err-item{border:1px solid var(--bd);border-left:3px solid var(--red);padding:1.2rem;background:#fff;}
+.err-t{font-weight:700;font-size:.85rem;color:var(--ink);margin-bottom:.4rem;}
+.err-c{font-family:"DM Mono",monospace;font-size:.72rem;background:var(--red-l);padding:.4rem .7rem;color:var(--red);margin-bottom:.5rem;display:block;line-height:1.6;}
+.err-f{font-size:.78rem;color:var(--teal);font-weight:600;line-height:1.5;}
+
+.cases{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem;}
+.ci{border:1px solid var(--bd);background:#fff;overflow:hidden;}
+.ci-h{padding:1rem 1.5rem;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;cursor:pointer;transition:background .15s;}
+.ci-h:hover{background:var(--light);}
+.ci-num{font-family:"DM Mono",monospace;font-size:.7rem;font-weight:700;color:var(--gray);background:var(--light);border:1px solid var(--bd);padding:.2rem .5rem;border-radius:2px;}
+.ci-q{font-weight:600;font-size:.9rem;color:var(--ink);}
+.ci-arr{color:var(--gray);font-size:.9rem;transition:transform .2s;}
+.ci-arr.open{transform:rotate(180deg);}
+.ci-body{display:none;padding:1.5rem;border-top:1px solid var(--bd);}
+.ci-body.open{display:block;}
+.ci-ctx{background:var(--light);border:1px solid var(--bd);border-left:3px solid var(--gold);padding:.8rem 1rem;font-size:.82rem;color:var(--gray);line-height:1.6;margin-bottom:1.2rem;}
+
+.cs-steps{display:flex;flex-direction:column;gap:0;}
+.cs-step{display:grid;grid-template-columns:32px 1fr;gap:1rem;padding:1rem 1.5rem;border:1px solid var(--bd);border-top:none;align-items:start;background:#fff;}
+.cs-step:first-child{border-top:1px solid var(--bd);}
+.cs-n{width:28px;height:28px;border-radius:50%;background:var(--sh);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+.cs-c h5{font-weight:700;font-size:.88rem;color:var(--ink);margin-bottom:.25rem;}
+.cs-c p{font-size:.8rem;color:var(--gray);line-height:1.55;}
+.cs-a{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--sh);background:var(--sh-l);padding:.2rem .5rem;border-radius:2px;display:inline-block;margin-top:.3rem;}
+
+.flow{display:flex;align-items:stretch;gap:0;margin-bottom:2rem;border:1px solid var(--bd);overflow:hidden;}
+.fs{flex:1;padding:1.5rem;background:#fff;position:relative;display:flex;flex-direction:column;gap:.5rem;}
+.fs+.fs{border-left:1px solid var(--bd);}
+.fs.sq{border-top:3px solid var(--sq);}
+.fs.sh{border-top:3px solid var(--sh);}
+.fs.bt{border-top:3px solid var(--teal);}
+.fn2{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;}
+.ft{font-weight:700;font-size:.9rem;color:var(--ink);}
+.fd{font-size:.78rem;color:var(--gray);line-height:1.55;}
+.fa{position:absolute;right:-14px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--bd);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray);z-index:2;}
+
+.closing{background:#fff;border-top:1px solid var(--bd);padding:4rem;}
+.closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.closing h3{font-family:"Playfair Display",serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.nc{border:1px solid var(--bd);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+.nc-l{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.nc-t{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+.nc-i{list-style:none;font-size:.82rem;color:var(--gray);}
+.nc-i li{padding:.3rem 0;padding-left:1rem;position:relative;}
+.nc-i li::before{content:"→";position:absolute;left:0;color:var(--gold);}
+.kl{list-style:none;}
+.kl li{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--bd);font-size:.88rem;align-items:flex-start;line-height:1.5;}
+.kl li:last-child{border-bottom:none;}
+.kc{color:var(--teal);flex-shrink:0;margin-top:.1rem;}
+footer{border-top:1px solid var(--bd);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+footer span{font-size:.75rem;color:var(--gray);}
+.fn3{display:flex;gap:1.5rem;}
+.fn3 a{font-size:.75rem;color:var(--gray);text-decoration:none;font-weight:500;}
+.fn3 a:hover{color:var(--teal);}
+
+.atbl{width:100%;border-collapse:collapse;font-size:.83rem;margin-bottom:1.5rem;}
+.atbl th{background:#fff;border:1px solid var(--bd);padding:.6rem 1rem;text-align:left;font-size:.72rem;color:var(--gray);font-weight:600;}
+.atbl td{border:1px solid #ECECEC;padding:.6rem 1rem;}
+.atbl tr:nth-child(even) td{background:var(--light);}
+.atbl td:first-child{color:var(--sh);font-weight:600;}
+.atbl td:nth-child(2){font-family:"DM Mono",monospace;font-size:.8rem;color:var(--sq);font-weight:600;}
+.atbl td:nth-child(3){color:var(--gray);}
+
+.schema-info{border:1px solid var(--bd);overflow:hidden;margin-bottom:1.5rem;background:#fff;}
+.schema-top{background:var(--sh);color:#fff;padding:.5rem 1rem;font-family:"DM Mono",monospace;font-size:.8rem;font-weight:600;}
+.schema-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.schema-col{padding:.8rem 1rem;}
+.schema-col+.schema-col{border-left:1px solid var(--bd);}
+.schema-col-t{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:.6rem;}
+.schema-col-f{font-family:"DM Mono",monospace;font-size:.75rem;color:var(--gray);line-height:2;}
+.schema-stats{padding:.8rem 1rem;border-top:1px solid var(--bd);background:var(--light);display:flex;gap:2rem;flex-wrap:wrap;}
+.schema-stat{font-size:.75rem;color:var(--gray);}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--bd);overflow:hidden;margin-bottom:2rem;}
+.cmp-col{background:#fff;}
+.cmp-col+.cmp-col{border-left:1px solid var(--bd);}
+.cmp-h{padding:.8rem 1.2rem;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--bd);}
+.cmp-body{padding:1.2rem;}
+.cmp-note{font-size:.78rem;color:var(--gray);line-height:1.6;margin-top:.6rem;}
+
+.sh-mock{border:1px solid var(--bd);overflow:hidden;margin-bottom:.8rem;}
+.sh-top{background:var(--sh);padding:.4rem 1rem;display:flex;align-items:center;gap:.8rem;}
+.sh-top-t{color:#fff;font-size:.78rem;font-weight:600;}
+.sh-fx{background:#F8F8F8;border-bottom:1px solid var(--bd);padding:.4rem .8rem;display:flex;gap:.6rem;align-items:center;font-family:"DM Mono",monospace;font-size:.78rem;}
+.sh-fxl{background:var(--bd);padding:.1rem .4rem;border-radius:2px;font-weight:600;color:var(--gray);font-size:.7rem;}
+.sh-fxv{color:var(--sh);flex:1;}
+.sh-t{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.76rem;}
+.sh-t th{background:#F0F0F0;border:1px solid #D0D0D0;padding:.3rem .7rem;font-size:.7rem;color:var(--gray);text-align:center;font-weight:600;}
+.sh-t td{border:1px solid #E0E0E0;padding:.3rem .7rem;background:#fff;color:var(--ink);}
+.sh-t td.rh{background:#F0F0F0;color:var(--gray);text-align:center;font-weight:600;font-size:.68rem;}
+.sh-t td.ch{background:#fff;color:var(--sh);font-weight:700;font-size:.74rem;font-family:"DM Sans",sans-serif;border-bottom:2px solid var(--sh);}
+.sh-t td.ac{background:#E8F5E9;outline:2px solid var(--sh);}
+.sh-t td.fc{color:var(--sh);font-weight:500;}
+
+@media(max-width:768px){
+  .hero,.g2,.g3,.cmp,.closing-inner,.schema-cols{grid-template-columns:1fr;}
+  .flow{flex-direction:column;}
+  .header,.prog,section,footer,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+  .hero{padding:3rem 1.5rem 2rem;}
+  .hero h1{font-size:2.4rem;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hl">De los Datos al Criterio</div>
+  <div class="hm"><span>Industria Musical</span><span class="hb">Clase 04 / 08</span></div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">Bloque 4 · SQL + Sheets</div>
+    <h1>SQL integrado<br>a <em>Google Sheets</em></h1>
+    <p class="hero-desc">SQL y Google Sheets no compiten — se complementan. Esta clase usa el catálogo real de Alzada para aprender a extraer datos con SQL y analizarlos en Sheets.</p>
+  </div>
+  <div class="sidebar">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Ficha de la clase</div>
+    <div class="si"><span class="si-l">Duración</span><span class="si-v">2 horas</span></div>
+    <div class="si"><span class="si-l">Bloques</span><span class="si-v">6</span></div>
+    <div class="si"><span class="si-l">Dataset</span><span class="si-v">Master Alzada (real)</span></div>
+    <div class="si"><span class="si-l">Demos</span><span class="si-v t">5 interactivas</span></div>
+    <div class="si"><span class="si-l">Enfoque</span><span class="si-v">SQL → Sheets</span></div>
+  </div>
+</div>
+
+<div class="prog">
+  <div class="pt">
+    <div class="ps a"></div><div class="ps a"></div><div class="ps a"></div>
+    <div class="ps c"></div><div class="ps"></div><div class="ps"></div>
+    <div class="ps"></div><div class="ps"></div>
+  </div>
+  <div class="pl">Clase 4 de 8 · SQL integrado a Google Sheets</div>
+</div>
+
+<!-- B0 MARCO TEÓRICO -->
+<section>
+  <div class="sn">00 · Marco Teórico</div>
+  <div class="st">Sheets y SQL: el mismo trabajo, distintas escalas</div>
+  <div class="ss">15 min · Por qué no son herramientas alternativas sino complementarias</div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:3rem;margin-bottom:2rem;">
+    <div>
+      <p style="font-size:1rem;color:var(--ink);line-height:1.85;margin-bottom:1.4rem;">Google Sheets y SQL resuelven el mismo problema — organizar y consultar datos — pero en contextos distintos. Sheets es visual, inmediato y perfecto para datasets pequeños. SQL es textual, preciso y necesario cuando los datos viven en una base de datos o tienen millones de filas.</p>
+      <p style="font-size:.93rem;color:var(--gray);line-height:1.85;margin-bottom:1.4rem;">En la industria musical, el flujo real es: los datos de streaming, revenue y catálogo viven en bases de datos de distribuidoras y plataformas. <strong>SQL extrae lo que necesitas.</strong> Sheets recibe ese resultado y lo convierte en el reporte que presentas al artista, manager o sello.</p>
+      <p style="font-size:.93rem;color:var(--gray);line-height:1.85;">La habilidad clave no es SQL <em>o</em> Sheets — es saber <strong>cuándo usar cuál</strong> y cómo conectarlos. Eso es lo que construimos hoy con datos reales del catálogo Alzada.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div style="border:1px solid var(--bd);border-top:3px solid var(--sh);padding:1.2rem;background:#fff;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sh);margin-bottom:.6rem;">Google Sheets — cuándo</div>
+        <ul style="font-size:.8rem;color:var(--gray);line-height:1.9;padding-left:1rem;">
+          <li>Menos de 100,000 filas</li><li>Exploración visual rápida</li>
+          <li>Reportes para stakeholders</li><li>Gráficas y tablas dinámicas</li>
+        </ul>
+      </div>
+      <div style="border:1px solid var(--bd);border-top:3px solid var(--sq);padding:1.2rem;background:#fff;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq);margin-bottom:.6rem;">SQL — cuándo</div>
+        <ul style="font-size:.8rem;color:var(--gray);line-height:1.9;padding-left:1rem;">
+          <li>Más de 100,000 filas</li><li>Datos en bases de datos</li>
+          <li>Consultas repetibles exactas</li><li>Cuando Sheets se congela</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Si lo sabes hacer en Sheets, ya entiendes la lógica en SQL</div>
+  <table class="atbl">
+    <thead><tr><th>En Google Sheets</th><th>Equivalente en SQL</th><th>Para qué sirve</th></tr></thead>
+    <tbody id="atbl-body"></tbody>
+  </table>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;margin-top:2rem;">Dataset de la clase — Master Alzada (archivo real)</div>
+  <div class="schema-info">
+    <div class="schema-top">📊 metadata_master — 42 tracks · 14 columnas · catálogo real del sello Alzada</div>
+    <div class="schema-cols">
+      <div class="schema-col">
+        <div class="schema-col-t">Identificadores</div>
+        <div class="schema-col-f">
+          <span style="color:var(--gold);font-weight:600;">🔑 TRACK_ID</span> — clave única<br>
+          UPC — código universal<br>ISRC — código de grabación
+        </div>
+      </div>
+      <div class="schema-col">
+        <div class="schema-col-t">Metadatos artísticos</div>
+        <div class="schema-col-f">
+          Título del Track<br>Artista Principal<br>Colaborador(es)<br>
+          Álbum / EP<br>Productor · Tracking · Mezcla · Master
+        </div>
+      </div>
+      <div class="schema-col">
+        <div class="schema-col-t">Distribución</div>
+        <div class="schema-col-f">
+          Fecha Lanzamiento<br>Estatus Distribución<br>
+          <span style="color:var(--pu);font-weight:600;">PyC</span> — sello (Rise / Blegh! / Alzada)
+        </div>
+      </div>
+    </div>
+    <div class="schema-stats">
+      <span class="schema-stat">📊 <strong>42</strong> tracks</span>
+      <span class="schema-stat">🎤 <strong>15</strong> artistas</span>
+      <span class="schema-stat">✅ <strong>23</strong> distribuidos</span>
+      <span class="schema-stat">⏳ <strong>19</strong> pendientes</span>
+      <span class="schema-stat" style="color:var(--red);">⚠️ <strong>11</strong> sin UPC/ISRC</span>
+      <span class="schema-stat">🏷️ <strong>3</strong> sellos</span>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">El flujo SQL → Sheets que usarás en la industria</div>
+  <div class="flow">
+    <div class="fs sq" style="position:relative;">
+      <span class="badge bsq">SQL</span>
+      <div class="fn2">PASO 1</div><div class="ft">Extraer datos</div>
+      <div class="fd">Escribes la query. SQL consulta la base de datos del sello o distribuidora.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs bt" style="position:relative;">
+      <span class="badge bt">Exportar</span>
+      <div class="fn2">PASO 2</div><div class="ft">CSV o Connected Sheets</div>
+      <div class="fd">Copias el resultado como CSV o usas Connected Sheets para conectar directamente.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs sh" style="position:relative;">
+      <span class="badge bsh">Sheets</span>
+      <div class="fn2">PASO 3</div><div class="ft">Analizar y limpiar</div>
+      <div class="fd">En Sheets aplicas fórmulas, tablas dinámicas y formato condicional. Ya lo conoces.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs sh">
+      <span class="badge bsh">Sheets</span>
+      <div class="fn2">PASO 4</div><div class="ft">Presentar</div>
+      <div class="fd">Gráficas, reporte final o dashboard. Sheets es la capa visual para el artista o manager.</div>
+    </div>
+  </div>
+</section>
+
+<!-- B1 SELECT Y WHERE -->
+<section>
+  <div class="sn">01 · SELECT y WHERE</div>
+  <div class="st">Filtrar el catálogo Alzada</div>
+  <div class="ss">20 min · La misma operación que en Sheets, pero sobre 42 tracks reales</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio</div>
+    <h3>¿Qué tracks del catálogo Alzada están distribuidos?</h3>
+    <p>En Sheets aplicarías un filtro en la columna Estatus Distribución. En SQL escribes la misma lógica con SELECT y WHERE. Resultado: 23 de 42 tracks distribuidos.</p>
+  </div>
+
+  <div class="cmp" style="margin-bottom:2rem;">
+    <div class="cmp-col">
+      <div class="cmp-h" style="border-top:3px solid var(--sh);">
+        <span class="badge bsh">Google Sheets</span>
+        <span style="font-size:.72rem;font-weight:700;color:var(--sh);">Filtro manual</span>
+      </div>
+      <div class="cmp-body">
+        <div class="sh-mock">
+          <div class="sh-top"><span class="sh-top-t">📊 Master_Alzada_METADATA.csv</span></div>
+          <div class="sh-fx"><span class="sh-fxl">fx</span><span class="sh-fxv">=FILTRAR(A2:G42, F2:F42="DISTRIBUIDO")</span></div>
+          <div style="overflow-x:auto;">
+            <table class="sh-t">
+              <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>F</th></tr></thead>
+              <tbody>
+                <tr><td class="rh">1</td><td class="ch">TRACK_ID</td><td class="ch">Titulo</td><td class="ch">Artista</td><td class="ch">Estatus</td></tr>
+                <tr><td class="rh">2</td><td>ALZ-GAB-SEI-0001</td><td class="ac">Seiseiseis</td><td>Gabove DeBlue</td><td class="fc">DISTRIBUIDO</td></tr>
+                <tr><td class="rh">3</td><td>ALZ-ALA-FUE-0002</td><td class="ac">Fuego Interno</td><td>Alan Gomez</td><td class="fc">DISTRIBUIDO</td></tr>
+                <tr><td class="rh">4</td><td>ALZ-CAR-CRI-0003</td><td class="ac">Criptograma</td><td>Carlos Vega</td><td class="fc">DISTRIBUIDO</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cmp-note">Filtro manual o función FILTRAR(). Funciona bien con 42 tracks. Con 500,000 registros de streaming, Sheets no carga.</div>
+      </div>
+    </div>
+    <div class="cmp-col">
+      <div class="cmp-h" style="border-top:3px solid var(--sq);">
+        <span class="badge bsq">SQL</span>
+        <span style="font-size:.72rem;font-weight:700;color:var(--sq);">Query exacta</span>
+      </div>
+      <div class="cmp-body">
+        <div class="sql" id="cmp-sql-1"></div>
+        <table class="rtbl">
+          <thead><tr><th>TRACK_ID</th><th>Titulo</th><th>Artista_Principal</th><th>Estatus</th></tr></thead>
+          <tbody>
+            <tr><td>ALZ-GAB-SEI-0001</td><td>Seiseiseis</td><td>Gabove DeBlue</td><td>DISTRIBUIDO</td></tr>
+            <tr><td>ALZ-ALA-FUE-0002</td><td>Fuego Interno</td><td>Alan Gomez</td><td>DISTRIBUIDO</td></tr>
+            <tr><td>ALZ-CAR-CRI-0003</td><td>Criptograma</td><td>Carlos Vega</td><td>DISTRIBUIDO</td></tr>
+            <tr><td colspan="4" style="color:var(--gray);font-style:italic;font-size:.72rem;">... 20 filas más</td></tr>
+          </tbody>
+        </table>
+        <div class="cmp-note">Mismo resultado en milisegundos. Exportas a CSV y lo pegas en Sheets para graficar.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Simulador — SELECT y WHERE con catálogo Alzada</div><div class="sim-hs">Elige una pregunta y ve la query + el resultado listo para Sheets</div></div>
+      <span class="tag tag-sq">INTERACTIVO</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.72rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.06em;align-self:center;">Pregunta:</span>
+      <button class="tab on" id="sw0" onclick="doSW(0)">Distribuidos</button>
+      <button class="tab" id="sw1" onclick="doSW(1)">Sin UPC</button>
+      <button class="tab" id="sw2" onclick="doSW(2)">Rise Records</button>
+      <button class="tab" id="sw3" onclick="doSW(3)">Beat Master</button>
+      <button class="tab" id="sw4" onclick="doSW(4)">Con álbum</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div style="padding:1.5rem;border-right:1px solid var(--bd);">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq);margin-bottom:.8rem;">Query SQL</div>
+        <div class="sql" id="sw-q"></div>
+        <div style="font-size:.8rem;color:var(--gray);line-height:1.6;" id="sw-e"></div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sh);margin-bottom:.8rem;">→ Resultado en Sheets</div>
+        <div id="sw-r"></div>
+        <div style="font-size:.75rem;color:var(--sh);font-style:italic;margin-top:.8rem;" id="sw-t"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B2 GROUP BY -->
+<section>
+  <div class="sn">02 · GROUP BY y Agregaciones</div>
+  <div class="st">SQL hace la tabla dinámica en la base de datos</div>
+  <div class="ss">20 min · Lo que en Sheets es tabla dinámica, en SQL es GROUP BY</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio</div>
+    <h3>¿Cuántos tracks tiene cada sello del catálogo Alzada?</h3>
+    <p>En Sheets harías una tabla dinámica: filas = PyC, valores = COUNT. En SQL escribes GROUP BY PyC con COUNT(*). Resultado: Rise Records 15, Blegh! Label 13, Alzada Corp. 13.</p>
+  </div>
+
+  <div class="g2">
+    <div>
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Estructura GROUP BY</div>
+      <div class="sql" id="gb-example"></div>
+    </div>
+    <div>
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Funciones de agregación</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;">
+        <div style="padding:.6rem 1rem;border:1px solid var(--bd);background:#fff;display:grid;grid-template-columns:110px 1fr;gap:.8rem;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--pu);font-weight:600;">COUNT(*)</span>
+          <span style="font-size:.82rem;color:var(--gray);">Cuenta filas — cuántos tracks por sello</span>
+        </div>
+        <div style="padding:.6rem 1rem;border:1px solid var(--bd);background:#fff;display:grid;grid-template-columns:110px 1fr;gap:.8rem;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--pu);font-weight:600;">COUNT(UPC)</span>
+          <span style="font-size:.82rem;color:var(--gray);">Cuenta solo valores no nulos — ignora vacíos</span>
+        </div>
+        <div style="padding:.6rem 1rem;border:1px solid var(--bd);background:#fff;display:grid;grid-template-columns:110px 1fr;gap:.8rem;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--pu);font-weight:600;">SUM()</span>
+          <span style="font-size:.82rem;color:var(--gray);">Suma total — revenue, streams, costos</span>
+        </div>
+        <div style="padding:.6rem 1rem;border:1px solid var(--bd);background:#fff;display:grid;grid-template-columns:110px 1fr;gap:.8rem;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--pu);font-weight:600;">AVG()</span>
+          <span style="font-size:.82rem;color:var(--gray);">Promedio — save rate promedio por plataforma</span>
+        </div>
+        <div style="padding:.6rem 1rem;border:1px solid var(--bd);background:#fff;display:grid;grid-template-columns:110px 1fr;gap:.8rem;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--pu);font-weight:600;">MAX() / MIN()</span>
+          <span style="font-size:.82rem;color:var(--gray);">Extremos — fecha más reciente / más antigua</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Regla de GROUP BY</div>
+    <p>Toda columna en el SELECT que <strong>no</strong> sea una función de agregación debe estar en el GROUP BY. Si seleccionas <span class="ic">PyC</span> y <span class="ic">Estatus_Distribucion</span>, ambas deben ir en <span class="ic">GROUP BY PyC, Estatus_Distribucion</span>. Es el error #1 al principio.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Simulador — GROUP BY con catálogo Alzada</div><div class="sim-hs">Selecciona cómo agrupar los datos del sello</div></div>
+      <span class="tag tag-sq">INTERACTIVO</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.72rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.06em;align-self:center;">Agrupar por:</span>
+      <button class="tab on" id="gb0" onclick="doGB(0)">Sello (PyC)</button>
+      <button class="tab" id="gb1" onclick="doGB(1)">Estatus</button>
+      <button class="tab" id="gb2" onclick="doGB(2)">Auditoría UPC</button>
+      <button class="tab" id="gb3" onclick="doGB(3)">Productor</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div style="padding:1.5rem;border-right:1px solid var(--bd);">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq);margin-bottom:.8rem;">Query SQL</div>
+        <div class="sql" id="gb-q"></div>
+        <div style="font-size:.8rem;color:var(--gray);line-height:1.6;" id="gb-e"></div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sh);margin-bottom:.8rem;">→ Pega esto en Sheets</div>
+        <div id="gb-r"></div>
+        <div style="font-size:.75rem;color:var(--sh);font-style:italic;margin-top:.8rem;" id="gb-t"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B3 ORDER BY LIMIT HAVING -->
+<section>
+  <div class="sn">03 · ORDER BY, LIMIT y HAVING</div>
+  <div class="st">Rankings y filtros avanzados sobre el catálogo</div>
+  <div class="ss">20 min · Las tres cláusulas que convierten una query en un reporte listo para Sheets</div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>ORDER BY</h4>
+      <p>Ordena el resultado antes de enviarlo a Sheets. <strong>DESC</strong> de mayor a menor. <strong>ASC</strong> de menor a mayor.</p>
+      <div class="sql" style="margin-top:.8rem;font-size:.74rem;" id="ob-ex"></div>
+      <p style="font-size:.78rem;color:var(--sh);font-style:italic;margin-top:.5rem;">🎵 Tracks más recientes del catálogo Alzada primero</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4>LIMIT</h4>
+      <p>Devuelve solo los primeros N resultados. Siempre va después de ORDER BY para que sea un ranking real.</p>
+      <div class="sql" style="margin-top:.8rem;font-size:.74rem;" id="lm-ex"></div>
+      <p style="font-size:.78rem;color:var(--sh);font-style:italic;margin-top:.5rem;">🎵 Top 5 artistas con más tracks en el catálogo</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4>HAVING</h4>
+      <p>Filtra <em>después</em> de agrupar. WHERE filtra filas. HAVING filtra los grupos ya calculados.</p>
+      <div class="sql" style="margin-top:.8rem;font-size:.74rem;" id="hv-ex"></div>
+      <p style="font-size:.78rem;color:var(--sh);font-style:italic;margin-top:.5rem;">🎵 Solo sellos con 8+ tracks distribuidos</p>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">WHERE vs HAVING — la confusión más común</div>
+    <p><strong>WHERE</strong> actúa antes de agrupar — filtra filas individuales. <strong>HAVING</strong> actúa después de agrupar — filtra grupos. Si tu condición usa COUNT(), SUM(), AVG() u otra función, siempre es HAVING. Si filtra un valor de fila individual, siempre es WHERE.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Simulador — Rankings del catálogo Alzada</div><div class="sim-hs">Queries listas para pegar en Google Sheets</div></div>
+      <span class="tag tag-g">INTERACTIVO</span>
+    </div>
+    <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--bd);display:flex;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.72rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.06em;align-self:center;">Ranking:</span>
+      <button class="tab on" id="rk0" onclick="doRK(0)">Top 5 artistas</button>
+      <button class="tab" id="rk1" onclick="doRK(1)">Sellos activos</button>
+      <button class="tab" id="rk2" onclick="doRK(2)">Artistas sin UPC</button>
+      <button class="tab" id="rk3" onclick="doRK(3)">Álbumes por tracks</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div style="padding:1.5rem;border-right:1px solid var(--bd);">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq);margin-bottom:.8rem;">Query SQL</div>
+        <div class="sql" id="rk-q"></div>
+        <div style="font-size:.8rem;color:var(--gray);line-height:1.6;" id="rk-e"></div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sh);margin-bottom:.8rem;">→ Resultado en Sheets</div>
+        <div id="rk-r"></div>
+        <div style="font-size:.75rem;color:var(--sh);font-style:italic;margin-top:.8rem;" id="rk-t"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B4 CONNECTED SHEETS -->
+<section>
+  <div class="sn">04 · Connected Sheets</div>
+  <div class="st">Correr SQL directamente desde Google Sheets</div>
+  <div class="ss">20 min · La integración nativa de Google — sin copiar, sin pegar</div>
+
+  <div class="hook">
+    <div class="hook-lbl">La integración más poderosa</div>
+    <h3>Connected Sheets te permite escribir SQL en Google Sheets y ver el resultado como tabla — sin salir de Sheets.</h3>
+    <p>Funciona con BigQuery (base de datos de Google Cloud). Cuando tu sello o distribuidora tiene datos en BigQuery, los consultas directamente desde tu spreadsheet sin exportar nada.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--sh)"></div>
+      <h4>¿Qué es Connected Sheets?</h4>
+      <p>Una función nativa de Google Sheets (Workspace) que conecta tu hoja con BigQuery. Escribes SQL en un panel lateral y el resultado aparece como tabla en tu hoja.<br><br>No exportas CSV. No copias resultados. La tabla se actualiza con un clic cuando los datos cambian.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--sq)"></div>
+      <h4>¿Cuándo lo necesitas?</h4>
+      <p>Cuando el sello o empresa tiene datos en Google BigQuery o Cloud SQL. Si tienes Google Workspace Business o Enterprise, probablemente ya tienes acceso.<br><br>Para datos de Spotify o distribuidoras que llegan como CSV — importas directamente a Sheets. El flujo SQL aplica cuando hay una BD propia.</p>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Cómo activar y usar Connected Sheets</div>
+  <div class="cs-steps">
+    <div class="cs-step"><div class="cs-n">1</div><div class="cs-c"><h5>Abrir la conexión</h5><p>En Google Sheets ve a Datos → Conectores de datos → BigQuery. Se abre un panel lateral para seleccionar tu proyecto y dataset.</p><span class="cs-a">Datos → Conectores de datos → BigQuery</span></div></div>
+    <div class="cs-step"><div class="cs-n">2</div><div class="cs-c"><h5>Seleccionar la fuente</h5><p>Elige el proyecto de BigQuery, el dataset y la tabla. O elige "Consulta personalizada" para escribir tu propio SQL.</p><span class="cs-a">Consulta personalizada → escribes tu SQL aquí</span></div></div>
+    <div class="cs-step"><div class="cs-n">3</div><div class="cs-c"><h5>Escribir la query</h5><p>Escribes tu SQL en el panel lateral. Exactamente las mismas cláusulas que aprendiste: SELECT, WHERE, GROUP BY, ORDER BY, LIMIT.</p><span class="cs-a">SELECT PyC, COUNT(*) FROM metadata_master GROUP BY PyC</span></div></div>
+    <div class="cs-step"><div class="cs-n">4</div><div class="cs-c"><h5>Ver el resultado en la hoja</h5><p>El resultado aparece como tabla en tu Sheets. Puedes crear tablas dinámicas y gráficas sobre esa tabla — todo conectado en tiempo real.</p><span class="cs-a">Clic en "Insertar resultados" → tabla en hoja activa</span></div></div>
+    <div class="cs-step"><div class="cs-n">5</div><div class="cs-c"><h5>Actualizar cuando cambien los datos</h5><p>Cuando llegan nuevos datos a BigQuery, haces clic en "Actualizar" en el panel. La tabla se recalcula sin reescribir nada.</p><span class="cs-a">Panel lateral → Actualizar datos → la tabla se recarga</span></div></div>
+  </div>
+
+  <div class="ibox" style="margin-top:2rem;">
+    <div class="ibox-lbl">El flujo que usarás el 90% del tiempo</div>
+    <p>En la práctica diaria, los reportes de streaming llegan como CSV de distribuidoras. <strong>El flujo será: recibes CSV → lo limpias con lo de Clase 3 → lo analizas en Sheets.</strong> SQL entra cuando trabajas con bases de datos propias o cuando el volumen hace que Sheets no aguante.</p>
+  </div>
+</section>
+
+<!-- B5 ERRORES -->
+<section>
+  <div class="sn">05 · Errores Comunes</div>
+  <div class="st">Los errores que todos cometen al principio</div>
+  <div class="ss">10 min · Mejor verlos aquí que en producción</div>
+  <div class="err-grid" id="err-grid"></div>
+</section>
+
+<!-- B6 CASOS REALES -->
+<section>
+  <div class="sn">06 · Casos Reales</div>
+  <div class="st">5 preguntas del sello Alzada — SQL y Sheets</div>
+  <div class="ss">25 min · Cada caso usa datos reales del catálogo. Lee, piensa la query, luego revela.</div>
+
+  <div style="background:var(--light);border:1px solid var(--bd);border-left:4px solid var(--gold);padding:1.2rem 1.5rem;margin-bottom:2rem;">
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.4rem;">Instrucciones</div>
+    <div style="font-size:.85rem;color:var(--ink);line-height:1.6;">Lee la pregunta. Piensa qué cláusulas SQL necesitas (SELECT, WHERE, GROUP BY, ORDER BY, LIMIT, HAVING). Intenta la query en papel. Luego haz clic para revelar y compara.</div>
+  </div>
+
+  <div class="cases" id="cases"></div>
+</section>
+
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="kl">
+        <li><span class="kc">✓</span> SQL y Sheets se complementan — SQL extrae, Sheets presenta.</li>
+        <li><span class="kc">✓</span> SELECT + WHERE = elegir columnas y filtrar filas.</li>
+        <li><span class="kc">✓</span> GROUP BY + COUNT/SUM = tabla dinámica en SQL.</li>
+        <li><span class="kc">✓</span> WHERE filtra antes de agrupar. HAVING filtra después.</li>
+        <li><span class="kc">✓</span> ORDER BY + LIMIT = ranking real de N resultados.</li>
+        <li><span class="kc">✓</span> Connected Sheets conecta SQL con tu hoja directamente.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="nc">
+        <div class="nc-l">Próxima clase</div>
+        <div class="nc-t">Clase 5 — Métricas que Importan</div>
+        <ul class="nc-i">
+          <li>KPIs vs métricas de vanidad en la industria musical</li>
+          <li>Save rate, listener growth, CAC y LTV de fans</li>
+          <li>Análisis de cohortes: retención de oyentes</li>
+          <li>Segmentación RFM aplicada a fanbase</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Clase 04 · SQL integrado a Google Sheets</span>
+  <nav class="fn3"><a href="#">← Clase 03</a><a href="#">Clase 05 →</a></nav>
+</footer>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+var ANALOGIES = [
+  ["Elegir columnas visibles","SELECT columnas","Controlar qué datos extraes"],
+  ["Filtro de columna (texto, número, fecha)","WHERE condición","Filtrar filas antes de verlas"],
+  ["Tabla dinámica: agrupar y contar","GROUP BY + COUNT()","Calcular métricas por categoría"],
+  ["Tabla dinámica: agrupar y sumar","GROUP BY + SUM()","Sumar valores por grupo"],
+  ["Ordenar columna de mayor a menor","ORDER BY DESC","Ordenar el resultado final"],
+  ["Ver solo primeras N filas","LIMIT N","Obtener top N sin traer todo"],
+  ["Filtrar resultado de tabla dinámica","HAVING condición","Filtrar después de agrupar"],
+  ["Hoja auxiliar con resultados intermedios","WITH nombre AS (...)","Organizar queries en pasos"],
+];
+
+var SW = [
+  {
+    q: "SELECT  TRACK_ID, Titulo, Artista_Principal, Fecha_Lanzamiento\nFROM    metadata_master\nWHERE   Estatus_Distribucion = 'DISTRIBUIDO'\nORDER BY Fecha_Lanzamiento DESC;",
+    e: "WHERE filtra exactamente el valor del campo. El texto siempre entre comillas simples. ORDER BY ... DESC muestra los más recientes primero. Resultado: 23 de 42 tracks distribuidos.",
+    h: ["TRACK_ID","Titulo","Artista_Principal","Fecha"],
+    r: [
+      ["ALZ-GAB-SEI-0001","Seiseiseis","Gabove DeBlue","31/10/2026"],
+      ["ALZ-ALA-FUE-0002","Fuego Interno","Alan Gomez","14/02/2026"],
+      ["ALZ-CAR-CRI-0003","Criptograma","Carlos Vega","30/01/2026"],
+      ["... (20 más)","","",""],
+    ],
+    t: "En Sheets: pega el resultado y aplica formato condicional verde. Este es tu inventario de catálogo activo."
+  },
+  {
+    q: "SELECT  TRACK_ID, Titulo, Artista_Principal, Estatus_Distribucion\nFROM    metadata_master\nWHERE   UPC IS NULL\n  AND   ISRC IS NULL\nORDER BY Artista_Principal;",
+    e: "IS NULL detecta celdas vacías — equivale a ESBLANCO() en Sheets. AND combina dos condiciones. Resultado: 11 tracks sin UPC ni ISRC, incluyendo 8 ya distribuidos — error crítico real.",
+    h: ["TRACK_ID","Titulo","Artista_Principal","Estatus"],
+    r: [
+      ["ALZ-CAR-ALQ-0004","Alquimia","Carlos Vega","DISTRIBUIDO"],
+      ["ALZ-LUN-SIL-0026","Silencio Urbano","Luna Cold","DISTRIBUIDO"],
+      ["ALZ-LUN-ODI-0029","Odisea","Luna Cold","DISTRIBUIDO"],
+      ["ALZ-SAN-HOR-0034","Horizonte","Santi","DISTRIBUIDO"],
+      ["... (7 más)","","",""],
+    ],
+    t: "En Sheets: resalta en rojo los que dicen DISTRIBUIDO. Tracks en plataformas sin código de identificación — urgente."
+  },
+  {
+    q: "SELECT  TRACK_ID, Titulo, Artista_Principal, Album_EP\nFROM    metadata_master\nWHERE   PyC = 'Rise Records'\nORDER BY Artista_Principal, Fecha_Lanzamiento;",
+    e: "ORDER BY con dos columnas: primero agrupa por artista, luego ordena por fecha dentro de cada artista. Rise Records tiene 15 tracks en el catálogo Alzada.",
+    h: ["TRACK_ID","Titulo","Artista_Principal","Album_EP"],
+    r: [
+      ["ALZ-DJP-VOR-0008","Vórtice","DJ Pyro","—"],
+      ["ALZ-GAB-LUZ-0010","Luz de Mar","Gabo & Vale","Mi Camino"],
+      ["ALZ-KID-CAL-0016","Calles","Kid Flaco","Origen"],
+      ["... (12 más)","","",""],
+    ],
+    t: "En Sheets: este es el roster de Rise Records. Agrega formato condicional por Estatus para ver qué está distribuido."
+  },
+  {
+    q: "SELECT  TRACK_ID, Titulo, Artista_Principal\nFROM    metadata_master\nWHERE   Productor = 'Beat Master'\n  AND   Estatus_Distribucion = 'DISTRIBUIDO'\nORDER BY Artista_Principal;",
+    e: "Dos condiciones con AND: el productor Y el estatus. Ambas deben cumplirse. SQL distingue mayúsculas en los valores — DISTRIBUIDO debe escribirse exactamente así.",
+    h: ["TRACK_ID","Titulo","Artista_Principal"],
+    r: [
+      ["ALZ-CAR-ALQ-0004","Alquimia","Carlos Vega"],
+      ["ALZ-DJP-VOR-0008","Vórtice","DJ Pyro"],
+      ["ALZ-LUN-ODI-0029","Odisea","Luna Cold"],
+    ],
+    t: "En Sheets: reporte de regalías de producción para Beat Master — solo tracks que ya generan revenue."
+  },
+  {
+    q: "SELECT  TRACK_ID, Titulo, Artista_Principal, Album_EP\nFROM    metadata_master\nWHERE   Album_EP IS NOT NULL\nORDER BY Album_EP, Artista_Principal;",
+    e: "IS NOT NULL filtra filas que SÍ tienen valor — el opuesto de IS NULL. Del total de 42 tracks, 25 tienen álbum asignado. Los 17 restantes son singles sin proyecto.",
+    h: ["TRACK_ID","Titulo","Artista_Principal","Album_EP"],
+    r: [
+      ["ALZ-GAB-SEI-0001","Seiseiseis","Gabove DeBlue","Kbron de Pueblo"],
+      ["ALZ-ALA-FUE-0002","Fuego Interno","Alan Gomez","Evolución"],
+      ["ALZ-GAB-LUZ-0010","Luz de Mar","Gabo & Vale","Mi Camino"],
+      ["... (22 más)","","",""],
+    ],
+    t: "En Sheets: filtra por Album_EP para ver la tracklist completa de cada proyecto del sello."
+  }
+];
+
+var GB = [
+  {
+    q: "SELECT   PyC AS sello,\n         COUNT(*) AS total_tracks\nFROM     metadata_master\nGROUP BY PyC\nORDER BY total_tracks DESC;",
+    e: "GROUP BY PyC crea un grupo por cada sello. COUNT(*) cuenta cuántos tracks tiene cada uno. Sin GROUP BY obtendrías solo el total de 42. Con él, el conteo separado por sello.",
+    h: ["sello","total_tracks"],
+    r: [["Rise Records","15"],["Blegh! Label","13"],["Alzada Corp.","13"]],
+    t: "En Sheets: gráfica de pastel con distribución del catálogo. Agrega % con =B2/SUMA($B$2:$B$4)."
+  },
+  {
+    q: "SELECT   Estatus_Distribucion,\n         COUNT(*) AS tracks\nFROM     metadata_master\nGROUP BY Estatus_Distribucion;",
+    e: "La query más simple de GROUP BY: agrupar por estatus y contar. Del catálogo de 42 tracks: 23 distribuidos, 19 pendientes. Un KPI inmediato del estado del catálogo.",
+    h: ["Estatus_Distribucion","tracks"],
+    r: [["DISTRIBUIDO","23"],["NO DISTRIBUIDO","19"]],
+    t: "En Sheets: convierte este resultado en un KPI visual. 55% del catálogo activo."
+  },
+  {
+    q: "SELECT   Artista_Principal,\n         COUNT(*)      AS total_tracks,\n         COUNT(UPC)    AS con_upc,\n         COUNT(*) - COUNT(UPC) AS sin_upc\nFROM     metadata_master\nGROUP BY Artista_Principal\nORDER BY total_tracks DESC;",
+    e: "COUNT(*) cuenta todas las filas. COUNT(UPC) cuenta solo las filas donde UPC tiene valor — ignora NULL automáticamente. La diferencia da los tracks sin UPC. Una consulta de auditoría de calidad.",
+    h: ["Artista","total","con_upc","sin_upc"],
+    r: [
+      ["Gabo & Vale","7","6","1"],
+      ["DJ Pyro","5","4","1"],
+      ["Kid Flaco","4","4","0"],
+      ["Luna Cold","4","2","2"],
+      ["Santi","4","2","2"],
+      ["Zoe Rey","4","3","1"],
+    ],
+    t: "En Sheets: resalta en rojo los artistas con sin_upc > 0. Lista de acción para el equipo de distribución."
+  },
+  {
+    q: "SELECT   Productor,\n         COUNT(*) AS tracks_producidos\nFROM     metadata_master\nGROUP BY Productor\nORDER BY tracks_producidos DESC\nLIMIT    5;",
+    e: "Agrupa por Productor y cuenta cuántos tracks produjo cada uno. LIMIT 5 devuelve solo los 5 más activos. Mosty y Max Beats lideran con 7 tracks cada uno.",
+    h: ["Productor","tracks_producidos"],
+    r: [["Mosty","7"],["Max Beats","7"],["Beat Master","6"],["Santi Produce","5"],["Producer X","5"]],
+    t: "En Sheets: ranking de productores del sello. Útil para negociaciones de contratos."
+  }
+];
+
+var RK = [
+  {
+    q: "SELECT   Artista_Principal,\n         COUNT(*) AS tracks\nFROM     metadata_master\nGROUP BY Artista_Principal\nORDER BY tracks DESC\nLIMIT    5;",
+    e: "ORDER BY tracks DESC ordena de mayor a menor. LIMIT 5 devuelve solo el top 5. Sin ORDER BY, los 5 resultados serían aleatorios — no sería un ranking real.",
+    h: ["Artista_Principal","tracks"],
+    r: [["Gabo & Vale","7"],["DJ Pyro","5"],["Kid Flaco","4"],["Luna Cold","4"],["Santi","4"]],
+    t: "En Sheets: gráfica de barras horizontal. Gabo & Vale lidera el catálogo con 7 tracks."
+  },
+  {
+    q: "SELECT   PyC AS sello,\n         COUNT(*) AS tracks_distribuidos\nFROM     metadata_master\nWHERE    Estatus_Distribucion = 'DISTRIBUIDO'\nGROUP BY PyC\nHAVING   COUNT(*) >= 8\nORDER BY tracks_distribuidos DESC;",
+    e: "WHERE filtra primero solo los DISTRIBUIDOS. GROUP BY agrupa por sello. HAVING filtra los sellos con 8+ tracks distribuidos. No puede ser WHERE porque COUNT aún no existe en ese punto.",
+    h: ["sello","tracks_distribuidos"],
+    r: [["Blegh! Label","9"],["Rise Records","8"]],
+    t: "En Sheets: Blegh! y Rise lideran distribución. Alzada Corp. queda fuera con solo 5 tracks distribuidos."
+  },
+  {
+    q: "SELECT   Artista_Principal,\n         COUNT(*)     AS total,\n         COUNT(UPC)   AS con_upc\nFROM     metadata_master\nGROUP BY Artista_Principal\nHAVING   COUNT(*) - COUNT(UPC) > 0\nORDER BY Artista_Principal;",
+    e: "HAVING COUNT(*) - COUNT(UPC) > 0 filtra artistas con al menos un track sin UPC. COUNT(UPC) ignora NULL automáticamente — esa es la clave de este patrón.",
+    h: ["Artista_Principal","total","con_upc"],
+    r: [
+      ["Carlos Vega","2","1"],["Gabo & Vale","7","6"],
+      ["Luna Cold","4","2"],["Nova","2","1"],
+      ["Santi","4","2"],["Zoe Rey","4","3"],
+    ],
+    t: "En Sheets: lista de acción para distribución. Artistas con con_upc < total necesitan atención."
+  },
+  {
+    q: "SELECT   Album_EP,\n         COUNT(*) AS tracks\nFROM     metadata_master\nWHERE    Album_EP IS NOT NULL\nGROUP BY Album_EP\nORDER BY tracks DESC;",
+    e: "WHERE Album_EP IS NOT NULL excluye los singles antes de agrupar. GROUP BY agrupa por proyecto. ORDER BY DESC muestra el álbum más completo primero.",
+    h: ["Album_EP","tracks"],
+    r: [
+      ["Singles 2025","8"],["Mi Camino","5"],["Atemporal","4"],
+      ["Esencia","3"],["Evolución","2"],["Origen","2"],["Kbron de Pueblo","1"],
+    ],
+    t: "En Sheets: cada fila es un proyecto del sello. Mi Camino con 5 tracks es el EP más completo."
+  }
+];
+
+var ERRORS = [
+  {t:"Texto sin comillas simples",
+   c:"WHERE PyC = Rise Records\n-- SQL busca una columna\n-- llamada Rise Records. Error.",
+   f:"WHERE PyC = 'Rise Records'\nEl texto SIEMPRE entre comillas simples."},
+  {t:"Número entre comillas",
+   c:"WHERE COUNT(*) > '5'\n-- Compara texto con número.\n-- Resultado incorrecto.",
+   f:"HAVING COUNT(*) > 5\nLos números nunca llevan comillas."},
+  {t:"Columna fuera de GROUP BY",
+   c:"SELECT PyC, Estatus, COUNT(*)\nFROM metadata_master\nGROUP BY PyC\n-- Estatus no está en GROUP BY. Error.",
+   f:"GROUP BY PyC, Estatus\nToda columna no-agregada\ndebe ir en GROUP BY."},
+  {t:"COUNT() en WHERE",
+   c:"WHERE COUNT(*) > 5\n-- No puedes usar funciones de\n-- agregación en WHERE. Error.",
+   f:"HAVING COUNT(*) > 5\nSi la condición usa COUNT,\nSUM o AVG, usa HAVING."},
+  {t:"LIMIT sin ORDER BY",
+   c:"SELECT Titulo FROM metadata_master\nLIMIT 5\n-- Las 5 filas son aleatorias.\n-- Esto NO es un top 5.",
+   f:"ORDER BY Fecha_Lanzamiento DESC\nLIMIT 5\nPrimero ordena, luego limita."},
+  {t:"Olvidar exportar a Sheets",
+   c:"-- Escribiste la query perfecta\n-- pero el resultado quedó\n-- solo en la consola SQL.",
+   f:"Exporta como CSV o copia.\nEn Sheets: Archivo → Importar\n→ Subir archivo CSV."},
+];
+
+var CASES = [
+  {num:"01",diff:"Básico",
+   q:"¿Cuántos tracks tiene cada sello del catálogo Alzada?",
+   ctx:"El director del sello quiere saber cómo está distribuido el catálogo entre Rise Records, Blegh! Label y Alzada Corp. para tomar decisiones de firma de nuevos artistas.",
+   sql:"SELECT   PyC AS sello,\n         COUNT(*) AS total_tracks\nFROM     metadata_master\nGROUP BY PyC\nORDER BY total_tracks DESC;",
+   ex:"GROUP BY PyC agrupa por sello. COUNT(*) cuenta los tracks de cada grupo. ORDER BY DESC muestra el sello más grande primero. Sin GROUP BY obtendrías solo el total de 42 tracks.",
+   sh:"En Sheets: tres celdas con los números y una gráfica de pastel. Simple y directo para el equipo directivo."},
+  {num:"02",diff:"Básico",
+   q:"¿Qué tracks están distribuidos pero NO tienen UPC asignado?",
+   ctx:"Un track distribuido sin UPC no puede ser identificado en plataformas ni generar reporte de regalías correctamente. Es un error crítico real en el catálogo Alzada.",
+   sql:"SELECT   TRACK_ID, Titulo, Artista_Principal\nFROM     metadata_master\nWHERE    Estatus_Distribucion = 'DISTRIBUIDO'\n  AND    UPC IS NULL\nORDER BY Artista_Principal;",
+   ex:"WHERE combina dos condiciones con AND: estar distribuido Y no tener UPC. IS NULL detecta vacíos. Los 8 tracks que devuelve esta query tienen un problema urgente.",
+   sh:"En Sheets: lista de acción resaltada en rojo. Cada fila es un ticket urgente para el equipo de distribución."},
+  {num:"03",diff:"Medio",
+   q:"¿Cuántos tracks distribuidos y no distribuidos tiene cada sello?",
+   ctx:"El equipo quiere un resumen ejecutivo: qué porcentaje del catálogo de cada sello está activo en plataformas.",
+   sql:"SELECT\n  PyC AS sello,\n  COUNT(*) AS total,\n  COUNT(CASE WHEN Estatus_Distribucion\n    = 'DISTRIBUIDO' THEN 1 END) AS distribuidos,\n  COUNT(CASE WHEN Estatus_Distribucion\n    = 'NO DISTRIBUIDO' THEN 1 END) AS pendientes\nFROM  metadata_master\nGROUP BY PyC\nORDER BY total DESC;",
+   ex:"CASE WHEN dentro de COUNT es poderoso: cuenta condicionalmente. COUNT solo suma cuando la condición es verdadera. Así obtienes dos conteos distintos en una sola query.",
+   sh:"En Sheets: tabla con tres columnas y una cuarta =C2/B2 para el % distribuido. Blegh! Label lidera con 69% del catálogo distribuido."},
+  {num:"04",diff:"Medio",
+   q:"¿Qué artistas tienen más tracks NO distribuidos?",
+   ctx:"El equipo de distribución necesita saber qué artistas tienen el mayor backlog pendiente para priorizar el trabajo de la semana.",
+   sql:"SELECT   Artista_Principal,\n         COUNT(*) AS tracks_pendientes\nFROM     metadata_master\nWHERE    Estatus_Distribucion = 'NO DISTRIBUIDO'\nGROUP BY Artista_Principal\nHAVING   COUNT(*) >= 2\nORDER BY tracks_pendientes DESC;",
+   ex:"WHERE filtra antes de agrupar: solo entran los NO DISTRIBUIDOS. HAVING filtra después: solo artistas con 2+ tracks pendientes. Esta diferencia WHERE vs HAVING es exactamente este caso.",
+   sh:"En Sheets: lista priorizada. El artista en el top tiene el mayor backlog. Agrega columna de sello con BUSCARV para asignar responsables."},
+  {num:"05",diff:"Avanzado",
+   q:"¿Qué productor tiene mayor porcentaje de tracks distribuidos?",
+   ctx:"El sello evalúa renovar contratos con productores. Quiere saber qué producción termina distribuida vs quedarse sin publicar en el catálogo.",
+   sql:"SELECT\n  Productor,\n  COUNT(*) AS total_producido,\n  COUNT(CASE WHEN Estatus_Distribucion\n    = 'DISTRIBUIDO' THEN 1 END) AS distribuidos,\n  ROUND(\n    COUNT(CASE WHEN Estatus_Distribucion = 'DISTRIBUIDO'\n      THEN 1 END) * 100.0 / COUNT(*), 1\n  ) AS pct_distribuido\nFROM  metadata_master\nGROUP BY Productor\nORDER BY pct_distribuido DESC;",
+   ex:"Calculamos el porcentaje en SQL: distribuidos * 100 / total. El 100.0 fuerza división decimal. ROUND redondea a 1 decimal. CASE WHEN dentro de COUNT permite contar condicionalmente.",
+   sh:"En Sheets: ranking de productores por efectividad. Un productor con 100% indica que todo lo que produce llega a plataformas."},
+];
+
+// ─── SQL COLORIZER ─────────────────────────────────────────────────────────
+function colorSql(text) {
+  return text
+    .replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|AS|AND|OR|IN|IS|NOT|NULL|BETWEEN|DISTINCT|DESC|ASC|CASE|WHEN|THEN|ELSE|END)\b/g, '<span class="kw">$1</span>')
+    .replace(/\b(COUNT|SUM|AVG|MAX|MIN|ROUND)\b/g, '<span class="fn">$1</span>')
+    .replace(/'([^']*)'/g, '<span class="st2">\'$1\'</span>')
+    .replace(/(--[^\n]*)/g, '<span class="cm">$1</span>')
+    .replace(/\b(\d+\.?\d*)\b(?![^<]*>)/g, '<span class="nm">$1</span>');
+}
+
+// ─── TABLE BUILDER ─────────────────────────────────────────────────────────
+function buildTable(headers, rows) {
+  var h = "";
+  for (var i = 0; i < headers.length; i++) {
+    h += "<th>" + headers[i] + "</th>";
+  }
+  var r = "";
+  for (var ri = 0; ri < rows.length; ri++) {
+    r += "<tr>";
+    for (var ci = 0; ci < rows[ri].length; ci++) {
+      var cell = rows[ri][ci];
+      var isNum = /^[\d,]+$/.test(String(cell).replace(/,/g, ""));
+      var isDots = String(cell).indexOf("...") === 0;
+      var cls = isDots ? ' style="color:var(--gray);font-style:italic;font-size:.72rem;"' : (isNum && ci > 0 ? ' class="nc"' : "");
+      r += "<td" + cls + ">" + cell + "</td>";
+    }
+    r += "</tr>";
+  }
+  return '<table class="rtbl"><thead><tr>' + h + "</tr></thead><tbody>" + r + "</tbody></table>";
+}
+
+// ─── TAB HELPERS ───────────────────────────────────────────────────────────
+function setTabs(prefix, total, active) {
+  for (var i = 0; i < total; i++) {
+    var b = document.getElementById(prefix + i);
+    if (b) b.classList.toggle("on", i === active);
+  }
+}
+
+// ─── SIMULATORS ────────────────────────────────────────────────────────────
+function doSW(idx) {
+  setTabs("sw", SW.length, idx);
+  var d = SW[idx];
+  document.getElementById("sw-q").innerHTML = colorSql(d.q);
+  document.getElementById("sw-e").textContent = d.e;
+  document.getElementById("sw-r").innerHTML = buildTable(d.h, d.r);
+  document.getElementById("sw-t").textContent = d.t;
+}
+
+function doGB(idx) {
+  setTabs("gb", GB.length, idx);
+  var d = GB[idx];
+  document.getElementById("gb-q").innerHTML = colorSql(d.q);
+  document.getElementById("gb-e").textContent = d.e;
+  document.getElementById("gb-r").innerHTML = buildTable(d.h, d.r);
+  document.getElementById("gb-t").textContent = d.t;
+}
+
+function doRK(idx) {
+  setTabs("rk", RK.length, idx);
+  var d = RK[idx];
+  document.getElementById("rk-q").innerHTML = colorSql(d.q);
+  document.getElementById("rk-e").textContent = d.e;
+  document.getElementById("rk-r").innerHTML = buildTable(d.h, d.r);
+  document.getElementById("rk-t").textContent = d.t;
+}
+
+// ─── BUILDERS ──────────────────────────────────────────────────────────────
+function buildAnalogy() {
+  var tbody = document.getElementById("atbl-body");
+  if (!tbody) return;
+  for (var i = 0; i < ANALOGIES.length; i++) {
+    var tr = document.createElement("tr");
+    if (i % 2 === 1) tr.style.background = "var(--light)";
+    var a = ANALOGIES[i];
+    tr.innerHTML =
+      "<td style='border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--sh);font-weight:600;'>" + a[0] + "</td>" +
+      "<td style='border:1px solid #ECECEC;padding:.6rem 1rem;font-family:DM Mono,monospace;font-size:.8rem;color:var(--sq);font-weight:600;'>" + a[1] + "</td>" +
+      "<td style='border:1px solid #ECECEC;padding:.6rem 1rem;color:var(--gray);'>" + a[2] + "</td>";
+    tbody.appendChild(tr);
+  }
+}
+
+function buildStaticSQL() {
+  var cmpSql = document.getElementById("cmp-sql-1");
+  if (cmpSql) cmpSql.innerHTML = colorSql("SELECT  TRACK_ID, Titulo, Artista_Principal, Fecha_Lanzamiento\nFROM    metadata_master\nWHERE   Estatus_Distribucion = 'DISTRIBUIDO'\nORDER BY Fecha_Lanzamiento DESC;");
+
+  var gbEx = document.getElementById("gb-example");
+  if (gbEx) gbEx.innerHTML = colorSql("SELECT   PyC AS sello,\n         COUNT(*) AS total_tracks\nFROM     metadata_master\nGROUP BY PyC\nORDER BY total_tracks DESC;");
+
+  var obEx = document.getElementById("ob-ex");
+  if (obEx) obEx.innerHTML = colorSql("ORDER BY Fecha_Lanzamiento DESC\nORDER BY Artista_Principal ASC");
+
+  var lmEx = document.getElementById("lm-ex");
+  if (lmEx) lmEx.innerHTML = colorSql("ORDER BY tracks DESC\nLIMIT 5\n-- Top 5 artistas");
+
+  var hvEx = document.getElementById("hv-ex");
+  if (hvEx) hvEx.innerHTML = colorSql("GROUP BY PyC\nHAVING COUNT(*) >= 8\n-- Solo sellos con 8+ tracks");
+}
+
+function buildErrors() {
+  var grid = document.getElementById("err-grid");
+  if (!grid) return;
+  for (var i = 0; i < ERRORS.length; i++) {
+    var e = ERRORS[i];
+    var div = document.createElement("div");
+    div.className = "err-item";
+    div.innerHTML =
+      "<div class='err-t'>" + e.t + "</div>" +
+      "<code class='err-c'>" + e.c + "</code>" +
+      "<div class='err-f'>✓ " + e.f + "</div>";
+    grid.appendChild(div);
+  }
+}
+
+function buildCases() {
+  var cont = document.getElementById("cases");
+  if (!cont) return;
+  for (var i = 0; i < CASES.length; i++) {
+    var c = CASES[i];
+    var diffColor = c.diff === "Básico" ? "var(--teal)" : c.diff === "Medio" ? "var(--gold)" : "var(--pu)";
+    var diffBg = c.diff === "Básico" ? "var(--teal-l)" : c.diff === "Medio" ? "var(--gold-l)" : "var(--pu-l)";
+    var item = document.createElement("div");
+    item.className = "ci";
+
+    var hdr = document.createElement("div");
+    hdr.className = "ci-h";
+    hdr.setAttribute("data-idx", i);
+    hdr.innerHTML =
+      "<span class='ci-num'>CASO " + c.num + "</span>" +
+      "<span class='ci-q'>" + c.q + "</span>" +
+      "<div style='display:flex;align-items:center;gap:.6rem;flex-shrink:0;'>" +
+        "<span style='font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:2px;background:" + diffBg + ";color:" + diffColor + ";'>" + c.diff + "</span>" +
+        "<span class='ci-arr' id='arr-" + i + "'>▼</span>" +
+      "</div>";
+    hdr.addEventListener("click", function() {
+      toggleCase(parseInt(this.getAttribute("data-idx")));
+    });
+
+    var body = document.createElement("div");
+    body.className = "ci-body";
+    body.id = "ci-body-" + i;
+
+    var sqlBlock = document.createElement("div");
+    sqlBlock.className = "sql";
+    sqlBlock.innerHTML = colorSql(c.sql);
+
+    body.innerHTML =
+      "<div class='ci-ctx'>" + c.ctx + "</div>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;'>" +
+        "<div>" +
+          "<div style='font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq);margin-bottom:.6rem;'>Query SQL</div>" +
+          "<div class='sql-placeholder' data-sql='" + encodeURIComponent(c.sql) + "'></div>" +
+          "<div style='font-size:.8rem;color:var(--gray);line-height:1.6;margin-top:.6rem;'>" + c.ex + "</div>" +
+        "</div>" +
+        "<div>" +
+          "<div style='font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sh);margin-bottom:.6rem;'>→ Qué haces en Sheets</div>" +
+          "<div style='background:var(--sh-l);border:1px solid #A5D6A7;border-left:3px solid var(--sh);padding:1rem;font-size:.82rem;color:var(--ink);line-height:1.6;'>" + c.sh + "</div>" +
+        "</div>" +
+      "</div>";
+
+    item.appendChild(hdr);
+    item.appendChild(body);
+    cont.appendChild(item);
+  }
+
+  // Now inject SQL into placeholders
+  var placeholders = cont.querySelectorAll(".sql-placeholder");
+  for (var j = 0; j < placeholders.length; j++) {
+    var ph = placeholders[j];
+    var sqlText = decodeURIComponent(ph.getAttribute("data-sql"));
+    var sqlDiv = document.createElement("div");
+    sqlDiv.className = "sql";
+    sqlDiv.innerHTML = colorSql(sqlText);
+    ph.parentNode.replaceChild(sqlDiv, ph);
+  }
+}
+
+function toggleCase(idx) {
+  var body = document.getElementById("ci-body-" + idx);
+  var arrow = document.getElementById("arr-" + idx);
+  if (!body) return;
+  var isOpen = body.classList.contains("open");
+  body.classList.toggle("open", !isOpen);
+  if (arrow) arrow.classList.toggle("open", !isOpen);
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function() {
+  buildAnalogy();
+  buildStaticSQL();
+  doSW(0);
+  doGB(0);
+  doRK(0);
+  buildErrors();
+  buildCases();
+});
+</script>
+</body>
+</html>

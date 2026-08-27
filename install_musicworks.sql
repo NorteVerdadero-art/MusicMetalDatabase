@@ -567,6 +567,36 @@ JOIN artists ar ON ar.artist_id = c.artist_id
 GROUP BY c.campaign_id, c.campaign_name, ar.artist_name, c.platform, c.objective;
 
 -- ---------------------------------------------------------------------
+-- Teaching views: single flat "table" per view, no JOIN needed by
+-- students. Used in the classroom exercises (SELECT/WHERE/GROUP BY
+-- practice) before JOINs are introduced.
+-- ---------------------------------------------------------------------
+CREATE VIEW track_catalog AS
+SELECT
+  t.track_title, ar.artist_name, ar.artist_type, g.genre_name,
+  r.release_type, t.duration_sec, t.is_explicit, l.label_type
+FROM tracks t
+JOIN releases r ON r.release_id = t.release_id
+JOIN artists ar ON ar.artist_id = r.artist_id
+JOIN genres g ON g.genre_id = ar.genre_id
+JOIN labels l ON l.label_id = r.label_id;
+
+CREATE VIEW stream_log AS
+SELECT
+  ar.artist_name, ar.artist_type, g.genre_name, d.dsp_name,
+  cw.iso_week AS week_num,
+  SUM(sw.streams) AS streams,
+  ROUND(SUM(sw.revenue), 2) AS revenue
+FROM streaming_weekly sw
+JOIN tracks t ON t.track_id = sw.track_id
+JOIN releases r ON r.release_id = t.release_id
+JOIN artists ar ON ar.artist_id = r.artist_id
+JOIN genres g ON g.genre_id = ar.genre_id
+JOIN dsps d ON d.dsp_id = sw.dsp_id
+JOIN calendar_week cw ON cw.week_id = sw.week_id
+GROUP BY ar.artist_name, ar.artist_type, g.genre_name, d.dsp_name, cw.iso_week;
+
+-- ---------------------------------------------------------------------
 -- Cleanup: drop generation-only helper tables
 -- ---------------------------------------------------------------------
 DROP TABLE seq_helper;

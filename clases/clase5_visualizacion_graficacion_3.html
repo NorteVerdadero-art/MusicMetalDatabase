@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 5 — Visualización y Graficación con Criterio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --ink:#1a1a2e;--teal:#00897B;--teal-l:#e0f2f1;
+  --gold:#D4A017;--gold-l:#FFF8E1;--red:#C62828;--red-l:#FFEBEE;
+  --gray:#6B7280;--light:#F8F9FA;--bd:#E5E7EB;--pu:#6B21A8;--pu-l:#F3E8FF;
+  --sh:#0F9D58;--sh-l:#E8F5E9;--bl:#1565C0;--bl-l:#E3F2FD;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#fff!important;color:#0a0a0a!important;}
+body{font-family:"DM Sans",sans-serif;line-height:1.6;}
+@media(prefers-color-scheme:dark){html,body{background:#fff!important;color:#0a0a0a!important;}}
+
+.header{border-bottom:1px solid var(--bd);padding:0 4rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;background:#fff;z-index:100;}
+.hl{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;}
+.hm{display:flex;gap:2rem;font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.08em;text-transform:uppercase;align-items:center;}
+.hb{background:var(--teal);color:#fff;padding:.2rem .7rem;border-radius:2px;font-size:.65rem;font-weight:600;letter-spacing:.1em;}
+
+.hero{padding:5.5rem 4rem 3.5rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.eyebrow::before{content:"";display:inline-block;width:24px;height:2px;background:var(--teal);}
+.hero h1{font-family:"Playfair Display",serif;font-size:3.2rem;line-height:1.1;font-weight:900;color:var(--ink);margin-bottom:1.5rem;}
+.hero h1 em{font-style:italic;color:var(--teal);}
+.hero-desc{font-size:1rem;color:var(--gray);line-height:1.75;font-weight:300;}
+.sidebar{border:1px solid var(--bd);border-top:3px solid var(--teal);padding:1.5rem;background:#fff;}
+.si{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd);font-size:.85rem;}
+.si:last-child{border-bottom:none;}
+.si-l{color:var(--gray);}
+.si-v{font-weight:600;color:var(--ink);}
+.si-v.t{color:var(--teal);}
+
+.prog{max-width:1100px;margin:0 auto;padding:0 4rem 3rem;}
+.pt{display:flex;gap:3px;margin-bottom:.5rem;}
+.ps{flex:1;height:4px;background:var(--bd);}
+.ps.a{background:var(--teal);}
+.ps.c{background:linear-gradient(90deg,var(--teal) 60%,var(--bd) 60%);}
+.pl{font-size:.7rem;color:var(--gray);}
+
+section{max-width:1100px;margin:0 auto;padding:3.8rem 4rem;border-top:1px solid var(--bd);}
+.sn{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);letter-spacing:.1em;margin-bottom:.4rem;}
+.st{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.ss{font-size:.9rem;color:var(--gray);margin-bottom:2.5rem;}
+
+.hook{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--teal);padding:2rem 2.5rem;margin-bottom:2.5rem;}
+.hook-lbl{font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.8rem;}
+.hook h3{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;line-height:1.3;margin-bottom:.8rem;color:var(--ink);}
+.hook p{font-size:.93rem;color:var(--gray);line-height:1.75;}
+
+.ibox{background:#fff;border:1px solid #FFE082;border-left:4px solid var(--gold);padding:1.5rem 2rem;margin:2rem 0;}
+.ibox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.ibox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+.ibox strong{color:#9A7208;}
+
+.wbox{background:#fff;border:1px solid #FFCDD2;border-left:4px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;}
+.wbox-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+.wbox p{font-size:.9rem;color:var(--ink);line-height:1.7;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.card{border:1px solid var(--bd);padding:1.8rem;position:relative;background:#fff;}
+.ca{position:absolute;top:0;left:0;width:100%;height:3px;}
+.card h4{font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--ink);margin-top:.7rem;}
+.card p{font-size:.86rem;color:var(--gray);line-height:1.65;}
+
+.sim{border:1px solid var(--bd);overflow:hidden;margin-bottom:2.5rem;background:#fff;}
+.sim-h{background:#fff;border-bottom:1px solid var(--bd);padding:.9rem 1.5rem;display:flex;align-items:center;gap:.8rem;}
+.sim-ht{font-size:.85rem;font-weight:600;color:var(--ink);}
+.sim-hs{font-size:.75rem;color:var(--gray);}
+.tag{color:#fff;font-size:.65rem;font-weight:600;padding:.15rem .5rem;border-radius:2px;letter-spacing:.08em;margin-left:auto;flex-shrink:0;}
+.tag-t{background:var(--teal);}
+.tag-g{background:var(--gold);}
+.tag-r{background:var(--red);}
+.tag-p{background:var(--pu);}
+.tag-sh{background:var(--sh);}
+.tag-bl{background:var(--bl);}
+
+.tab{border:1px solid var(--bd);background:#fff;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--gray);transition:all .15s;border-radius:2px;}
+.tab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.tab:hover:not(.on){border-color:var(--teal);color:var(--teal);}
+
+/* CHART VISUALS */
+.chart-box{padding:1.5rem;}
+.chart-title{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;font-family:"Playfair Display",serif;font-style:italic;}
+.bar-chart{display:flex;flex-direction:column;gap:.7rem;}
+.bar-row{display:flex;align-items:center;gap:.7rem;}
+.bar-label{font-size:.76rem;color:var(--gray);width:130px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;background:var(--light);border-radius:2px;height:26px;overflow:hidden;border:1px solid var(--bd);}
+.bar-fill{height:100%;border-radius:2px;display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;transition:width .5s ease;}
+.bar-val{font-size:.7rem;font-weight:600;color:#fff;font-family:"DM Mono",monospace;}
+.bar-pct{font-size:.7rem;color:var(--gray);font-family:"DM Mono",monospace;width:60px;flex-shrink:0;}
+
+.line-svg{width:100%;height:220px;}
+.pie-wrap{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+.pie-legend{display:flex;flex-direction:column;gap:.5rem;}
+.leg-item{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--ink);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+.scatter-svg{width:100%;height:280px;}
+.dot-point{cursor:pointer;transition:r .15s;}
+.dot-point:hover{r:7;}
+
+/* TABLE COND */
+.ctbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.ctbl th{background:#fff;border:1px solid var(--bd);padding:.5rem .9rem;text-align:left;font-size:.72rem;color:var(--gray);font-weight:600;border-bottom:2px solid var(--teal);}
+.ctbl td{border:1px solid #ECECEC;padding:.5rem .9rem;color:var(--ink);background:#fff;}
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:2px;font-size:.66rem;font-weight:700;}
+.badge-hi{background:var(--teal-l);color:var(--teal);}
+.badge-mid{background:var(--gold-l);color:#9A7208;}
+.badge-lo{background:var(--red-l);color:var(--red);}
+.mbar{height:8px;border-radius:2px;display:inline-block;margin-left:.4rem;vertical-align:middle;}
+
+/* CHART SELECTOR */
+.selector-grid{display:grid;grid-template-columns:280px 1fr;}
+.selector-questions{border-right:1px solid var(--bd);padding:1.2rem;}
+.sq-item{padding:.7rem .9rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.82rem;color:var(--ink);transition:all .15s;border-radius:2px;}
+.sq-item:hover{border-color:var(--teal);background:var(--teal-l);}
+.sq-item.sel{background:var(--teal);color:#fff;border-color:var(--teal);}
+.selector-result{padding:1.5rem;}
+
+/* SHEETS MOCK */
+.sh-mock{border:1px solid var(--bd);overflow:hidden;margin-bottom:.8rem;}
+.sh-top{background:var(--sh);padding:.4rem 1rem;display:flex;align-items:center;gap:.8rem;}
+.sh-top-t{color:#fff;font-size:.78rem;font-weight:600;}
+.sh-fx{background:#F8F8F8;border-bottom:1px solid var(--bd);padding:.4rem .8rem;display:flex;gap:.6rem;align-items:center;font-family:"DM Mono",monospace;font-size:.76rem;}
+.sh-fxl{background:var(--bd);padding:.1rem .4rem;border-radius:2px;font-weight:600;color:var(--gray);font-size:.68rem;}
+.sh-fxv{color:var(--sh);flex:1;}
+.sh-t{width:100%;border-collapse:collapse;font-family:"DM Mono",monospace;font-size:.74rem;}
+.sh-t th{background:#F0F0F0;border:1px solid #D0D0D0;padding:.3rem .7rem;font-size:.68rem;color:var(--gray);text-align:center;font-weight:600;}
+.sh-t td{border:1px solid #E0E0E0;padding:.3rem .7rem;background:#fff;color:var(--ink);}
+.sh-t td.rh{background:#F0F0F0;color:var(--gray);text-align:center;font-weight:600;font-size:.66rem;}
+.sh-t td.ch{background:#fff;color:var(--sh);font-weight:700;font-size:.72rem;font-family:"DM Sans",sans-serif;border-bottom:2px solid var(--sh);}
+.sh-t td.ac{background:#E8F5E9;}
+
+/* STEPPER */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{border:1px solid var(--bd);border-top:none;padding:1.1rem 1.5rem;display:grid;grid-template-columns:32px 1fr;gap:1rem;align-items:start;background:#fff;cursor:pointer;transition:background .15s;}
+.step:first-child{border-top:1px solid var(--bd);}
+.step:hover{background:var(--light);}
+.step.active{background:var(--teal-l);border-color:var(--teal);}
+.step-n{width:30px;height:30px;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:.76rem;font-weight:700;color:var(--teal);flex-shrink:0;}
+.step-n.done{background:var(--teal);color:#fff;}
+.step-t{font-weight:700;font-size:.86rem;color:var(--ink);margin-bottom:.25rem;}
+.step-d{font-size:.79rem;color:var(--gray);line-height:1.5;}
+
+/* GOOD/BAD CHART DETECTOR */
+.detector-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.detector-col{padding:1.5rem;}
+.detector-col+.detector-col{border-left:1px solid var(--bd);}
+.detector-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;}
+.spot-btn{margin-top:1rem;width:100%;border:1px solid var(--red);background:#fff;color:var(--red);padding:.6rem;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:2px;transition:all .15s;}
+.spot-btn:hover{background:var(--red);color:#fff;}
+.spot-answer{display:none;margin-top:.8rem;padding:.8rem;background:var(--red-l);border-left:3px solid var(--red);font-size:.82rem;color:var(--ink);line-height:1.6;}
+.spot-answer.show{display:block;}
+
+/* LOOKER FLOW */
+.flow{display:flex;align-items:stretch;gap:0;margin-bottom:2rem;border:1px solid var(--bd);overflow:hidden;}
+.fs{flex:1;padding:1.5rem;background:#fff;position:relative;display:flex;flex-direction:column;gap:.5rem;}
+.fs+.fs{border-left:1px solid var(--bd);}
+.fs.a{border-top:3px solid var(--teal);}
+.fs.b{border-top:3px solid var(--gold);}
+.fn2{font-family:"DM Mono",monospace;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;}
+.ft{font-weight:700;font-size:.88rem;color:var(--ink);}
+.fd{font-size:.77rem;color:var(--gray);line-height:1.5;}
+.fa{position:absolute;right:-14px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--bd);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray);z-index:2;}
+
+/* MINI DASHBOARD BUILDER */
+.dash-builder{display:grid;grid-template-columns:220px 1fr;}
+.dash-controls{border-right:1px solid var(--bd);padding:1.2rem;}
+.dash-opt{padding:.6rem .8rem;border:1px solid var(--bd);margin-bottom:.5rem;cursor:pointer;font-size:.8rem;transition:all .15s;border-radius:2px;display:flex;align-items:center;gap:.5rem;}
+.dash-opt:hover{border-color:var(--teal);}
+.dash-opt.added{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:600;}
+.dash-canvas{padding:1.5rem;min-height:400px;background:var(--light);}
+.dash-widget{background:#fff;border:1px solid var(--bd);padding:1rem;margin-bottom:1rem;}
+.dash-widget-title{font-size:.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem;}
+.dash-empty{text-align:center;padding:3rem 1rem;color:var(--gray);font-size:.85rem;font-style:italic;}
+
+.closing{background:#fff;border-top:1px solid var(--bd);padding:3.8rem 4rem;}
+.closing-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+.closing h3{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.closing p{font-size:.9rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.nc{border:1px solid var(--bd);border-top:3px solid var(--gold);padding:1.5rem;background:#fff;}
+.nc-l{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.nc-t{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.8rem;}
+.nc-i{list-style:none;font-size:.82rem;color:var(--gray);}
+.nc-i li{padding:.3rem 0;padding-left:1rem;position:relative;}
+.nc-i li::before{content:"→";position:absolute;left:0;color:var(--gold);}
+.kl{list-style:none;}
+.kl li{display:flex;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--bd);font-size:.87rem;align-items:flex-start;line-height:1.5;}
+.kl li:last-child{border-bottom:none;}
+.kc{color:var(--teal);flex-shrink:0;margin-top:.1rem;}
+footer{border-top:1px solid var(--bd);padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+footer span{font-size:.75rem;color:var(--gray);}
+.fn3{display:flex;gap:1.5rem;}
+.fn3 a{font-size:.75rem;color:var(--gray);text-decoration:none;font-weight:500;}
+.fn3 a:hover{color:var(--teal);}
+
+@media(max-width:768px){
+  .hero,.g2,.g3,.g4,.selector-grid,.detector-grid,.dash-builder,.closing-inner{grid-template-columns:1fr;}
+  .flow{flex-direction:column;}
+  .header,.prog,section,footer,.closing{padding-left:1.5rem;padding-right:1.5rem;}
+  .hero{padding:3rem 1.5rem 2rem;}
+  .hero h1{font-size:2.2rem;}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="hl">De los Datos al Criterio</div>
+  <div class="hm"><span>Industria Musical</span><span class="hb">Visualización y Graficación</span></div>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">Bloque 5 · Ejecución visual</div>
+    <h1>Visualización<br>y <em>Graficación</em><br>con Criterio</h1>
+    <p class="hero-desc">Ya sabes explorar, limpiar y consultar. Ahora ejecutas: construyes las gráficas y reportes que un manager o sello va a ver y usar para decidir.</p>
+  </div>
+  <div class="sidebar">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Ficha de la clase</div>
+    <div class="si"><span class="si-l">Duración</span><span class="si-v">2 horas</span></div>
+    <div class="si"><span class="si-l">Bloques</span><span class="si-v">6</span></div>
+    <div class="si"><span class="si-l">Dataset</span><span class="si-v">Catálogo Alzada</span></div>
+    <div class="si"><span class="si-l">Demos</span><span class="si-v t">7 interactivas</span></div>
+    <div class="si"><span class="si-l">Enfoque</span><span class="si-v">Ejecutar, no consultar</span></div>
+  </div>
+</div>
+
+<!-- B0 MARCO TEÓRICO -->
+<section>
+  <div class="sn">00 · Marco Teórico</div>
+  <div class="st">El criterio antes que la herramienta</div>
+  <div class="ss">Por qué la pregunta de negocio decide la gráfica — no al revés</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Punto de partida</div>
+    <h3>Una gráfica funciona como argumento visual dentro de un reporte.</h3>
+    <p>Cada gráfica que construyes le está diciendo algo a quien la ve, quiera o no. Si eliges mal, dices algo distinto a lo que quieres decir — o peor, dices algo falso sin darte cuenta. Esta clase te enseña a construir gráficas que dicen exactamente lo que quieres decir.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4>El error más común</h4>
+      <p>Elegir la gráfica por costumbre o porque "se ve bien" en vez de porque responde la pregunta. Un pastel con 12 categorías se vuelve ilegible; ahí una tabla comunica mejor. Una línea con solo 2 puntos tampoco muestra tendencia real, por más que se vea como línea de crecimiento.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4>El criterio correcto</h4>
+      <p>Antes de abrir Sheets o Looker Studio, responde: ¿qué pregunta quiero que esta gráfica conteste? Esa respuesta define el tipo de gráfica. La herramienta llega después, como medio de ejecución.</p>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">Las 3 preguntas que toda gráfica debe responder</div>
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4 style="margin-top:0">¿Qué tipo de comparación?</h4>
+      <p>Categorías (barras), tiempo (líneas), partes de un todo (pastel), relación entre variables (dispersión).</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4 style="margin-top:0">¿Quién la va a ver?</h4>
+      <p>Un manager necesita 3 segundos para entender el punto. Un analista puede leer una tabla detallada.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4 style="margin-top:0">¿Qué decisión sigue después?</h4>
+      <p>Si la gráfica no lleva a una acción clara, probablemente sobra o está mal enfocada.</p>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Regla de esta clase</div>
+    <p>El título de la gráfica debe ser el insight, no la descripción. <strong>"Streams por canción"</strong> es descripción. <strong>"Montaña concentra el 61% de los streams del catálogo"</strong> es insight. El lector entiende el punto sin leer nada más.</p>
+  </div>
+</section>
+
+<!-- B1 LAS 6 GRÁFICAS -->
+<section>
+  <div class="sn">01 · Las 6 Gráficas Esenciales</div>
+  <div class="st">Lo que cubre el 90% de los casos reales</div>
+  <div class="ss">No necesitas 40 tipos de gráfica. Necesitas dominar 6 y saber cuándo usar cada una</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Selector de gráfica por pregunta de negocio</div><div class="sim-hs">Haz clic en una pregunta y descubre qué gráfica la responde mejor</div></div>
+      <span class="tag tag-t">INTERACTIVO</span>
+    </div>
+    <div class="selector-grid">
+      <div class="selector-questions" id="selector-questions"></div>
+      <div class="selector-result" id="selector-result"></div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--teal)"></div>
+      <h4 style="margin-top:0">📊 Barras</h4>
+      <p><strong>Compara categorías.</strong> La más versátil. Úsala cuando el orden de las categorías no importa — solo su magnitud relativa.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--gold)"></div>
+      <h4 style="margin-top:0">📈 Líneas</h4>
+      <p><strong>Muestra evolución en el tiempo.</strong> Necesitas al menos 4-5 puntos para que se vea una tendencia real, no ruido.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--pu)"></div>
+      <h4 style="margin-top:0">🥧 Pastel / Dona</h4>
+      <p><strong>Composición de un total.</strong> Máximo 5 categorías. Con más, se vuelve ilegible — usa barras en su lugar.</p>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="ca" style="background:var(--red)"></div>
+      <h4 style="margin-top:0">⚬ Dispersión</h4>
+      <p><strong>Relación entre 2 variables.</strong> ¿Save rate se relaciona con revenue? Cada punto es un track — el patrón revela la relación.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--sh)"></div>
+      <h4 style="margin-top:0">📊 Barras apiladas</h4>
+      <p><strong>Composición + comparación.</strong> Ves el total Y las partes al mismo tiempo — útil para estatus por categoría.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--bl)"></div>
+      <h4 style="margin-top:0">📋 Tabla condicional</h4>
+      <p><strong>Detalle con jerarquía visual.</strong> Cuando hay demasiadas variables para una gráfica, pero necesitas que resalte lo importante.</p>
+    </div>
+  </div>
+</section>
+
+<!-- B2 CONSTRUCCIÓN GUIADA -->
+<section>
+  <div class="sn">02 · Construcción Guiada</div>
+  <div class="st">4 gráficas sobre el catálogo Alzada, paso a paso</div>
+  <div class="ss">No solo veas el resultado — sigue la construcción como si estuvieras tú en Sheets</div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio 1</div>
+    <h3>¿Cómo se distribuye el catálogo entre los 3 sellos de Alzada?</h3>
+    <p>Es una comparación de categorías — barras es la respuesta obvia. Vamos a construirla paso a paso en Sheets.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Construcción — Gráfica de barras: tracks por sello</div><div class="sim-hs">Sigue los 4 pasos en orden</div></div>
+      <span class="tag tag-sh">PASO A PASO</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div style="border-right:1px solid var(--bd);">
+        <div class="steps" id="build1-steps"></div>
+      </div>
+      <div style="padding:1.5rem;" id="build1-panel"></div>
+    </div>
+  </div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio 2</div>
+    <h3>¿Qué porcentaje del catálogo está distribuido vs pendiente?</h3>
+    <p>Es composición de un total con solo 2 categorías — perfecto para una dona.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Resultado — Dona: estatus de distribución</div><div class="sim-hs">23 distribuidos, 19 pendientes, sobre 42 tracks totales</div></div>
+      <span class="tag tag-p">RESULTADO</span>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">"55% del catálogo Alzada ya está distribuido en plataformas"</div>
+      <div class="pie-wrap">
+        <svg viewBox="0 0 200 200" style="width:200px;height:200px;flex-shrink:0;">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="var(--bd)" stroke-width="32"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="var(--teal)" stroke-width="32"
+            stroke-dasharray="301.6 547.5" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="var(--gold)" stroke-width="32"
+            stroke-dasharray="245.9 547.5" stroke-dashoffset="-301.6" transform="rotate(-90 100 100)"/>
+          <text x="100" y="95" text-anchor="middle" font-family="Playfair Display, serif" font-size="28" font-weight="700" fill="var(--ink)">55%</text>
+          <text x="100" y="115" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="var(--gray)">distribuido</text>
+        </svg>
+        <div class="pie-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Distribuido — 23 tracks (55%)</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Pendiente — 19 tracks (45%)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio 3</div>
+    <h3>¿Cómo se ve el estatus de distribución dentro de cada sello?</h3>
+    <p>Necesitas comparar Y ver composición al mismo tiempo — barras apiladas.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Resultado — Barras apiladas: estatus por sello</div><div class="sim-hs">Blegh! Label tiene la mejor proporción distribuida</div></div>
+      <span class="tag tag-p">RESULTADO</span>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">"Blegh! Label lidera con 69% de su catálogo distribuido"</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-label">Blegh! Label</span>
+          <div class="bar-track" style="display:flex;">
+            <div class="bar-fill" style="width:69%;background:var(--teal);border-radius:2px 0 0 2px;"><span class="bar-val">9</span></div>
+            <div class="bar-fill" style="width:31%;background:var(--gold);border-radius:0 2px 2px 0;"><span class="bar-val">4</span></div>
+          </div>
+          <span class="bar-pct">13 total</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Rise Records</span>
+          <div class="bar-track" style="display:flex;">
+            <div class="bar-fill" style="width:53%;background:var(--teal);border-radius:2px 0 0 2px;"><span class="bar-val">8</span></div>
+            <div class="bar-fill" style="width:47%;background:var(--gold);border-radius:0 2px 2px 0;"><span class="bar-val">7</span></div>
+          </div>
+          <span class="bar-pct">15 total</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Alzada Corp.</span>
+          <div class="bar-track" style="display:flex;">
+            <div class="bar-fill" style="width:38%;background:var(--teal);border-radius:2px 0 0 2px;"><span class="bar-val">5</span></div>
+            <div class="bar-fill" style="width:62%;background:var(--gold);border-radius:0 2px 2px 0;"><span class="bar-val">8</span></div>
+          </div>
+          <span class="bar-pct">13 total</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:1.2rem;margin-top:1.2rem;">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Distribuido</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Pendiente</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hook">
+    <div class="hook-lbl">Pregunta de negocio 4</div>
+    <h3>¿Los artistas con más tracks tienen más problemas de UPC?</h3>
+    <p>Es relación entre 2 variables — dispersión revela si hay un patrón.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Resultado — Dispersión: tracks totales vs tracks sin UPC</div><div class="sim-hs">Pasa el cursor sobre cada punto para ver el artista</div></div>
+      <span class="tag tag-p">INTERACTIVO</span>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">"Más tracks no significa más problemas de UPC — no hay relación clara"</div>
+      <svg id="scatter-svg" class="scatter-svg" viewBox="0 0 500 260"></svg>
+      <div style="font-size:.76rem;color:var(--gray);margin-top:.5rem;">Eje X: total de tracks · Eje Y: tracks sin UPC · Cada punto es un artista</div>
+    </div>
+  </div>
+</section>
+
+<!-- B3 ERRORES DE VISUALIZACIÓN -->
+<section>
+  <div class="sn">03 · Errores de Visualización</div>
+  <div class="st">Gráficas que mienten con datos verdaderos</div>
+  <div class="ss">Los datos pueden ser correctos y la gráfica seguir siendo engañosa — encuentra el problema</div>
+
+  <div class="wbox">
+    <div class="wbox-lbl">Por qué esto importa</div>
+    <p>Una gráfica puede ser técnicamente correcta y aun así comunicar algo falso. El problema está en la forma de presentar los números, no en los números mismos. Esa distinción separa a quien hace gráficas de quien comunica con criterio.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Detector de gráficas engañosas</div><div class="sim-hs">Observa cada gráfica, intenta encontrar el problema antes de revelar la respuesta</div></div>
+      <span class="tag tag-r">ENCUENTRA EL ERROR</span>
+    </div>
+
+    <div class="detector-grid">
+      <div class="detector-col">
+        <div class="detector-label" style="color:var(--red);">❌ Ejemplo 1 — Eje cortado</div>
+        <svg viewBox="0 0 280 180" style="width:100%;">
+          <line x1="30" y1="150" x2="260" y2="150" stroke="var(--bd)" stroke-width="1"/>
+          <text x="10" y="45" font-size="9" fill="var(--gray)">98K</text>
+          <text x="10" y="150" font-size="9" fill="var(--gray)">95K</text>
+          <rect x="60" y="120" width="50" height="30" fill="var(--teal)"/>
+          <rect x="150" y="40" width="50" height="110" fill="var(--gold)"/>
+          <text x="85" y="115" text-anchor="middle" font-size="9" fill="var(--gray)">Norte V.</text>
+          <text x="175" y="35" text-anchor="middle" font-size="9" fill="var(--gray)">Thell B.</text>
+        </svg>
+        <button class="spot-btn" onclick="toggleSpot(1)">¿Qué está mal?</button>
+        <div class="spot-answer" id="spot-1">El eje Y empieza en 95K, no en 0. Eso hace que una diferencia real de 3K streams (95K vs 98K, solo 3% de diferencia) se vea como si Thell Barrio tuviera <strong>el triple</strong> de streams. Es la manipulación visual más común y más efectiva.</div>
+      </div>
+
+      <div class="detector-col">
+        <div class="detector-label" style="color:var(--red);">❌ Ejemplo 2 — Demasiadas categorías en pastel</div>
+        <svg viewBox="0 0 280 180" style="width:100%;">
+          <circle cx="130" cy="90" r="70" fill="none" stroke="var(--bd)" stroke-width="1"/>
+          <path d="M130,90 L130,20 A70,70 0 0,1 188,55 Z" fill="var(--teal)"/>
+          <path d="M130,90 L188,55 A70,70 0 0,1 195,100 Z" fill="var(--gold)"/>
+          <path d="M130,90 L195,100 A70,70 0 0,1 180,140 Z" fill="var(--pu)"/>
+          <path d="M130,90 L180,140 A70,70 0 0,1 140,159 Z" fill="var(--red)"/>
+          <path d="M130,90 L140,159 A70,70 0 0,1 90,155 Z" fill="var(--sh)"/>
+          <path d="M130,90 L90,155 A70,70 0 0,1 65,120 Z" fill="var(--bl)"/>
+          <path d="M130,90 L65,120 A70,70 0 0,1 60,90 Z" fill="#999"/>
+          <path d="M130,90 L60,90 A70,70 0 0,1 130,20 Z" fill="#CCC"/>
+        </svg>
+        <button class="spot-btn" onclick="toggleSpot(2)">¿Qué está mal?</button>
+        <div class="spot-answer" id="spot-2">8 categorías en un pastel son imposibles de comparar visualmente — nadie puede distinguir 12% de 14% con la vista. Con más de 5 categorías, usa barras horizontales ordenadas de mayor a menor.</div>
+      </div>
+    </div>
+
+    <div class="detector-grid" style="border-top:1px solid var(--bd);">
+      <div class="detector-col">
+        <div class="detector-label" style="color:var(--red);">❌ Ejemplo 3 — Línea con muy pocos puntos</div>
+        <svg viewBox="0 0 280 180" style="width:100%;">
+          <line x1="30" y1="150" x2="260" y2="150" stroke="var(--bd)" stroke-width="1"/>
+          <line x1="30" y1="150" x2="30" y2="20" stroke="var(--bd)" stroke-width="1"/>
+          <polyline points="60,120 200,40" fill="none" stroke="var(--teal)" stroke-width="3"/>
+          <circle cx="60" cy="120" r="5" fill="var(--teal)"/>
+          <circle cx="200" cy="40" r="5" fill="var(--teal)"/>
+          <text x="60" y="140" text-anchor="middle" font-size="9" fill="var(--gray)">Ene</text>
+          <text x="200" y="140" text-anchor="middle" font-size="9" fill="var(--gray)">Jun</text>
+          <text x="130" y="30" text-anchor="middle" font-size="10" fill="var(--teal)" font-weight="700">"¡Crecimiento explosivo!"</text>
+        </svg>
+        <button class="spot-btn" onclick="toggleSpot(3)">¿Qué está mal?</button>
+        <div class="spot-answer" id="spot-3">Solo 2 puntos no muestran tendencia — muestran una línea recta entre dos números. Pudo haber bajado en febrero, marzo, abril y solo repuntar en mayo. Se necesitan mínimo 4-5 puntos intermedios para hablar de "tendencia" real.</div>
+      </div>
+
+      <div class="detector-col">
+        <div class="detector-label" style="color:var(--red);">❌ Ejemplo 4 — Colores sin significado consistente</div>
+        <svg viewBox="0 0 280 180" style="width:100%;">
+          <line x1="30" y1="150" x2="260" y2="150" stroke="var(--bd)" stroke-width="1"/>
+          <rect x="50" y="90" width="40" height="60" fill="var(--red)"/>
+          <rect x="110" y="70" width="40" height="80" fill="var(--teal)"/>
+          <rect x="170" y="100" width="40" height="50" fill="var(--gold)"/>
+          <text x="70" y="165" text-anchor="middle" font-size="9" fill="var(--gray)">Rise</text>
+          <text x="130" y="165" text-anchor="middle" font-size="9" fill="var(--gray)">Blegh!</text>
+          <text x="190" y="165" text-anchor="middle" font-size="9" fill="var(--gray)">Alzada</text>
+        </svg>
+        <button class="spot-btn" onclick="toggleSpot(4)">¿Qué está mal?</button>
+        <div class="spot-answer" id="spot-4">El rojo se asocia culturalmente con "alerta" o "negativo" — pero aquí Rise Records (rojo) no tiene ningún problema, es solo la primera barra. Usar rojo sin razón hace que el lector asuma algo negativo que no existe. Reserva el rojo para alertas reales.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Checklist anti-engaño antes de publicar una gráfica</div>
+    <p>¿El eje Y empieza en cero (o está claramente marcado si no)? ¿Tengo suficientes puntos para hablar de tendencia? ¿Uso máximo 5-6 categorías en pastel? ¿Mis colores tienen un significado consistente en todo el reporte? <strong>Si alguna respuesta es no, la gráfica necesita ajuste antes de presentarla.</strong></p>
+  </div>
+</section>
+
+<!-- B4 LOOKER STUDIO -->
+<section>
+  <div class="sn">04 · De Sheets a Looker Studio</div>
+  <div class="st">Cuándo pasar de una hoja a un dashboard real</div>
+  <div class="ss">Sheets sirve como taller de trabajo. Looker Studio entra cuando el reporte necesita vivir por su cuenta</div>
+
+  <div class="hook">
+    <div class="hook-lbl">La diferencia clave</div>
+    <h3>Sheets funciona bien mientras construyes. Looker Studio toma el relevo cuando el reporte se comparte y actualiza en vivo.</h3>
+    <p>Looker Studio (gratis, de Google) conecta directo a Sheets, BigQuery o Google Analytics y arma dashboards que se actualizan solos. No reemplaza a Sheets — lo complementa cuando el reporte necesita ser visto por más gente, de forma más profesional, de forma recurrente.</p>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ca" style="background:var(--sh)"></div>
+      <h4>Cuándo quedarte en Sheets</h4>
+      <p>Análisis puntual, exploración personal, reportes que armas una sola vez, cuando necesitas fórmulas complejas o estás iterando rápido sobre los datos.</p>
+    </div>
+    <div class="card">
+      <div class="ca" style="background:var(--bl)"></div>
+      <h4>Cuándo migrar a Looker Studio</h4>
+      <p>El reporte se comparte con el equipo o el sello regularmente, necesita verse profesional, debe actualizarse solo cuando cambian los datos fuente, o varias personas necesitan verlo al mismo tiempo.</p>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:1rem;">El flujo de migración Sheets → Looker Studio</div>
+  <div class="flow">
+    <div class="fs a" style="position:relative;">
+      <span class="tag tag-sh" style="margin-left:0;">Sheets</span>
+      <div class="fn2">PASO 1</div><div class="ft">Preparar los datos</div>
+      <div class="fd">Tu hoja de Sheets ya limpia y estructurada — con encabezados claros, sin fórmulas rotas.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs b" style="position:relative;">
+      <span class="tag tag-bl" style="margin-left:0;">Conectar</span>
+      <div class="fn2">PASO 2</div><div class="ft">Looker Studio → Conectar</div>
+      <div class="fd">Crear informe nuevo → Añadir datos → Google Sheets → seleccionar tu hoja.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs a" style="position:relative;">
+      <span class="tag tag-sh" style="margin-left:0;">Diseñar</span>
+      <div class="fn2">PASO 3</div><div class="ft">Arrastrar gráficas</div>
+      <div class="fd">Looker Studio ofrece los mismos tipos de gráfica que viste hoy — arrastras y configuras visualmente.</div>
+      <div class="fa">→</div>
+    </div>
+    <div class="fs b">
+      <span class="tag tag-bl" style="margin-left:0;">Compartir</span>
+      <div class="fn2">PASO 4</div><div class="ft">Compartir el link</div>
+      <div class="fd">El dashboard se actualiza solo cuando cambia la hoja de Sheets fuente. Compartes un link, no un archivo.</div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">Ventaja real de Looker Studio</div>
+    <p>Cuando actualizas la hoja de Sheets conectada, el dashboard en Looker Studio <strong>se actualiza automáticamente</strong> — nadie tiene que reenviar un archivo nuevo cada semana. El sello siempre ve la versión más reciente sin que tú hagas nada extra.</p>
+  </div>
+</section>
+
+<!-- B5 EJERCICIO DE EJECUCIÓN -->
+<section>
+  <div class="sn">05 · Ejercicio de Ejecución</div>
+  <div class="st">Arma tu mini-dashboard</div>
+  <div class="ss">Construye un dashboard completo eligiendo qué widgets agregar — como lo harías en Looker Studio</div>
+
+  <div class="sim">
+    <div class="sim-h">
+      <div><div class="sim-ht">Constructor de dashboard — Catálogo Alzada</div><div class="sim-hs">Haz clic en los widgets de la izquierda para agregarlos al dashboard</div></div>
+      <span class="tag tag-t">CONSTRUYE TÚ</span>
+    </div>
+    <div class="dash-builder">
+      <div class="dash-controls">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.8rem;">Widgets disponibles</div>
+        <div id="dash-options"></div>
+        <div style="font-size:.72rem;color:var(--gray);margin-top:1rem;line-height:1.5;">Piensa como manager: ¿qué necesitas ver primero para tomar una decisión rápida?</div>
+      </div>
+      <div class="dash-canvas" id="dash-canvas">
+        <div class="dash-empty">👈 Agrega widgets desde la izquierda para construir tu dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <div class="ibox-lbl">No hay un orden único correcto</div>
+    <p>Lo importante es que <strong>cada widget responda una pregunta real</strong> y que el conjunto cuente una historia coherente — de lo general (composición del catálogo) a lo específico (qué necesita atención). Eso es diseño de dashboard con criterio, no solo "meter gráficas".</p>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="closing-inner">
+    <div>
+      <h3>Puntos clave de esta clase</h3>
+      <p>Lo que debes poder explicar después de hoy.</p>
+      <ul class="kl">
+        <li><span class="kc">✓</span> El título de una gráfica debe ser el insight, no la descripción.</li>
+        <li><span class="kc">✓</span> Barras, líneas, pastel, dispersión, apiladas y tabla condicional cubren el 90% de los casos.</li>
+        <li><span class="kc">✓</span> Una gráfica puede ser técnicamente correcta y aun así ser engañosa.</li>
+        <li><span class="kc">✓</span> Eje cortado, demasiadas categorías y colores sin significado son los errores más comunes.</li>
+        <li><span class="kc">✓</span> Sheets sirve para construir; Looker Studio, para compartir en vivo.</li>
+        <li><span class="kc">✓</span> Un dashboard cuenta una historia — de lo general a lo específico.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="nc">
+        <div class="nc-l">Próxima clase</div>
+        <div class="nc-t">Clase 6 — Modelos Estadísticos Aplicados</div>
+        <ul class="nc-i">
+          <li>Correlación simple: ¿estas métricas se mueven juntas?</li>
+          <li>Media móvil: separar tendencia real de ruido</li>
+          <li>Regresión lineal simple: proyecciones básicas</li>
+          <li>Modelo de scoring: qué tan listo está un track para inversión</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>De los Datos al Criterio · Clase 05 · Visualización y Graficación con Criterio</span>
+  <nav class="fn3"><a href="#">← Clase 04</a><a href="#">Clase 06 →</a></nav>
+</footer>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+
+var CHART_SELECTOR = [
+  {q:"¿Cuántos tracks tiene cada sello?",chart:"Barras",
+   why:"Comparas 3 categorías (sellos) por una magnitud (cantidad de tracks). Las barras son ideales cuando comparas pocas categorías sin orden temporal.",
+   visual:"bar"},
+  {q:"¿Cómo evolucionaron los streams mes a mes?",chart:"Líneas",
+   why:"Hay una secuencia temporal — el orden de los puntos importa. Las líneas conectan los puntos y revelan tendencia, algo que las barras no logran igual de bien.",
+   visual:"line"},
+  {q:"¿Qué porcentaje del catálogo está distribuido?",chart:"Pastel / Dona",
+   why:"Es composición de un total con pocas categorías (2: distribuido y pendiente). El pastel funciona bien con 2-5 categorías donde el 100% importa visualmente.",
+   visual:"pie"},
+  {q:"¿Se relaciona el save rate con el revenue?",chart:"Dispersión",
+   why:"Comparas 2 variables numéricas por cada track. Cada punto es un caso individual — el patrón de puntos revela si hay relación o no.",
+   visual:"scatter"},
+  {q:"¿Cómo se compone el estatus dentro de cada sello?",chart:"Barras apiladas",
+   why:"Necesitas ver el total de cada sello Y su composición interna al mismo tiempo. Las barras apiladas muestran ambas cosas en una sola vista.",
+   visual:"stacked"},
+  {q:"¿Qué artistas necesitan atención urgente en calidad de datos?",chart:"Tabla con formato condicional",
+   why:"Hay demasiadas variables (artista, tracks, UPC, estatus) para una sola gráfica. Una tabla con colores de semáforo prioriza visualmente sin perder el detalle.",
+   visual:"table"},
+];
+
+var BUILD1_STEPS = [
+  {t:"Paso 1 — Selecciona los datos",
+   d:"En Sheets, seleccionas la columna PyC (sello) completa. Sheets necesita saber qué agrupar antes de graficar.",
+   panel:"select"},
+  {t:"Paso 2 — Crea la tabla dinámica primero",
+   d:"Insertar → Tabla dinámica. Filas: PyC. Valores: CONTAR de TRACK_ID. Esto te da el conteo por sello antes de graficar.",
+   panel:"pivot"},
+  {t:"Paso 3 — Inserta el gráfico",
+   d:"Con la tabla dinámica lista, seleccionas el rango de resultados → Insertar → Gráfico → Google Sheets sugiere barras automáticamente.",
+   panel:"insert"},
+  {t:"Paso 4 — Ajusta el título con criterio",
+   d:"Cambias el título genérico 'PyC' por el insight real: qué sello domina el catálogo. Esto es lo que diferencia una gráfica de un reporte.",
+   panel:"title"},
+];
+
+var BUILD1_PANELS = {
+  select: '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Vista de Sheets</div><div class="sh-mock"><div class="sh-top"><span class="sh-top-t">📊 Master_Alzada_METADATA</span></div><table class="sh-t"><thead><tr><th></th><th>N</th></tr></thead><tbody><tr><td class="rh">1</td><td class="ch">PyC</td></tr><tr><td class="rh">2</td><td class="ac">Rise Records</td></tr><tr><td class="rh">3</td><td class="ac">Blegh! Label</td></tr><tr><td class="rh">4</td><td class="ac">Rise Records</td></tr><tr><td class="rh">5</td><td class="ac">Alzada Corp.</td></tr></tbody></table></div>',
+  pivot: '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Tabla dinámica generada</div><table class="ctbl"><thead><tr><th>Sello</th><th>Cuenta de TRACK_ID</th></tr></thead><tbody><tr><td>Rise Records</td><td>15</td></tr><tr><td>Blegh! Label</td><td>13</td></tr><tr><td>Alzada Corp.</td><td>13</td></tr></tbody></table>',
+  insert: '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:.8rem;">Gráfica sugerida automáticamente</div><div class="bar-chart"><div class="bar-row"><span class="bar-label">Rise Records</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">15</span></div></div></div><div class="bar-row"><span class="bar-label">Blegh! Label</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div><div class="bar-row"><span class="bar-label">Alzada Corp.</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div></div>',
+  title: '<div class="chart-title" style="margin-bottom:1rem;">"Rise Records lidera el catálogo con 15 de 42 tracks totales"</div><div class="bar-chart"><div class="bar-row"><span class="bar-label">Rise Records</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">15</span></div></div></div><div class="bar-row"><span class="bar-label">Blegh! Label</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:#B0BEC5;"><span class="bar-val">13</span></div></div></div><div class="bar-row"><span class="bar-label">Alzada Corp.</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:#B0BEC5;"><span class="bar-val">13</span></div></div></div></div><div style="font-size:.76rem;color:var(--teal);font-style:italic;margin-top:.8rem;">✓ El título ahora es el insight, no la etiqueta de la columna</div>'
+};
+
+var SCATTER_DATA = [
+  {name:"Gabo & Vale",total:7,sinUpc:1},
+  {name:"DJ Pyro",total:5,sinUpc:1},
+  {name:"Kid Flaco",total:4,sinUpc:0},
+  {name:"Luna Cold",total:4,sinUpc:2},
+  {name:"Santi",total:4,sinUpc:2},
+  {name:"Zoe Rey",total:4,sinUpc:1},
+  {name:"Carlos Vega",total:2,sinUpc:1},
+  {name:"Nova",total:2,sinUpc:1},
+  {name:"Alan Gomez",total:2,sinUpc:0},
+  {name:"Sofia Cross",total:1,sinUpc:0},
+];
+
+var DASH_WIDGETS = [
+  {id:"w1",name:"Tracks por sello",icon:"📊",desc:"Barras — comparación de catálogo"},
+  {id:"w2",name:"Estatus general",icon:"🥧",desc:"Dona — % distribuido vs pendiente"},
+  {id:"w3",name:"Estatus por sello",icon:"📊",desc:"Barras apiladas — detalle interno"},
+  {id:"w4",name:"Alerta de calidad",icon:"⚠️",desc:"Tabla — artistas con UPC faltante"},
+  {id:"w5",name:"Top artistas",icon:"🏆",desc:"Barras — ranking por tracks"},
+  {id:"w6",name:"Relación tracks/errores",icon:"⚬",desc:"Dispersión — correlación de calidad"},
+];
+
+var DASH_CONTENT = {
+  w1:'<div class="dash-widget-title">📊 Tracks por sello</div><div class="bar-chart"><div class="bar-row"><span class="bar-label" style="width:90px;">Rise</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal);"><span class="bar-val">15</span></div></div></div><div class="bar-row"><span class="bar-label" style="width:90px;">Blegh!</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div><div class="bar-row"><span class="bar-label" style="width:90px;">Alzada</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--teal);"><span class="bar-val">13</span></div></div></div></div>',
+  w2:'<div class="dash-widget-title">🥧 Estatus general del catálogo</div><div style="display:flex;align-items:center;gap:1rem;"><svg viewBox="0 0 100 100" style="width:80px;height:80px;flex-shrink:0;"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--bd)" stroke-width="16"/><circle cx="50" cy="50" r="40" fill="none" stroke="var(--teal)" stroke-width="16" stroke-dasharray="138 251" transform="rotate(-90 50 50)"/></svg><div style="font-size:.8rem;color:var(--gray);">23 distribuidos (55%)<br>19 pendientes (45%)</div></div>',
+  w3:'<div class="dash-widget-title">📊 Estatus por sello</div><div class="bar-chart"><div class="bar-row"><span class="bar-label" style="width:90px;">Blegh!</span><div class="bar-track" style="display:flex;"><div class="bar-fill" style="width:69%;background:var(--teal);"></div><div class="bar-fill" style="width:31%;background:var(--gold);"></div></div></div><div class="bar-row"><span class="bar-label" style="width:90px;">Rise</span><div class="bar-track" style="display:flex;"><div class="bar-fill" style="width:53%;background:var(--teal);"></div><div class="bar-fill" style="width:47%;background:var(--gold);"></div></div></div></div>',
+  w4:'<div class="dash-widget-title">⚠️ Artistas con UPC faltante</div><table class="ctbl"><thead><tr><th>Artista</th><th>Sin UPC</th></tr></thead><tbody><tr><td>Luna Cold</td><td><span class="badge badge-lo">2</span></td></tr><tr><td>Santi</td><td><span class="badge badge-lo">2</span></td></tr><tr><td>Gabo & Vale</td><td><span class="badge badge-mid">1</span></td></tr></tbody></table>',
+  w5:'<div class="dash-widget-title">🏆 Top artistas por tracks</div><div class="bar-chart"><div class="bar-row"><span class="bar-label" style="width:110px;">Gabo & Vale</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--gold);"><span class="bar-val">7</span></div></div></div><div class="bar-row"><span class="bar-label" style="width:110px;">DJ Pyro</span><div class="bar-track"><div class="bar-fill" style="width:71%;background:var(--gold);"><span class="bar-val">5</span></div></div></div></div>',
+  w6:'<div class="dash-widget-title">⚬ Relación tracks vs errores UPC</div><div style="font-size:.8rem;color:var(--gray);padding:1rem;text-align:center;">Ver gráfica de dispersión completa en Bloque 02 — sin relación clara entre volumen y calidad de datos.</div>'
+};
+
+// ═══════════════════════ RENDER: CHART SELECTOR ═══════════════════════
+function buildSelector() {
+  var qCont = document.getElementById("selector-questions");
+  for (var i = 0; i < CHART_SELECTOR.length; i++) {
+    var item = document.createElement("div");
+    item.className = "sq-item";
+    item.textContent = CHART_SELECTOR[i].q;
+    item.setAttribute("data-idx", i);
+    item.addEventListener("click", function() {
+      showSelectorResult(parseInt(this.getAttribute("data-idx")));
+    });
+    qCont.appendChild(item);
+  }
+  showSelectorResult(0);
+}
+
+function showSelectorResult(idx) {
+  var items = document.querySelectorAll(".sq-item");
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle("sel", i === idx);
+  }
+  var d = CHART_SELECTOR[idx];
+  var html = '<div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.6rem;">Gráfica recomendada</div>';
+  html += '<div style="font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:1rem;">' + d.chart + '</div>';
+  html += '<div style="font-size:.85rem;color:var(--gray);line-height:1.7;margin-bottom:1.2rem;">' + d.why + '</div>';
+  document.getElementById("selector-result").innerHTML = html;
+}
+
+// ═══════════════════════ RENDER: BUILD1 STEPPER ═══════════════════════
+function buildBuild1() {
+  var cont = document.getElementById("build1-steps");
+  for (var i = 0; i < BUILD1_STEPS.length; i++) {
+    var s = BUILD1_STEPS[i];
+    var div = document.createElement("div");
+    div.className = "step";
+    div.id = "b1step-" + i;
+    div.innerHTML = "<div class='step-n' id='b1num-" + i + "'>" + (i+1) + "</div><div><div class='step-t'>" + s.t + "</div><div class='step-d'>" + s.d + "</div></div>";
+    (function(idx) {
+      div.addEventListener("click", function() { showBuild1Step(idx); });
+    })(i);
+    cont.appendChild(div);
+  }
+  showBuild1Step(0);
+}
+
+function showBuild1Step(idx) {
+  for (var i = 0; i < BUILD1_STEPS.length; i++) {
+    var el = document.getElementById("b1step-" + i);
+    var num = document.getElementById("b1num-" + i);
+    el.classList.toggle("active", i === idx);
+    num.classList.toggle("done", i < idx);
+    num.textContent = i < idx ? "✓" : (i + 1);
+  }
+  document.getElementById("build1-panel").innerHTML = BUILD1_PANELS[BUILD1_STEPS[idx].panel];
+}
+
+// ═══════════════════════ RENDER: SCATTER PLOT ═══════════════════════
+function buildScatter() {
+  var svg = document.getElementById("scatter-svg");
+  var w = 500, h = 260, pad = 45;
+  var maxX = 8, maxY = 3;
+
+  var xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  xAxis.setAttribute("x1", pad); xAxis.setAttribute("y1", h - pad);
+  xAxis.setAttribute("x2", w - 20); xAxis.setAttribute("y2", h - pad);
+  xAxis.setAttribute("stroke", "var(--bd)"); xAxis.setAttribute("stroke-width", "1");
+  svg.appendChild(xAxis);
+
+  var yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  yAxis.setAttribute("x1", pad); yAxis.setAttribute("y1", h - pad);
+  yAxis.setAttribute("x2", pad); yAxis.setAttribute("y2", 20);
+  yAxis.setAttribute("stroke", "var(--bd)"); yAxis.setAttribute("stroke-width", "1");
+  svg.appendChild(yAxis);
+
+  for (var yv = 0; yv <= maxY; yv++) {
+    var yPos = h - pad - (yv / maxY) * (h - pad - 20);
+    var lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    lbl.setAttribute("x", pad - 8); lbl.setAttribute("y", yPos + 3);
+    lbl.setAttribute("text-anchor", "end"); lbl.setAttribute("font-size", "9");
+    lbl.setAttribute("fill", "var(--gray)"); lbl.textContent = yv;
+    svg.appendChild(lbl);
+  }
+  for (var xv = 0; xv <= maxX; xv += 2) {
+    var xPos = pad + (xv / maxX) * (w - pad - 20);
+    var lblx = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    lblx.setAttribute("x", xPos); lblx.setAttribute("y", h - pad + 16);
+    lblx.setAttribute("text-anchor", "middle"); lblx.setAttribute("font-size", "9");
+    lblx.setAttribute("fill", "var(--gray)"); lblx.textContent = xv;
+    svg.appendChild(lblx);
+  }
+
+  for (var i = 0; i < SCATTER_DATA.length; i++) {
+    var d = SCATTER_DATA[i];
+    var cx = pad + (d.total / maxX) * (w - pad - 20);
+    var cy = h - pad - (d.sinUpc / maxY) * (h - pad - 20);
+    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", cx); circle.setAttribute("cy", cy);
+    circle.setAttribute("r", "6"); circle.setAttribute("fill", d.sinUpc > 0 ? "var(--red)" : "var(--teal)");
+    circle.setAttribute("fill-opacity", "0.75");
+    circle.setAttribute("class", "dot-point");
+    var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    title.textContent = d.name + " — " + d.total + " tracks, " + d.sinUpc + " sin UPC";
+    circle.appendChild(title);
+    svg.appendChild(circle);
+  }
+
+  var xlabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  xlabel.setAttribute("x", w/2); xlabel.setAttribute("y", h - 5);
+  xlabel.setAttribute("text-anchor", "middle"); xlabel.setAttribute("font-size", "9");
+  xlabel.setAttribute("fill", "var(--gray)"); xlabel.textContent = "Total de tracks →";
+  svg.appendChild(xlabel);
+}
+
+// ═══════════════════════ SPOT THE ERROR ═══════════════════════
+function toggleSpot(n) {
+  var el = document.getElementById("spot-" + n);
+  el.classList.toggle("show");
+}
+
+// ═══════════════════════ DASHBOARD BUILDER ═══════════════════════
+var dashAdded = {};
+
+function buildDashOptions() {
+  var cont = document.getElementById("dash-options");
+  for (var i = 0; i < DASH_WIDGETS.length; i++) {
+    var w = DASH_WIDGETS[i];
+    var div = document.createElement("div");
+    div.className = "dash-opt";
+    div.id = "dopt-" + w.id;
+    div.innerHTML = "<span>" + w.icon + "</span><span>" + w.name + "</span>";
+    (function(widget) {
+      div.addEventListener("click", function() { toggleDashWidget(widget); });
+    })(w);
+    cont.appendChild(div);
+  }
+}
+
+function toggleDashWidget(w) {
+  var btn = document.getElementById("dopt-" + w.id);
+  var canvas = document.getElementById("dash-canvas");
+
+  if (dashAdded[w.id]) {
+    delete dashAdded[w.id];
+    btn.classList.remove("added");
+    var existing = document.getElementById("dwidget-" + w.id);
+    if (existing) existing.remove();
+  } else {
+    dashAdded[w.id] = true;
+    btn.classList.add("added");
+    var empty = canvas.querySelector(".dash-empty");
+    if (empty) empty.remove();
+    var widget = document.createElement("div");
+    widget.className = "dash-widget";
+    widget.id = "dwidget-" + w.id;
+    widget.innerHTML = DASH_CONTENT[w.id];
+    canvas.appendChild(widget);
+  }
+
+  if (Object.keys(dashAdded).length === 0) {
+    canvas.innerHTML = '<div class="dash-empty">👈 Agrega widgets desde la izquierda para construir tu dashboard</div>';
+  }
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+document.addEventListener("DOMContentLoaded", function() {
+  buildSelector();
+  buildBuild1();
+  buildScatter();
+  buildDashOptions();
+});
+</script>
+</body>
+</html>
