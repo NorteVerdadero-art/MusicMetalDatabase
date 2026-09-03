@@ -37,7 +37,7 @@ JOIN campaigns c ON c.campaign_id = csw.campaign_id
 JOIN artists ar ON ar.artist_id = c.artist_id
 GROUP BY c.campaign_id, c.campaign_name, ar.artist_name, c.platform, c.objective;
 
-CREATE OR REPLACE VIEW track_catalog AS
+CREATE OR REPLACE VIEW track_details AS
 SELECT
   t.track_title, ar.artist_name, ar.artist_type, g.genre_name,
   r.release_type, t.duration_sec, t.is_explicit, l.label_type

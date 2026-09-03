@@ -13,6 +13,7 @@
     { href: 'clase6_modelos_estadisticos_4.html', label: 'Modelos Estadísticos Aplicados' },
     { href: 'clase7_dashboards_sheets_1.html', label: 'Dashboards en Sheets' },
     { href: 'clase_pipeline_sql_mysql.html', label: 'El Pipeline de Datos: MySQL' },
+    { href: 'clase_modelado_dashboard_insights.html', label: 'Modelado, Dashboard e Insights' },
     { href: '', label: 'Storytelling y Comunicación', next: true }
   ];
   var REPASO = [
@@ -44,7 +45,7 @@
     var aside = document.createElement('aside');
     aside.id = 'cc-sidebar';
     aside.innerHTML =
-      '<h3>De los Datos al Criterio</h3>' +
+      '<h3>Curso de Analítica de Datos: Industria Musical</h3>' +
       '<div class="cc-group">' + buildNav(PAGES) + '</div>' +
       '<div class="cc-group"><h3>Repaso</h3>' + buildNav(REPASO) + '</div>';
     document.body.appendChild(aside);
