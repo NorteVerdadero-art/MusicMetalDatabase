@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
-<title>Modelado, Visualización e Insights</title>
+<title>Storytelling y Comunicación</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -98,6 +98,16 @@ section h2{font-size:1.5rem;}
 .ex-solution{display:none; margin-top:10px; background:#f4f4f8; border-radius:8px; padding:10px 12px; font-size:.86rem;}
 .ex-solution code{display:block; margin-top:4px; color:var(--bl);}
 
+.write-box{border:1px solid var(--border); border-radius:12px; margin:18px 0; overflow:hidden;}
+.write-head{background:var(--bg-soft); padding:10px 16px; border-bottom:1px solid var(--border); font-weight:600; font-size:.92rem;}
+.write-body{padding:16px;}
+.write-input{
+  width:100%; min-height:54px; border:1px dashed var(--border); border-radius:8px; padding:10px 12px;
+  font-size:.92rem; resize:vertical; background:#fbfbfd; color:var(--ink); font-family:'DM Sans',sans-serif;
+}
+.write-input + .write-input{margin-top:10px;}
+.write-label{font-size:.78rem; color:var(--gray); margin:0 0 4px; text-transform:uppercase; letter-spacing:.03em;}
+
 .machine-callout{
   border:1px solid var(--teal); border-radius:10px; padding:16px 18px; margin:18px 0; background:#f2faf9;
 }
@@ -106,13 +116,10 @@ section h2{font-size:1.5rem;}
 .machine-callout ol{margin:0; padding-left:1.2em;}
 .machine-callout li{margin-bottom:6px;}
 
-.kpi-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:16px 0;}
-.kpi-card{border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg-soft);}
-.kpi-card .kpi-label{font-size:.76rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px;}
-.kpi-card .kpi-blank{
-  border:2px dashed var(--border); border-radius:6px; min-height:34px; display:flex; align-items:center;
-  padding:0 10px; color:var(--gray); font-family:'DM Mono',monospace; font-size:.9rem;
-}
+.chart-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:16px 0;}
+.chart-card{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg-soft);}
+.chart-card h4{font-size:.95rem; margin-bottom:6px; color:var(--pu);}
+.chart-card p{font-size:.85rem; color:var(--gray); margin:0;}
 
 .steps{counter-reset:step; margin:16px 0;}
 .step{display:flex; gap:12px; margin-bottom:14px;}
@@ -122,204 +129,45 @@ section h2{font-size:1.5rem;}
 }
 .step-body{padding-top:2px;}
 
-.chart-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:16px 0;}
-.chart-card{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg-soft);}
-.chart-card h4{font-size:.95rem; margin-bottom:6px; color:var(--pu);}
-.chart-card p{font-size:.85rem; color:var(--gray); margin:0;}
-
 .summary-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
 .summary-table th, .summary-table td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
 .summary-table th{background:var(--bg-soft);}
 
 .closing{padding:36px 40px; background:var(--bg-soft);}
 footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px solid var(--border);}
+
+.demo-pair{display:flex; gap:20px; flex-wrap:wrap; margin:16px 0;}
+.demo-card{flex:1; min-width:240px; border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg-soft); text-align:center;}
+.demo-card .demo-label{font-size:.76rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin-bottom:10px;}
+.digit-grid{font-family:'DM Mono',monospace; font-size:1.3rem; letter-spacing:.35em; line-height:2; color:var(--ink);}
+.digit-hot{color:var(--red); font-weight:700;}
+.svg-card svg{width:100%; height:auto; display:block;}
+.svg-card .svg-title{font-size:.82rem; font-weight:600; margin:10px 0 2px;}
 </style>
 </head>
 <body>
 <div class="hero">
   <div class="kicker">Curso de Analítica de Datos: Industria Musical</div>
-  <h1>Modelado, Visualización e Insights</h1>
-  <p class="sub">Hoy simulamos el pipeline completo, de punta a punta: qué preguntamos, cómo modelamos la respuesta, cómo la mostramos, y qué decisión sale de ahí. Con MySQL Workbench como herramienta principal.</p>
+  <h1>Storytelling y Comunicación</h1>
+  <p class="sub">Hoy no hay sintaxis nueva grande. Cerramos el pipeline: de query a decisión comunicada. Cada ejercicio de hoy repasa algo que ya sabes hacer — la novedad es qué haces con el resultado.</p>
   <div class="hook">
     <span class="box-label">Contexto</span>
-    <p>Ya conectaste tu MusicWorks a un cliente real y dominas SELECT, WHERE, GROUP BY, ORDER BY, HAVING e INNER JOIN. Hoy no aprendemos sintaxis nueva de cero — la ponemos a trabajar dentro de un proceso completo de analista: <strong>Extracción → Limpieza/Modelado → Dashboard → Insights</strong>. De regalo, cerramos con cómo usar un LLM (como este mismo con el que preparé la clase) para escribir queries sin regalar la robustez ni la velocidad de tu base.</p>
+    <p>Ya sabes extraer (SELECT/WHERE/JOIN), modelar (CASE/COALESCE/CTE) y armar datos para un dashboard (GROUP BY por fecha o categoría). Lo que falta es el último tramo: convertir ese resultado en algo que alguien que no toca SQL pueda entender y usar para decidir. Ese es el trabajo real de un analista — la query es medio camino, no el destino.</p>
   </div>
 </div>
 
 <section id="bloque-00">
-  <span class="block-tag">Bloque 00</span>
-  <h2>Refresh: INNER, LEFT y RIGHT JOIN</h2>
+  <span class="block-tag">Bloque 00 · Refresh</span>
+  <h2>La plantilla de insight, otra vez</h2>
   <div class="read-box">
-    <span class="box-label">Cómo leer esto</span>
-    <div class="read-box-item"><span class="read-box-val">JOIN tabla ON a.x = b.y</span> <span class="read-box-txt">cose dos tablas fila por fila donde la condición ON se cumple. Sin JOIN, cada tabla vive aislada.</span></div>
-    <div class="read-box-item"><span class="read-box-val">alias (a, r, ar...)</span> <span class="read-box-txt">apodo corto de una tabla, para no escribir el nombre completo en cada columna.</span></div>
-    <div class="read-box-item"><span class="read-box-val">tabla.columna</span> <span class="read-box-txt">necesario cuando dos tablas cruzadas tienen una columna con el mismo nombre (ej: artist_name en dos lados).</span></div>
+    <span class="box-label">De la clase pasada</span>
+    <p>"Sobre <u>[tema]</u>, encontré que <u>[dato + comparación]</u>. Recomiendo <u>[acción]</u> porque <u>[razón]</u>." Hoy construimos sobre eso: cómo elegir QUÉ mostrar, a QUIÉN, y con QUÉ gráfica.</p>
   </div>
 
-  <h3>El ejemplo mini que lo explica todo</h3>
-  <p>Antes de la base real, dos tablitas de juguete — 3 artistas, 2 premios. Fíjate: <strong>Ghost (id 3) no tiene fila en <code>premios_demo</code></strong>, nunca ganó nada. Ese hueco es la clave de todo el bloque.</p>
-
-  <div style="display:flex; gap:20px; flex-wrap:wrap; margin:16px 0;">
-    <div style="flex:1; min-width:200px;">
-      <table class="compare-table">
-        <thead><tr><th colspan="2"><code>artistas_demo</code></th></tr><tr><th>artist_id</th><th>nombre</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Metallica</td></tr>
-          <tr><td>2</td><td>Slayer</td></tr>
-          <tr><td>3</td><td>Ghost</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="flex:1; min-width:200px;">
-      <table class="compare-table">
-        <thead><tr><th colspan="2"><code>premios_demo</code></th></tr><tr><th>artist_id</th><th>premio</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Grammy</td></tr>
-          <tr><td>2</td><td>Grammy</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="sim" id="exj1">
-    <div class="sim-head"><span class="sim-title">Mini 1 · INNER JOIN</span> <span class="sim-tag">solo lo que calza</span></div>
+  <div class="sim" id="exs1">
+    <div class="sim-head"><span class="sim-title">Refresh · Top 5 por streams</span> <span class="sim-tag">GROUP BY · SUM · ORDER BY</span></div>
     <div class="sim-body">
-      <p class="ex-prompt">Trae <code>nombre</code> (de <code>artistas_demo</code>) y <code>premio</code> (de <code>premios_demo</code>), cruzando por <code>artist_id</code>. Predice antes de correr: ¿cuántas filas esperas?</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT a.nombre, p.premio FROM artistas_demo a JOIN premios_demo p ON p.artist_id = a.artist_id;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="sim" id="exj2">
-    <div class="sim-head"><span class="sim-title">Mini 2 · LEFT JOIN</span> <span class="sim-tag">todo lo de la izquierda</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Mismo cruce, pero ahora con LEFT JOIN (tabla izquierda = <code>artistas_demo</code>). ¿Cuántas filas salen ahora, y qué trae Ghost en la columna <code>premio</code>?</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT a.nombre, p.premio FROM artistas_demo a LEFT JOIN premios_demo p ON p.artist_id = a.artist_id;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="sim" id="exj3">
-    <div class="sim-head"><span class="sim-title">Mini 3 · "¿quién no ha ganado nada?"</span> <span class="sim-tag">LEFT JOIN + IS NULL</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Usa el LEFT JOIN de arriba, pero quédate solo con los artistas cuyo <code>premio</code> salió NULL. Trae solo <code>nombre</code>.</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT a.nombre FROM artistas_demo a LEFT JOIN premios_demo p ON p.artist_id = a.artist_id WHERE p.premio IS NULL;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="sim" id="exj4">
-    <div class="sim-head"><span class="sim-title">Mini 4 · RIGHT JOIN</span> <span class="sim-tag">el espejo de LEFT</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">RIGHT JOIN conserva TODO de la tabla de la derecha. Escribe el mismo resultado del Mini 2, pero invirtiendo el orden: arranca de <code>premios_demo</code> y usa RIGHT JOIN hacia <code>artistas_demo</code>.</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT a.nombre, p.premio FROM premios_demo p RIGHT JOIN artistas_demo a ON p.artist_id = a.artist_id;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="wbox">
-    <span class="box-label">Por qué casi nadie usa RIGHT JOIN</span>
-    <p>El Mini 4 debió darte exactamente el mismo resultado que el Mini 2 — nada más volteaste el orden de las tablas y el tipo de JOIN. Por eso en la práctica casi nadie escribe RIGHT JOIN: es más fácil reordenar las tablas y usar LEFT siempre. Igual necesitas reconocerlo — te lo vas a topar leyendo queries de otras personas.</p>
-  </div>
-
-  <p>Todo lo demás de hoy corre contra tu base real en Workbench — el panel de arriba es un motor de juguete, para practicar el patrón antes de escalarlo a miles de filas. Desde aquí, todo se corre en vivo.</p>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Los 4 Minis, con tablas reales (releases / campaigns)</span>
-    <p>Mismo patrón exacto de los Minis 1-4, cambiando <code>artistas_demo</code>/<code>premios_demo</code> por <code>releases</code>/<code>campaigns</code> — no todos los releases tienen campaña propia, igual que no todos los artistas tenían premio:</p>
-    <code>-- Mini 1, INNER: solo releases CON campaña propia
-SELECT r.release_title, c.campaign_name
-FROM releases r
-JOIN campaigns c ON c.release_id = r.release_id;
-
--- Mini 2, LEFT: TODOS los releases, con o sin campaña
-SELECT r.release_title, c.campaign_name
-FROM releases r
-LEFT JOIN campaigns c ON c.release_id = r.release_id;
-
--- Mini 3, LEFT + IS NULL: releases sin campaña propia
-SELECT r.release_title
-FROM releases r
-LEFT JOIN campaigns c ON c.release_id = r.release_id
-WHERE c.campaign_id IS NULL;
-
--- Mini 4, RIGHT: mismo resultado del Mini 2, tablas invertidas
-SELECT r.release_title, c.campaign_name
-FROM campaigns c
-RIGHT JOIN releases r ON c.release_id = r.release_id;</code>
-    <p>El Mini 3 es, de hecho, la misma pregunta que vas a resolver formalmente en la Fase 1 de abajo — ya la adelantaste.</p>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Refresh 1 — ¿cuántas rolas por género, cruzando 4 tablas?</span>
-    <p>El mismo cruce que arma la vista <code>track_details</code> por dentro, escrito a mano:</p>
-    <code>SELECT g.genre_name, COUNT(*) AS total_rolas
-FROM tracks t
-JOIN releases r ON r.release_id = t.release_id
-JOIN artists a  ON a.artist_id = r.artist_id
-JOIN genres g   ON g.genre_id = a.genre_id
-GROUP BY g.genre_name
-ORDER BY total_rolas DESC;</code>
-    <p>Corre esto y confirma: ¿cuál es el género con más tracks en tu catálogo?</p>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Refresh 2 — reto: releases sin campaña propia</span>
-    <p>Esta es la que se pone interesante: no todos los <code>releases</code> tienen una fila en <code>campaigns</code> apuntándoles (<code>campaigns.release_id</code> es opcional). Con INNER JOIN, esos releases <strong>desaparecen</strong> del resultado — con LEFT JOIN, se quedan con NULL del lado de campaigns. Pruébalo:</p>
-    <code>-- INNER JOIN: solo releases CON campaña propia
-SELECT COUNT(*) FROM releases r
-JOIN campaigns c ON c.release_id = r.release_id;
-
--- LEFT JOIN: TODOS los releases, con o sin campaña
-SELECT COUNT(*) FROM releases r
-LEFT JOIN campaigns c ON c.release_id = r.release_id;</code>
-    <p>Los dos números no coinciden — esa diferencia es exactamente cuántos releases nunca tuvieron su propia campaña. Guarda ese resultado, lo usamos en la Fase 1.</p>
-  </div>
-
-  <div class="wbox">
-    <span class="box-label">La diferencia que importa hoy</span>
-    <p><strong>INNER JOIN</strong> solo trae filas que calzan en ambos lados — perfecto cuando la pregunta es "de lo que sí existe en ambas tablas". <strong>LEFT JOIN</strong> conserva TODAS las filas de la tabla izquierda, rellenando con NULL lo que no encontró del otro lado — perfecto cuando la pregunta es "qué me estoy perdiendo" o "quién no tiene X todavía". Hoy vas a usar los dos, a propósito.</p>
-  </div>
-</section>
-
-<section id="bloque-01">
-  <span class="block-tag fase">Fase 1 · Extracción</span>
-  <h2>Antes de escribir SQL: la pregunta de negocio</h2>
-  <div class="ibox">
-    <span class="box-label">El error más caro del análisis de datos</span>
-    <p>No es un JOIN mal escrito — es empezar a extraer sin tener clara la pregunta. Extracción no es "traer todo lo que hay", es decidir <strong>qué pregunta respondemos</strong> y <strong>qué 2-3 métricas</strong> nos dan esa respuesta, antes de tocar el teclado.</p>
-  </div>
-
-  <table class="compare-table">
-    <thead><tr><th>Pregunta de negocio</th><th>Métrica(s) que la responden</th><th>Tabla(s) fuente</th></tr></thead>
-    <tbody>
-      <tr><td>¿Qué género deberíamos priorizar en el próximo trimestre de marketing?</td><td class="sql-col">tracks por género, streams por género</td><td class="sql-col">tracks, releases, artists, genres</td></tr>
-      <tr><td>¿Qué artistas independientes están creciendo sin apoyo de campañas?</td><td class="sql-col">streams totales vs. inversión en campañas</td><td class="sql-col">vw_artist_monthly_summary, campaigns</td></tr>
-      <tr><td>¿Qué releases se lanzaron "a ciegas", sin campaña propia?</td><td class="sql-col">releases sin fila correspondiente en campaigns</td><td class="sql-col">releases LEFT JOIN campaigns</td></tr>
-    </tbody>
-  </table>
-
-  <div class="wbox">
-    <span class="box-label">Regla de oro de hoy</span>
-    <p>Si no puedes decir en una frase qué decisión de negocio va a informar tu query, todavía no es momento de escribir el SELECT. Escribe primero la pregunta en un comentario SQL (<code>-- pregunta: ...</code>) arriba de tu query — es una práctica real de la industria, no un capricho de clase.</p>
-  </div>
-
-  <div class="sim" id="ex1">
-    <div class="sim-head"><span class="sim-title">Ejercicio 1 · Elegir la métrica correcta</span> <span class="sim-tag">GROUP BY · SUM · ORDER BY</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Pregunta de negocio: "¿qué 5 artistas están generando más streams en total, según nuestra muestra mensual?" Sobre <code>artist_monthly</code>: trae <code>artist_name</code> y la suma de <code>territory_streams</code> como <code>total_streams</code>, top 5, de mayor a menor.</p>
+      <p class="ex-prompt">Sobre <code>artist_monthly</code>: los 5 artistas con más streams totales — el mismo ejercicio de la clase pasada, para tenerlo fresco.</p>
       <textarea class="ex-input" spellcheck="false"></textarea>
       <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
       <div class="ex-solution">Una forma válida:<code>SELECT artist_name, SUM(territory_streams) AS total_streams FROM artist_monthly GROUP BY artist_name ORDER BY total_streams DESC LIMIT 5;</code></div>
@@ -329,149 +177,125 @@ LEFT JOIN campaigns c ON c.release_id = r.release_id;</code>
   </div>
 
   <div class="machine-callout">
-    <span class="box-label">🖥️ Ejercicio 1, con tu base real</span>
-    <p>Mismo <code>artist_monthly</code> del panel → <code>vw_artist_monthly_summary</code>, la vista real:</p>
+    <span class="box-label">🖥️ Con tu base real</span>
     <code>SELECT artist_name, SUM(territory_streams) AS total_streams
 FROM vw_artist_monthly_summary
 GROUP BY artist_name
 ORDER BY total_streams DESC
 LIMIT 5;</code>
   </div>
+</section>
 
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Ahora en tu máquina — la pregunta de "a ciegas"</span>
-    <p>Trae los releases que nunca recibieron campaña propia (el LEFT JOIN del Refresh 2, pero mostrando cuáles son):</p>
-    <code>SELECT r.release_title, r.release_type, r.release_date
-FROM releases r
-LEFT JOIN campaigns c ON c.release_id = r.release_id
-WHERE c.campaign_id IS NULL
-ORDER BY r.release_date DESC;</code>
-    <p>Nota el patrón: <strong>LEFT JOIN + WHERE columna_derecha IS NULL</strong> es la forma estándar en SQL de preguntar "¿qué me falta?". Apúntalo, lo vas a usar toda tu carrera.</p>
+<section id="bloque-01">
+  <span class="block-tag fase">Bloque 1 · La estructura de una historia</span>
+  <h2>El resultado no es el mensaje</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">BLUF</span> <span class="read-box-txt">Bottom Line Up Front — la conclusión va primero, no al final. Nadie lee hasta la fila 40 de tu tabla.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Situación</span> <span class="read-box-txt">el contexto que ya todos conocen (1 frase).</span></div>
+    <div class="read-box-item"><span class="read-box-val">Complicación</span> <span class="read-box-txt">lo que el dato reveló que rompe la expectativa (el "aha").</span></div>
+    <div class="read-box-item"><span class="read-box-val">Resolución</span> <span class="read-box-txt">qué hacer al respecto.</span></div>
+  </div>
+
+  <p>Usemos un resultado real de la clase pasada: la campaña más cara por conversión costó <strong>$14.67</strong> (Wild Waves, TikTok); la más barata, <strong>$0.80</strong> (Midnight Ghosts, también TikTok) — <strong>18 veces</strong> de diferencia.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Titular malo</th><th>Por qué falla</th><th>Titular bueno (BLUF)</th></tr></thead>
+    <tbody>
+      <tr><td class="bad">"Cost per conversion by platform: TikTok $3.26 avg, Meta $2.79 avg..."</td><td>Es la tabla leída en voz alta. Nadie actúa sobre un promedio con 4 decimales.</td><td class="good">"Una campaña específica en TikTok cuesta 18x más por conversión que la más barata — no es la plataforma, es esa campaña. Recomiendo pausarla esta semana."</td></tr>
+      <tr><td class="bad">"TikTok es mala plataforma"</td><td>Falso — el promedio por plataforma es parecido entre todas (revisa el Bloque 3). La variación real está a nivel de campaña individual, no de plataforma.</td><td class="good">"El problema no es TikTok como canal — es que 2 de 10 campañas ahí se dispararon en costo. Las otras 8 rinden normal."</td></tr>
+    </tbody>
+  </table>
+
+  <div class="wbox">
+    <span class="box-label">Error clásico</span>
+    <p>Agarrar el primer patrón que ves y convertirlo en titular sin revisar si es real o casualidad de la muestra. "TikTok es mala" suena a historia — y está mal, según el mismo dato. Un buen titular sobrevive cuando alguien pregunta "¿y si lo cortas distinto?".</p>
+  </div>
+
+  <div class="write-box">
+    <div class="write-head">Ejercicio · Escribe tu propio BLUF</div>
+    <div class="write-body">
+      <p class="write-label">Usa el resultado del Refresh de arriba (top 5 artistas por streams). Escribe la Situación, la Complicación y la Resolución en una sola frase cada una.</p>
+      <div class="write-label">Situación</div>
+      <textarea class="write-input" spellcheck="false" placeholder="Lo que ya todos saben, en una frase..."></textarea>
+      <div class="write-label">Complicación</div>
+      <textarea class="write-input" spellcheck="false" placeholder="Lo que el dato reveló que sorprende..."></textarea>
+      <div class="write-label">Resolución</div>
+      <textarea class="write-input" spellcheck="false" placeholder="Qué deberíamos hacer al respecto..."></textarea>
+    </div>
   </div>
 </section>
 
 <section id="bloque-02">
-  <span class="block-tag fase">Fase 2 · Limpieza y Modelado</span>
-  <h2>De dato crudo a tabla que se puede confiar</h2>
-  <div class="read-box">
-    <span class="box-label">Cómo leer esto</span>
-    <div class="read-box-item"><span class="read-box-val">CASE WHEN ... THEN ... ELSE ... END</span> <span class="read-box-txt">un IF/ELSE dentro del SELECT — convierte un número continuo en una categoría legible.</span></div>
-    <div class="read-box-item"><span class="read-box-val">COALESCE(x, valor_defecto)</span> <span class="read-box-txt">si x es NULL, usa el valor_defecto en su lugar. Arregla los huecos que deja un LEFT JOIN.</span></div>
-    <div class="read-box-item"><span class="read-box-val">WITH nombre AS (...)</span> <span class="read-box-txt">una CTE — le pones nombre a una query y la reusas como si fuera una tabla, dentro de la misma consulta.</span></div>
-  </div>
-  <p>Modelar no es "hacerlo bonito" — es dejar el dato en una forma donde categorías y huecos ya no rompen el siguiente paso (el dashboard). Esto es exactamente lo que harías con una tabla dinámica en Sheets antes de graficar: agrupar, categorizar, rellenar vacíos.</p>
+  <span class="block-tag fase">Bloque 2 · Conoce a tu audiencia</span>
+  <h2>El mismo dato, dos versiones</h2>
+  <p>Cuánto detalle mostrar depende de quién escucha — no es "simplificar para tontos", es respetar el tiempo de cada quién.</p>
 
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Paso 1 — categorizar con CASE</span>
-    <p>Sin categorías, "1,946,069 oyentes" no dice nada por sí solo. Con CASE, se vuelve una etiqueta que cualquiera entiende:</p>
-    <code>SELECT artist_name, monthly_listeners_baseline,
-  CASE
-    WHEN monthly_listeners_baseline >= 1500000 THEN 'Top'
-    WHEN monthly_listeners_baseline >=  500000 THEN 'Media'
-    ELSE 'Emergente'
-  END AS tier
-FROM artists
-ORDER BY monthly_listeners_baseline DESC;</code>
-    <p>Los umbrales (1.5M, 500K) son criterio de negocio, no sintaxis — hoy los propongo yo, pero en tu trabajo real los define el equipo de marketing.</p>
-  </div>
+  <table class="compare-table">
+    <thead><tr><th></th><th>A un exec / dueño del sello</th><th>A otro analista</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Qué abre</strong></td><td class="sql-col">La recomendación, en la primera frase</td><td class="sql-col">La pregunta de negocio y el filtro usado</td></tr>
+      <tr><td><strong>Cuánto SQL muestra</strong></td><td class="sql-col">Cero — ni el nombre de la tabla</td><td class="sql-col">La query completa, para que la audite</td></tr>
+      <tr><td><strong>Cuántos números</strong></td><td class="sql-col">1-2, redondeados</td><td class="sql-col">Los que hagan falta, con decimales</td></tr>
+      <tr><td><strong>Qué se omite</strong></td><td class="sql-col">Casos límite, matices técnicos</td><td class="sql-col">Nada — quiere poder replicarlo</td></tr>
+    </tbody>
+  </table>
 
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Paso 2 — rellenar huecos con COALESCE</span>
-    <p>¿Cuánto ha gastado el sello en marketing por artista? Con LEFT JOIN, los artistas sin campaña quedan en NULL — y NULL en un dashboard se ve roto. COALESCE lo arregla:</p>
-    <code>SELECT a.artist_name, COALESCE(SUM(csw.spend), 0) AS gasto_total
-FROM artists a
-LEFT JOIN campaigns c ON c.artist_id = a.artist_id
-LEFT JOIN campaign_spend_weekly csw ON csw.campaign_id = c.campaign_id
-GROUP BY a.artist_name
-ORDER BY gasto_total ASC
-LIMIT 10;</code>
-    <p>Sin el COALESCE, esos primeros 10 artistas mostrarían <code>NULL</code> en vez de <code>0.00</code> — técnicamente distinto ("no sabemos" vs. "sabemos que es cero"), pero para un dashboard de gasto, 0 es la lectura correcta.</p>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Paso 3 — modelar con una CTE (WITH)</span>
-    <p>Junta el CASE de arriba en una tabla temporal con nombre, y luego pregúntale cosas — así se ve un modelo real antes de ir al dashboard:</p>
-    <code>WITH artist_tier AS (
-  SELECT a.artist_id, a.artist_name, a.monthly_listeners_baseline,
-    CASE
-      WHEN a.monthly_listeners_baseline >= 1500000 THEN 'Top'
-      WHEN a.monthly_listeners_baseline >=  500000 THEN 'Media'
-      ELSE 'Emergente'
-    END AS tier
-  FROM artists a
-)
-SELECT tier, COUNT(*) AS num_artistas, ROUND(AVG(monthly_listeners_baseline)) AS promedio_oyentes
-FROM artist_tier
-GROUP BY tier
-ORDER BY promedio_oyentes DESC;</code>
-    <p>Fíjate: la segunda query ni sabe que existe <code>monthly_listeners_baseline</code> "crudo" — solo ve <code>artist_tier</code>, ya limpia. Esa separación (modelar una vez, consultar muchas veces) es la esencia del paso de Modelado.</p>
-  </div>
-
-  <div class="wbox">
-    <span class="box-label">Error clásico</span>
-    <p>Anidar CASE dentro de CASE hasta perder el hilo. Si necesitas más de 3-4 categorías, casi siempre es señal de que la regla de negocio no está clara todavía — vuelve a la Fase 1 y pregunta.</p>
+  <div class="write-box">
+    <div class="write-head">Ejercicio · Dos versiones del mismo hallazgo</div>
+    <div class="write-body">
+      <p class="write-label">Mismo dato (la campaña de $14.67 vs $0.80). Escribe cómo se lo dirías a cada quién.</p>
+      <div class="write-label">Versión para el dueño del sello (1 frase, sin SQL, con la acción ya sugerida)</div>
+      <textarea class="write-input" spellcheck="false"></textarea>
+      <div class="write-label">Versión para otro analista (incluye qué tabla/columna usarías para verificarlo)</div>
+      <textarea class="write-input" spellcheck="false"></textarea>
+    </div>
   </div>
 </section>
 
 <section id="bloque-03">
-  <span class="block-tag fase">Fase 3 · Dashboard</span>
-  <h2>De la tabla al gráfico correcto</h2>
+  <span class="block-tag fase">Bloque 3 · Diseño que dirige el ojo</span>
+  <h2>El ojo ve antes de que la persona "lea"</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">Atributo preatentivo</span> <span class="read-box-txt">color, tamaño y posición se procesan en menos de 500ms — antes de pensar. Por eso UN elemento resaltado se ve al instante.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Anotación directa</span> <span class="read-box-txt">el título de la gráfica dice la conclusión, no describe el eje.</span></div>
+  </div>
+  <p>Ya sabes qué tipo de gráfica usar para cada forma de dato (Clase 5 y Clase 7). Lo que falta es cómo hacer que esa gráfica se lea SOLA, sin que la persona tenga que estudiarla.</p>
+
   <div class="ibox">
-    <span class="box-label">La pregunta que se te olvida hacer</span>
-    <p>Antes de graficar: ¿qué <em>forma</em> tiene tu resultado? Un dashboard no es "un montón de gráficas" — es elegir el tipo correcto según la forma del dato que tu query ya modeló.</p>
-  </div>
-
-  <div class="chart-grid">
-    <div class="chart-card"><h4>Línea</h4><p>Una métrica a través del tiempo (mes a mes). Necesitas una columna de fecha ordenada y UNA métrica numérica.</p></div>
-    <div class="chart-card"><h4>Barras</h4><p>Comparar categorías entre sí (género, plataforma, artista). Necesitas GROUP BY sobre una columna categórica.</p></div>
-    <div class="chart-card"><h4>Tabla / KPI</h4><p>Un número solo, o un top-N con contexto. Cuando el dato ya es la respuesta, no necesita gráfica.</p></div>
-    <div class="chart-card"><h4>Mapa</h4><p>Cuando la categoría es geográfica (territorio, país). No lo vemos hoy — <code>territories</code> queda para otra sesión.</p></div>
-  </div>
-
-  <div class="sim" id="ex2">
-    <div class="sim-head"><span class="sim-title">Ejercicio 2 · Datos para una línea de tiempo</span> <span class="sim-tag">WHERE · ORDER BY</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Vas a graficar la tendencia mensual de Metallica. Sobre <code>artist_monthly</code>: trae <code>month_date</code> y <code>territory_streams</code> donde <code>artist_name = 'Metallica'</code>, ordenado por fecha (de la más vieja a la más nueva — así se lee una línea de tiempo).</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT month_date, territory_streams FROM artist_monthly WHERE artist_name = 'Metallica' ORDER BY month_date;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
+    <span class="box-label">Demo — encuentra el 3</span>
+    <p>Busca el único "3" en esta fila. Cronométrate:</p>
+    <div class="demo-pair">
+      <div class="demo-card">
+        <div class="demo-label">Sin atributo preatentivo</div>
+        <div class="digit-grid">8 8 8 8 8 8 8 8 3 8 8 8 8 8 8 8 8 8</div>
+      </div>
+      <div class="demo-card">
+        <div class="demo-label">Con atributo preatentivo (color + tamaño)</div>
+        <div class="digit-grid">8 8 8 8 8 8 8 8 <span class="digit-hot">3</span> 8 8 8 8 8 8 8 8 8</div>
+      </div>
     </div>
+    <p>En la primera tuviste que leer uno por uno. En la segunda lo viste sin leer nada — eso es "preatentivo". Regla práctica: máximo 1-2 colores de alerta por gráfica. Si todo está resaltado, nada lo está.</p>
   </div>
 
-  <div class="sim" id="ex3">
-    <div class="sim-head"><span class="sim-title">Ejercicio 3 · Tendencia agregada (todo el catálogo)</span> <span class="sim-tag">GROUP BY fecha</span></div>
+  <table class="compare-table">
+    <thead><tr><th>Título descriptivo (dice QUÉ es)</th><th>Anotación directa (dice la CONCLUSIÓN)</th></tr></thead>
+    <tbody>
+      <tr><td class="bad">"Cost per Conversion by Platform"</td><td class="good">"Una campaña en TikTok cuesta 18x más por conversión que la más barata"</td></tr>
+      <tr><td class="bad">"Streams mensuales de Metallica"</td><td class="good">"Los streams de Metallica se recuperaron después de la caída de diciembre 2024"</td></tr>
+    </tbody>
+  </table>
+
+  <div class="wbox">
+    <span class="box-label">Por qué importa</span>
+    <p>Si alguien solo lee los títulos de tus gráficas y sigue de largo (así se leen la mayoría de reportes), la versión descriptiva no le dejó nada. La versión de anotación directa ya le dio la conclusión completa.</p>
+  </div>
+
+  <div class="sim" id="exs2">
+    <div class="sim-head"><span class="sim-title">Refresh · Conversiones por plataforma</span> <span class="sim-tag">GROUP BY categoría</span></div>
     <div class="sim-body">
-      <p class="ex-prompt">Ahora la vista ejecutiva: total de <code>territory_streams</code> por <code>month_date</code>, sumando todos los artistas de la muestra, ordenado cronológicamente.</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT month_date, SUM(territory_streams) AS total FROM artist_monthly GROUP BY month_date ORDER BY month_date;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Ejercicios 2 y 3, con tu base real</span>
-    <p>Mismo cambio de siempre — <code>artist_monthly</code> → <code>vw_artist_monthly_summary</code>:</p>
-    <code>-- Ejercicio 2: tendencia de un artista
-SELECT month_date, territory_streams
-FROM vw_artist_monthly_summary
-WHERE artist_name = 'Metallica'
-ORDER BY month_date;
-
--- Ejercicio 3: tendencia agregada, todo el catálogo
-SELECT month_date, SUM(territory_streams) AS total
-FROM vw_artist_monthly_summary
-GROUP BY month_date
-ORDER BY month_date;</code>
-  </div>
-
-  <div class="sim" id="ex4">
-    <div class="sim-head"><span class="sim-title">Ejercicio 4 · Datos para barras</span> <span class="sim-tag">GROUP BY categoría</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Sobre <code>campaign_roi</code>: total de <code>total_conversions</code> por <code>platform</code> (columna <code>conversions</code>), de mayor a menor — listo para una barra comparando plataformas.</p>
+      <p class="ex-prompt">Sobre <code>campaign_roi</code>: total de <code>total_conversions</code> por <code>platform</code> (columna <code>conversions</code>), de mayor a menor.</p>
       <textarea class="ex-input" spellcheck="false"></textarea>
       <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
       <div class="ex-solution">Una forma válida:<code>SELECT platform, SUM(total_conversions) AS conversions FROM campaign_roi GROUP BY platform ORDER BY conversions DESC;</code></div>
@@ -481,134 +305,162 @@ ORDER BY month_date;</code>
   </div>
 
   <div class="machine-callout">
-    <span class="box-label">🖥️ Ahora en tu máquina</span>
-    <p>Corre el Ejercicio 4 contra <code>vw_campaign_roi</code> (la vista real, no la muestra del panel) y exporta a CSV — ese archivo es literalmente lo que subirías a Sheets o Looker Studio para armar la barra.</p>
+    <span class="box-label">🖥️ Con tu base real</span>
     <code>SELECT platform, SUM(total_conversions) AS conversions
 FROM vw_campaign_roi
 GROUP BY platform
 ORDER BY conversions DESC;</code>
   </div>
+
+  <div class="write-box">
+    <div class="write-head">Ejercicio · Anotación directa</div>
+    <div class="write-body">
+      <p class="write-label">Con el resultado del ejercicio de arriba (conversiones por plataforma), escribe un título descriptivo y uno de anotación directa.</p>
+      <div class="write-label">Título descriptivo (el que pondría cualquier BI por default)</div>
+      <textarea class="write-input" spellcheck="false" placeholder="Ej: Conversiones totales por plataforma..."></textarea>
+      <div class="write-label">Anotación directa (dice la conclusión)</div>
+      <textarea class="write-input" spellcheck="false" placeholder="Ej: [Plataforma] genera X veces más conversiones que..."></textarea>
+    </div>
+  </div>
+
+  <div class="sim" id="exs3">
+    <div class="sim-head"><span class="sim-title">Refresh · JOIN entre dos resultados (el que alimenta tu historia)</span> <span class="sim-tag">JOIN · WHERE · ORDER BY</span></div>
+    <div class="sim-body">
+      <p class="ex-prompt">Cruza <code>campaign_roi</code> con <code>artist_monthly</code> por <code>artist_name</code>: trae <code>artist_name</code>, <code>platform</code>, <code>cost_per_conversion</code> y <code>territory_streams</code> del mes <code>'2026-08-01'</code>, de las 5 campañas más baratas por conversión. Esto responde: "¿los artistas con campañas eficientes también están generando streams de verdad?"</p>
+      <textarea class="ex-input" spellcheck="false"></textarea>
+      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
+      <div class="ex-solution">Una forma válida:<code>SELECT cm.artist_name, cm.platform, cm.cost_per_conversion, am.territory_streams
+FROM campaign_roi cm
+JOIN artist_monthly am ON am.artist_name = cm.artist_name
+WHERE am.month_date = '2026-08-01'
+ORDER BY cm.cost_per_conversion ASC
+LIMIT 5;</code></div>
+      <div class="ex-output"></div>
+      <div class="ex-feedback"></div>
+    </div>
+  </div>
+
+  <div class="wbox">
+    <span class="box-label">¿Por qué salieron menos artistas de los que esperabas?</span>
+    <p>Es INNER JOIN — solo aparecen artistas que están en AMBAS tablas. Si un artista tiene campañas pero no está en la muestra de streams (o viceversa), desaparece. Mismo comportamiento que viste en el Refresh 2 de la clase pasada.</p>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Con tu base real</span>
+    <code>SELECT roi.artist_name, roi.platform, roi.cost_per_conversion, ms.territory_streams
+FROM vw_campaign_roi roi
+JOIN vw_artist_monthly_summary ms
+  ON ms.artist_name = roi.artist_name AND ms.month_date = '2026-08-01'
+ORDER BY roi.cost_per_conversion ASC
+LIMIT 5;</code>
+  </div>
 </section>
 
 <section id="bloque-04">
-  <span class="block-tag fase">Fase 4 · Insights y toma de decisiones</span>
-  <h2>El número no es el insight — la decisión sí</h2>
+  <span class="block-tag fase">Bloque 4 · Comparar y no engañar</span>
+  <h2>Un número solo no es una historia</h2>
   <div class="read-box">
     <span class="box-label">Cómo leer esto</span>
-    <p>Un insight tiene esta forma: <strong>[métrica] + [comparación/contexto] → [decisión sugerida]</strong>. "Cost per conversion de $14.67 en TikTok" no es un insight. "TikTok cuesta 3x más por conversión que Meta — mover presupuesto de TikTok a Meta el próximo mes" sí lo es.</p>
+    <div class="read-box-item"><span class="read-box-val">Punto de comparación</span> <span class="read-box-txt">todo número necesita algo contra qué medirse: mes anterior, meta, otro artista.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Eje truncado</span> <span class="read-box-txt">si el eje Y no empieza en 0, una diferencia chica se ve gigante.</span></div>
   </div>
 
-  <div class="sim" id="ex5">
-    <div class="sim-head"><span class="sim-title">Ejercicio 5 · Candidatas a cortar</span> <span class="sim-tag">ORDER BY DESC · LIMIT</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Sobre <code>campaign_roi</code>: las 5 campañas con <strong>peor</strong> (más alto) <code>cost_per_conversion</code> — candidatas a pausar o replantear.</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT campaign_name, platform, cost_per_conversion FROM campaign_roi ORDER BY cost_per_conversion DESC LIMIT 5;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
+  <table class="compare-table">
+    <thead><tr><th>Número solo</th><th>Con punto de comparación</th></tr></thead>
+    <tbody>
+      <tr><td class="bad">"Slayer generó 1.75M streams este mes."</td><td class="good">"Slayer generó 1.75M streams — mismo nivel que el mes pasado, después de dos meses de caída."</td></tr>
+    </tbody>
+  </table>
+  <p>No necesitas sintaxis nueva para esto — es una disciplina. Antes de presentar cualquier número, pregúntate: ¿contra qué lo estoy comparando?</p>
+
+  <div class="wbox">
+    <span class="box-label">Demo — mismo dato, dos historias</span>
+    <p>Estas dos gráficas usan EXACTAMENTE los mismos 12 meses de streams de Metallica. Solo cambia dónde empieza el eje Y.</p>
+    <div class="demo-pair">
+      <div class="demo-card svg-card">
+        <div class="svg-title">Eje Y desde 0</div>
+        <svg viewBox="0 0 340 130">
+          <line x1="10" y1="110" x2="330" y2="110" stroke="#cfd3da" stroke-width="1"/>
+          <text x="10" y="123" font-size="9" fill="#6B7280">0</text>
+          <text x="295" y="123" font-size="9" fill="#6B7280">120K streams</text>
+          <polyline points="10.0,15.8 39.1,27.7 68.2,30.3 97.3,30.4 126.4,31.8 155.5,25.3 184.5,27.8 213.6,36.8 242.7,46.2 271.8,43.5 300.9,38.0 330.0,43.6" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
+        </svg>
+        <p style="font-size:.82rem; color:#6B7280; margin-top:8px;">Se ve estable, con una ligera baja al final.</p>
+      </div>
+      <div class="demo-card svg-card">
+        <div class="svg-title">Eje Y desde 70K (truncado)</div>
+        <svg viewBox="0 0 340 130">
+          <line x1="10" y1="110" x2="330" y2="110" stroke="#cfd3da" stroke-width="1"/>
+          <text x="10" y="123" font-size="9" fill="#6B7280">70K</text>
+          <text x="285" y="123" font-size="9" fill="#6B7280">115K streams</text>
+          <polyline points="10.0,14.3 39.1,46.2 68.2,53.1 97.3,53.4 126.4,57.1 155.5,39.6 184.5,46.3 213.6,70.4 242.7,95.5 271.8,88.1 300.9,73.5 330.0,88.4" fill="none" stroke="#1a1a2e" stroke-width="2.5"/>
+        </svg>
+        <p style="font-size:.82rem; color:#6B7280; margin-top:8px;">Se ve volátil, con una caída dramática.</p>
+      </div>
     </div>
-  </div>
-
-  <div class="sim" id="ex6">
-    <div class="sim-head"><span class="sim-title">Ejercicio 6 · Candidatas a escalar</span> <span class="sim-tag">WHERE · ORDER BY ASC</span></div>
-    <div class="sim-body">
-      <p class="ex-prompt">Ahora lo contrario, pero con un filtro de confianza: entre las campañas con <strong>más de 50</strong> conversiones (para no confiar en un resultado con muestra chica), las 5 con <strong>mejor</strong> (más bajo) <code>cost_per_conversion</code>.</p>
-      <textarea class="ex-input" spellcheck="false"></textarea>
-      <div class="ex-actions"><button class="ex-btn ex-run">▶ Ejecutar</button><button class="ex-btn ex-sol-toggle">Ver solución</button></div>
-      <div class="ex-solution">Una forma válida:<code>SELECT campaign_name, platform, cost_per_conversion FROM campaign_roi WHERE total_conversions > 50 ORDER BY cost_per_conversion ASC LIMIT 5;</code></div>
-      <div class="ex-output"></div>
-      <div class="ex-feedback"></div>
-    </div>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Ejercicios 5 y 6, con tu base real</span>
-    <p>Mismo cambio de siempre — <code>campaign_roi</code> → <code>vw_campaign_roi</code>:</p>
-    <code>-- Ejercicio 5: candidatas a cortar
-SELECT campaign_name, platform, cost_per_conversion
-FROM vw_campaign_roi
-ORDER BY cost_per_conversion DESC
-LIMIT 5;
-
--- Ejercicio 6: candidatas a escalar (con filtro de confianza)
-SELECT campaign_name, platform, cost_per_conversion
-FROM vw_campaign_roi
-WHERE total_conversions > 50
-ORDER BY cost_per_conversion ASC
-LIMIT 5;</code>
-  </div>
-
-  <div class="machine-callout">
-    <span class="box-label">🖥️ Reto en vivo — etiqueta de decisión con CASE</span>
-    <p>Junta todo: modela una etiqueta de decisión directamente en la query, contra tu base real:</p>
-    <code>SELECT campaign_name, platform, cost_per_conversion,
-  CASE
-    WHEN cost_per_conversion &gt; 10 THEN 'Revisar / pausar'
-    WHEN cost_per_conversion &lt; 3  THEN 'Escalar presupuesto'
-    ELSE 'Mantener'
-  END AS decision
-FROM vw_campaign_roi
-ORDER BY cost_per_conversion DESC;</code>
-    <p>Con este resultado en pantalla, dime en voz alta: ¿cuántas campañas caen en cada categoría, y qué le dirías al equipo de marketing en una sola frase?</p>
+    <p>Mismos 12 números, exactamente. Pregúntale al grupo: "¿cuál de las dos usarían para pedir presupuesto?" — la respuesta incómoda es el punto de la lección. Ningún número fue alterado; la mentira está toda en el eje.</p>
   </div>
 
   <div class="ibox">
-    <span class="box-label">Plantilla para tu insight de hoy</span>
-    <p>"Sobre <u>____</u> (tema), encontré que <u>____</u> (dato + comparación). Recomiendo <u>____</u> (acción concreta) porque <u>____</u> (razón basada en el número)."</p>
+    <span class="box-label">Otros dos trucos del mismo tipo</span>
+    <p><strong>Ventana de tiempo elegida a modo:</strong> si tienes 24 meses y solo muestras los 3 que crecieron, es 100% honesto en los números y 100% engañoso en la historia. <strong>Doble eje sin avisar:</strong> poner streams y revenue en dos ejes distintos sin dejarlo clarísimo hace que dos líneas sin relación parezcan ir juntas.</p>
   </div>
 </section>
 
 <section id="bloque-05">
-  <span class="block-tag">Bonus</span>
-  <h2>Usar un LLM para escribir queries — sin perder el control</h2>
-  <p>Un LLM (como el que armó esta clase) puede escribir SQL más rápido que tú. El riesgo no es que se equivoque en la sintaxis — normalmente no lo hace. El riesgo es que te entregue una query que <strong>corre bien en una tabla de 100 filas y se arrastra en una de 800,000</strong>, o que responda una pregunta ligeramente distinta a la que hiciste porque no conocía tu esquema real.</p>
+  <span class="block-tag fase">Bloque 5 · Caveatear sin restar autoridad</span>
+  <h2>Decir "esto tiene un límite" sin sonar inseguro</h2>
+  <p>Cuando tu dato tiene una limitación (muestra chica, datos simulados, mes incompleto), hay una forma de decirlo que suma credibilidad, y una que la resta.</p>
 
   <table class="compare-table">
-    <thead><tr><th>Prompt débil</th><th>Prompt con criterio</th><th>Por qué importa</th></tr></thead>
+    <thead><tr><th>Resta autoridad</th><th>Suma autoridad</th></tr></thead>
     <tbody>
-      <tr><td class="bad">"Dame los artistas con más streams"</td><td class="good">"Sobre la tabla streaming_weekly (track_id, dsp_id, week_id, streams, revenue — 800k+ filas) más artists/releases/tracks, dame los 10 artistas con más streams TOTALES sumando todas las semanas y DSPs. Nombra las tablas y columnas exactas que uses."</td><td>Sin el esquema, el LLM adivina nombres de columna — a veces adivina bien, a veces inventa una columna que no existe.</td></tr>
-      <tr><td class="bad">"Optimiza este query"</td><td class="good">"Este query hace SELECT * FROM streaming_weekly WHERE revenue > 500 sin filtro de fecha, sobre una tabla de 800k filas sin índice en revenue. ¿Cómo lo reescribo para que use un índice existente (track_id, dsp_id o week_id) o para que al menos no traiga columnas que no necesito?"</td><td>Le das el cuello de botella real (tabla grande + WHERE sin índice), no un "hazlo más rápido" genérico.</td></tr>
-      <tr><td class="bad">"Hazme un JOIN de todo"</td><td class="good">"Necesito UNA fila por artista con: total streams (SUM), tier por monthly_listeners_baseline (CASE con estos 3 umbrales), y gasto total en campañas (COALESCE a 0 si no tiene). ¿Qué JOINs necesito y en qué orden agrupo, para no duplicar streams por cada campaña?"</td><td>Sin especificar la granularidad final (una fila por artista), un LLM fácilmente te da un JOIN que multiplica filas y ensucia los SUM.</td></tr>
+      <tr><td class="bad">"Bueno, esto podría no ser exacto porque son pocos datos, y tal vez si tuviéramos más información sería diferente, pero creo que tal vez..."</td><td class="good">"Con datos de agosto únicamente — 59 campañas — la tendencia ya es clara: recomiendo mover presupuesto de TikTok a Spotify."</td></tr>
     </tbody>
   </table>
 
-  <div class="wbox">
-    <span class="box-label">La trampa de los JOINs que multiplican</span>
-    <p>Si le pides "júntame streams y gasto de campañas" con un solo query de dos JOINs y un SUM, es fácil terminar sumando streams una vez POR CADA fila de campaña que ese artista tenga — el número sale inflado y nadie se da cuenta hasta que alguien más audita el dashboard. Pídele siempre al LLM que te explique la granularidad de cada JOIN antes de confiar en el SUM final; o, más seguro, calcula cada métrica en su propia CTE y júntalas al final (como el patrón <code>WITH</code> de la Fase 2).</p>
+  <div class="ibox">
+    <span class="box-label">La diferencia</span>
+    <p>El caveat es un HECHO que declaras una vez, con seguridad — no una disculpa que repites cada dos frases. Dilo y avanza con tu recomendación. El ejemplo lo tienes en tu propio curso: el disclaimer de MusicWorks ("métricas 100% ilustrativas") aparece una vez, en el footer de cada clase — no se repite nervioso en cada párrafo.</p>
+  </div>
+</section>
+
+<section id="bloque-06">
+  <span class="block-tag fase">Bloque 6 · Capstone</span>
+  <h2>El pipeline completo, de una sola sentada</h2>
+  <p>Todo lo del curso, en cinco pasos. Usamos el resultado del Ejercicio 3 (Bloque 3) como ejemplo resuelto — luego tú lo repites con tu propia pregunta.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-body"><strong>Pregunta de negocio.</strong> "¿Qué artistas tienen campañas eficientes Y están generando streams reales — a cuáles le subimos presupuesto?"</div></div>
+    <div class="step"><div class="step-body"><strong>Query (JOIN + WHERE + ORDER BY).</strong> El del Ejercicio 3 — cruza costo por conversión con streams del mes.</div></div>
+    <div class="step"><div class="step-body"><strong>Gráfica con criterio (Bloque 3 y 4).</strong> Barra ordenada, UN color de resalte para la mejor campaña, eje Y desde 0, y el título como conclusión — no como descripción.</div></div>
+    <div class="step"><div class="step-body"><strong>3 frases de insight (Bloque 1, BLUF).</strong> Situación: gastamos en varias campañas parejo. Complicación: 5 de ellas cuestan menos de $1 por conversión Y sus artistas ya traen streams fuertes. Resolución: mover presupuesto de las campañas caras hacia esas 5.</div></div>
+    <div class="step"><div class="step-body"><strong>1 recomendación, para el dueño del sello (Bloque 2).</strong> "Aumentaría el presupuesto de [artista top del Ejercicio 3] un 20% el próximo mes — su campaña ya es la más barata por conversión y sus streams vienen creciendo."</div></div>
   </div>
 
   <div class="machine-callout">
-    <span class="box-label">🖥️ Ahora en tu máquina — EXPLAIN, la prueba de "corre como el rayo"</span>
-    <p>No le creas a nadie (ni a un LLM, ni a un compañero) que un query es rápido — pídele a MySQL que te lo diga con <code>EXPLAIN</code>. Corre estas dos:</p>
-    <code>EXPLAIN SELECT * FROM streaming_weekly WHERE track_id = 100;
-
-EXPLAIN SELECT * FROM streaming_weekly WHERE revenue > 500;</code>
-    <p>La primera dice <strong>"Index lookup"</strong> — MySQL va directo a las filas que necesita. La segunda dice <strong>"Table scan"</strong> sobre las 766,566 filas completas — porque <code>revenue</code> no tiene índice. Mismo tipo de pregunta, costo radicalmente distinto. Cuando un LLM te entregue una query para una tabla grande, pídele el <code>EXPLAIN</code> junto con el query, o corre tú el EXPLAIN antes de darle "ejecutar" en producción.</p>
-  </div>
-
-  <div class="ibox">
-    <span class="box-label">Checklist antes de correr un query que te dio un LLM</span>
-    <p>1) ¿Le diste el esquema real (nombres de tabla/columna), no nombres que "suenan lógicos"? 2) ¿Especificaste la granularidad esperada (una fila por qué)? 3) ¿Corriste EXPLAIN si la tabla es grande? 4) ¿Comparaste el conteo de filas del resultado contra lo que esperabas a ojo? 5) ¿Entiendes cada cláusula lo suficiente para explicarla tú, sin el LLM al lado?</p>
+    <span class="box-label">🖥️ Ahora tú, con tu base real</span>
+    <p>Elige tu propia pregunta de negocio (puede ser genre_name, territory, o release_type en vez de artista) y repite los 5 pasos completos, contra <code>musicworks</code> real. Preséntalo en voz alta como si el dueño del sello estuviera en la sala.</p>
   </div>
 </section>
 
 <div class="closing">
-  <h2>Cierre: el pipeline completo, hoy</h2>
+  <h2>Cierre de hoy</h2>
   <table class="summary-table">
-    <thead><tr><th>Fase</th><th>Qué hicimos</th><th>Herramienta SQL nueva</th></tr></thead>
+    <thead><tr><th>Etapa</th><th>Lo que aprendiste</th></tr></thead>
     <tbody>
-      <tr><td>Extracción</td><td>Definir la pregunta y la métrica antes de escribir SELECT</td><td>INNER/LEFT JOIN con criterio</td></tr>
-      <tr><td>Limpieza y Modelado</td><td>Categorizar, rellenar huecos, nombrar el modelo</td><td>CASE WHEN, COALESCE, CTE (WITH)</td></tr>
-      <tr><td>Dashboard</td><td>Dar forma al resultado según el tipo de gráfica</td><td>GROUP BY por fecha / por categoría</td></tr>
-      <tr><td>Insights</td><td>Convertir el número en una recomendación</td><td>CASE como etiqueta de decisión</td></tr>
-      <tr><td>Bonus</td><td>Usar un LLM sin perder control del esquema ni la velocidad</td><td>EXPLAIN</td></tr>
+      <tr><td>Extracción</td><td>SELECT, WHERE, ORDER BY, LIMIT, GROUP BY, HAVING</td></tr>
+      <tr><td>Relaciones</td><td>INNER, LEFT, RIGHT JOIN — y cuándo usar cada uno</td></tr>
+      <tr><td>Modelado</td><td>CASE WHEN, COALESCE, CTE (WITH)</td></tr>
+      <tr><td>Dashboard</td><td>Dar forma al resultado según el tipo de gráfica</td></tr>
+      <tr><td>Insights</td><td>Convertir un número en una recomendación (BLUF)</td></tr>
+      <tr><td>Storytelling</td><td>Audiencia, atributos preatentivos, anotación directa, comparación, y cómo no engañar sin querer</td></tr>
     </tbody>
   </table>
 
   <div class="ibox">
-    <span class="box-label">Fórmulas nuevas para ir adelantando (próximas clases)</span>
-    <p><strong>Subqueries</strong> (un SELECT dentro de otro) — ya las rozamos hoy con las CTEs, que son subqueries con nombre. <strong>Window functions</strong> — <code>ROW_NUMBER()</code>, <code>RANK()</code> y <code>LAG()/LEAD()</code> — responden "¿cuál es el top 1 POR CADA artista?" o "¿cuánto creció respecto al mes anterior?", cosas que GROUP BY solo no puede. <strong>Funciones de fecha</strong> — <code>DATE_FORMAT()</code>, <code>DATEDIFF()</code> — para convertir semanas en trimestres o calcular antigüedad. Si retomas tu curso de SQL, esos tres temas son el siguiente escalón natural después de JOIN.</p>
+    <span class="box-label">Próxima clase</span>
+    <p>Usar un LLM para generar gráficas y reportes completos directo desde tu query — sin depender de Power BI, Tableau o Looker. Ya tienes el criterio de hoy (qué gráfica, qué título, qué comparación); lo que falta es la mecánica de pedírselo bien a un LLM.</p>
   </div>
 </div>
 
@@ -620,30 +472,22 @@ EXPLAIN SELECT * FROM streaming_weekly WHERE revenue > 500;</code>
 'use strict';
 
 /* ============================================================
-   DATOS EMBEBIDOS — muestra real, extraída de vw_artist_monthly_summary
-   y vw_campaign_roi. Solo para el panel interactivo de esta clase.
+   DATOS EMBEBIDOS — misma muestra de la clase pasada (continuidad),
+   extraída de vw_artist_monthly_summary y vw_campaign_roi.
    ============================================================ */
 const ARTIST_MONTHLY = [{"label_name": "Costa Norte Discos", "month_date": "2024-09-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 61246}, {"label_name": "Costa Norte Discos", "month_date": "2024-10-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 68668}, {"label_name": "Costa Norte Discos", "month_date": "2024-11-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 69111}, {"label_name": "Costa Norte Discos", "month_date": "2024-12-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 57591}, {"label_name": "Costa Norte Discos", "month_date": "2025-01-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 56121}, {"label_name": "Costa Norte Discos", "month_date": "2025-02-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 55472}, {"label_name": "Costa Norte Discos", "month_date": "2025-03-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 102001}, {"label_name": "Costa Norte Discos", "month_date": "2025-04-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 89951}, {"label_name": "Costa Norte Discos", "month_date": "2025-05-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 86815}, {"label_name": "Costa Norte Discos", "month_date": "2025-06-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 77505}, {"label_name": "Costa Norte Discos", "month_date": "2025-07-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 83102}, {"label_name": "Costa Norte Discos", "month_date": "2025-08-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 115384}, {"label_name": "Costa Norte Discos", "month_date": "2025-09-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 113073}, {"label_name": "Costa Norte Discos", "month_date": "2025-10-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 98718}, {"label_name": "Costa Norte Discos", "month_date": "2025-11-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 95600}, {"label_name": "Costa Norte Discos", "month_date": "2025-12-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 95467}, {"label_name": "Costa Norte Discos", "month_date": "2026-01-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 93826}, {"label_name": "Costa Norte Discos", "month_date": "2026-02-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 101695}, {"label_name": "Costa Norte Discos", "month_date": "2026-03-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 98687}, {"label_name": "Costa Norte Discos", "month_date": "2026-04-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 87835}, {"label_name": "Costa Norte Discos", "month_date": "2026-05-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 76506}, {"label_name": "Costa Norte Discos", "month_date": "2026-06-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 79850}, {"label_name": "Costa Norte Discos", "month_date": "2026-07-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 86429}, {"label_name": "Costa Norte Discos", "month_date": "2026-08-01", "artist_name": "Metallica", "artist_type": "independent", "territory_streams": 79707}, {"label_name": "Aurelia Records", "month_date": "2025-03-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1897794}, {"label_name": "Aurelia Records", "month_date": "2025-04-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1894931}, {"label_name": "Aurelia Records", "month_date": "2025-05-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1790841}, {"label_name": "Aurelia Records", "month_date": "2025-06-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1763839}, {"label_name": "Aurelia Records", "month_date": "2025-07-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1714909}, {"label_name": "Aurelia Records", "month_date": "2025-08-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1761628}, {"label_name": "Aurelia Records", "month_date": "2025-09-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1611628}, {"label_name": "Aurelia Records", "month_date": "2025-10-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1528768}, {"label_name": "Aurelia Records", "month_date": "2025-11-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1490525}, {"label_name": "Aurelia Records", "month_date": "2025-12-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1396801}, {"label_name": "Aurelia Records", "month_date": "2026-01-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1424195}, {"label_name": "Aurelia Records", "month_date": "2026-02-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1421627}, {"label_name": "Aurelia Records", "month_date": "2026-03-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1360114}, {"label_name": "Aurelia Records", "month_date": "2026-04-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1256590}, {"label_name": "Aurelia Records", "month_date": "2026-05-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1213230}, {"label_name": "Aurelia Records", "month_date": "2026-06-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1183901}, {"label_name": "Aurelia Records", "month_date": "2026-07-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1081257}, {"label_name": "Aurelia Records", "month_date": "2026-08-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1098788}, {"label_name": "Aurelia Records", "month_date": "2024-09-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 2143898}, {"label_name": "Aurelia Records", "month_date": "2024-10-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 2091964}, {"label_name": "Aurelia Records", "month_date": "2024-11-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1715792}, {"label_name": "Aurelia Records", "month_date": "2024-12-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1796003}, {"label_name": "Aurelia Records", "month_date": "2025-01-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1790437}, {"label_name": "Aurelia Records", "month_date": "2025-02-01", "artist_name": "Iron Maiden", "artist_type": "independent", "territory_streams": 1822432}, {"label_name": "Vertigo Sound", "month_date": "2025-05-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1845649}, {"label_name": "Vertigo Sound", "month_date": "2025-06-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1737852}, {"label_name": "Vertigo Sound", "month_date": "2025-07-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1696466}, {"label_name": "Vertigo Sound", "month_date": "2025-08-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1724090}, {"label_name": "Vertigo Sound", "month_date": "2025-09-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1711413}, {"label_name": "Vertigo Sound", "month_date": "2025-10-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1613398}, {"label_name": "Vertigo Sound", "month_date": "2025-11-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1613175}, {"label_name": "Vertigo Sound", "month_date": "2025-12-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1503220}, {"label_name": "Vertigo Sound", "month_date": "2026-01-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1438343}, {"label_name": "Vertigo Sound", "month_date": "2026-02-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1428276}, {"label_name": "Vertigo Sound", "month_date": "2026-03-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1359528}, {"label_name": "Vertigo Sound", "month_date": "2026-04-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1309458}, {"label_name": "Vertigo Sound", "month_date": "2026-05-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1263069}, {"label_name": "Vertigo Sound", "month_date": "2026-06-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1224945}, {"label_name": "Vertigo Sound", "month_date": "2026-07-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1835974}, {"label_name": "Vertigo Sound", "month_date": "2026-08-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1752174}, {"label_name": "Vertigo Sound", "month_date": "2024-09-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 749560}, {"label_name": "Vertigo Sound", "month_date": "2024-10-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 778543}, {"label_name": "Vertigo Sound", "month_date": "2024-11-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 763619}, {"label_name": "Vertigo Sound", "month_date": "2024-12-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 705045}, {"label_name": "Vertigo Sound", "month_date": "2025-01-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 689927}, {"label_name": "Vertigo Sound", "month_date": "2025-02-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1836178}, {"label_name": "Vertigo Sound", "month_date": "2025-03-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1761748}, {"label_name": "Vertigo Sound", "month_date": "2025-04-01", "artist_name": "Slayer", "artist_type": "independent", "territory_streams": 1746463}, {"label_name": "Bedroom Tapes Records", "month_date": "2024-09-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 3211166}, {"label_name": "Bedroom Tapes Records", "month_date": "2024-10-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 3097392}, {"label_name": "Bedroom Tapes Records", "month_date": "2024-11-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2973870}, {"label_name": "Bedroom Tapes Records", "month_date": "2024-12-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 3074932}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-01-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2826473}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-02-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2821326}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-03-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2736266}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-04-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2668840}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-05-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2534383}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-06-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2398341}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-07-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2346330}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-08-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2260696}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-09-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2206507}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-10-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2071148}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-11-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 2311861}, {"label_name": "Bedroom Tapes Records", "month_date": "2025-12-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1990733}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-01-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1980845}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-02-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1949249}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-03-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1845960}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-04-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1801337}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-05-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1860170}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-06-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1701388}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-07-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1776811}, {"label_name": "Bedroom Tapes Records", "month_date": "2026-08-01", "artist_name": "Megadeth", "artist_type": "mainstream", "territory_streams": 1549756}, {"label_name": "Nocturno Discos", "month_date": "2025-01-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2027399}, {"label_name": "Nocturno Discos", "month_date": "2025-02-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1970447}, {"label_name": "Nocturno Discos", "month_date": "2025-03-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1930377}, {"label_name": "Nocturno Discos", "month_date": "2025-04-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1872173}, {"label_name": "Nocturno Discos", "month_date": "2025-05-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1896656}, {"label_name": "Nocturno Discos", "month_date": "2025-06-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1704824}, {"label_name": "Nocturno Discos", "month_date": "2025-07-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1619111}, {"label_name": "Nocturno Discos", "month_date": "2025-08-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2308837}, {"label_name": "Nocturno Discos", "month_date": "2025-09-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2300106}, {"label_name": "Nocturno Discos", "month_date": "2025-10-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2296693}, {"label_name": "Nocturno Discos", "month_date": "2025-11-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2199718}, {"label_name": "Nocturno Discos", "month_date": "2025-12-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2193771}, {"label_name": "Nocturno Discos", "month_date": "2026-01-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 2120360}, {"label_name": "Nocturno Discos", "month_date": "2026-02-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1916636}, {"label_name": "Nocturno Discos", "month_date": "2026-03-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1927710}, {"label_name": "Nocturno Discos", "month_date": "2026-04-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 4541900}, {"label_name": "Nocturno Discos", "month_date": "2026-05-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 4208134}, {"label_name": "Nocturno Discos", "month_date": "2026-06-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 4161180}, {"label_name": "Nocturno Discos", "month_date": "2026-07-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 4131065}, {"label_name": "Nocturno Discos", "month_date": "2026-08-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 4065936}, {"label_name": "Nocturno Discos", "month_date": "2024-09-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1233430}, {"label_name": "Nocturno Discos", "month_date": "2024-10-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1159766}, {"label_name": "Nocturno Discos", "month_date": "2024-11-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1110256}, {"label_name": "Nocturno Discos", "month_date": "2024-12-01", "artist_name": "Black Sabbath", "artist_type": "independent", "territory_streams": 1077849}, {"label_name": "Rooftop Sessions", "month_date": "2026-02-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2781607}, {"label_name": "Rooftop Sessions", "month_date": "2026-03-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2721943}, {"label_name": "Rooftop Sessions", "month_date": "2026-04-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2661159}, {"label_name": "Rooftop Sessions", "month_date": "2026-05-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2612587}, {"label_name": "Rooftop Sessions", "month_date": "2026-06-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2487507}, {"label_name": "Rooftop Sessions", "month_date": "2026-07-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2437805}, {"label_name": "Rooftop Sessions", "month_date": "2026-08-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2274108}, {"label_name": "Rooftop Sessions", "month_date": "2024-09-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1611897}, {"label_name": "Rooftop Sessions", "month_date": "2024-10-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1518121}, {"label_name": "Rooftop Sessions", "month_date": "2024-11-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1481450}, {"label_name": "Rooftop Sessions", "month_date": "2024-12-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1433748}, {"label_name": "Rooftop Sessions", "month_date": "2025-01-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1446852}, {"label_name": "Rooftop Sessions", "month_date": "2025-02-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1368392}, {"label_name": "Rooftop Sessions", "month_date": "2025-03-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1333578}, {"label_name": "Rooftop Sessions", "month_date": "2025-04-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1334168}, {"label_name": "Rooftop Sessions", "month_date": "2025-05-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1235786}, {"label_name": "Rooftop Sessions", "month_date": "2025-06-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1193682}, {"label_name": "Rooftop Sessions", "month_date": "2025-07-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1211594}, {"label_name": "Rooftop Sessions", "month_date": "2025-08-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1131173}, {"label_name": "Rooftop Sessions", "month_date": "2025-09-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1143253}, {"label_name": "Rooftop Sessions", "month_date": "2025-10-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1095984}, {"label_name": "Rooftop Sessions", "month_date": "2025-11-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1157572}, {"label_name": "Rooftop Sessions", "month_date": "2025-12-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 1196651}, {"label_name": "Rooftop Sessions", "month_date": "2026-01-01", "artist_name": "Judas Priest", "artist_type": "independent", "territory_streams": 2109926}, {"label_name": "Static Field Recordings", "month_date": "2024-09-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6378535}, {"label_name": "Static Field Recordings", "month_date": "2024-10-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6477024}, {"label_name": "Static Field Recordings", "month_date": "2024-11-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6250820}, {"label_name": "Static Field Recordings", "month_date": "2024-12-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6060289}, {"label_name": "Static Field Recordings", "month_date": "2025-01-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5883620}, {"label_name": "Static Field Recordings", "month_date": "2025-02-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5680578}, {"label_name": "Static Field Recordings", "month_date": "2025-03-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5471444}, {"label_name": "Static Field Recordings", "month_date": "2025-04-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5567307}, {"label_name": "Static Field Recordings", "month_date": "2025-05-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 7790850}, {"label_name": "Static Field Recordings", "month_date": "2025-06-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 7394132}, {"label_name": "Static Field Recordings", "month_date": "2025-07-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6833953}, {"label_name": "Static Field Recordings", "month_date": "2025-08-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 7008204}, {"label_name": "Static Field Recordings", "month_date": "2025-09-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 7019333}, {"label_name": "Static Field Recordings", "month_date": "2025-10-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6283089}, {"label_name": "Static Field Recordings", "month_date": "2025-11-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6429409}, {"label_name": "Static Field Recordings", "month_date": "2025-12-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6320964}, {"label_name": "Static Field Recordings", "month_date": "2026-01-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 6035131}, {"label_name": "Static Field Recordings", "month_date": "2026-02-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5825738}, {"label_name": "Static Field Recordings", "month_date": "2026-03-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5679801}, {"label_name": "Static Field Recordings", "month_date": "2026-04-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5359029}, {"label_name": "Static Field Recordings", "month_date": "2026-05-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5432602}, {"label_name": "Static Field Recordings", "month_date": "2026-06-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 5025017}, {"label_name": "Static Field Recordings", "month_date": "2026-07-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 4910238}, {"label_name": "Static Field Recordings", "month_date": "2026-08-01", "artist_name": "Pantera", "artist_type": "independent", "territory_streams": 4788900}, {"label_name": "Rio Sonoro Label", "month_date": "2025-06-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2777336}, {"label_name": "Rio Sonoro Label", "month_date": "2025-07-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2643063}, {"label_name": "Rio Sonoro Label", "month_date": "2025-08-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2695548}, {"label_name": "Rio Sonoro Label", "month_date": "2025-09-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2475636}, {"label_name": "Rio Sonoro Label", "month_date": "2025-10-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2569582}, {"label_name": "Rio Sonoro Label", "month_date": "2025-11-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2434375}, {"label_name": "Rio Sonoro Label", "month_date": "2025-12-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2352755}, {"label_name": "Rio Sonoro Label", "month_date": "2026-01-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2327197}, {"label_name": "Rio Sonoro Label", "month_date": "2026-02-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2171946}, {"label_name": "Rio Sonoro Label", "month_date": "2026-03-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 2132134}, {"label_name": "Rio Sonoro Label", "month_date": "2026-04-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1977033}, {"label_name": "Rio Sonoro Label", "month_date": "2026-05-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1980041}, {"label_name": "Rio Sonoro Label", "month_date": "2026-06-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1963937}, {"label_name": "Rio Sonoro Label", "month_date": "2026-07-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1817622}, {"label_name": "Rio Sonoro Label", "month_date": "2026-08-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1833279}, {"label_name": "Rio Sonoro Label", "month_date": "2024-09-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1616196}, {"label_name": "Rio Sonoro Label", "month_date": "2024-10-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1633086}, {"label_name": "Rio Sonoro Label", "month_date": "2024-11-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1656846}, {"label_name": "Rio Sonoro Label", "month_date": "2024-12-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1539436}, {"label_name": "Rio Sonoro Label", "month_date": "2025-01-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1494988}, {"label_name": "Rio Sonoro Label", "month_date": "2025-02-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1439970}, {"label_name": "Rio Sonoro Label", "month_date": "2025-03-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1435091}, {"label_name": "Rio Sonoro Label", "month_date": "2025-04-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1382076}, {"label_name": "Rio Sonoro Label", "month_date": "2025-05-01", "artist_name": "Slipknot", "artist_type": "mainstream", "territory_streams": 1383259}];
 const CAMPAIGN_ROI = [{"platform": "Google", "objective": "followers", "artist_name": "Iron Maiden", "total_spend": 2513.35, "total_clicks": 13674, "campaign_name": "Golden Roses — Follower Growth", "total_conversions": 1125, "total_impressions": 842033, "cost_per_conversion": 2.23}, {"platform": "YouTube", "objective": "pre-save", "artist_name": "Slayer", "total_spend": 2403.72, "total_clicks": 14497, "campaign_name": "Lonely Ghosts — Pre-Save Drive", "total_conversions": 1051, "total_impressions": 793081, "cost_per_conversion": 2.29}, {"platform": "Spotify Ad Studio", "objective": "awareness", "artist_name": "Slayer", "total_spend": 1055.53, "total_clicks": 15732, "campaign_name": "Iron Bones — Release Campaign", "total_conversions": 1251, "total_impressions": 731197, "cost_per_conversion": 0.84}, {"platform": "Meta", "objective": "streams", "artist_name": "Black Sabbath", "total_spend": 1827.35, "total_clicks": 15630, "campaign_name": "Paper Shadows — Awareness Push", "total_conversions": 1354, "total_impressions": 642860, "cost_per_conversion": 1.35}, {"platform": "TikTok", "objective": "followers", "artist_name": "Judas Priest", "total_spend": 1359.66, "total_clicks": 14114, "campaign_name": "Sunken Sirens — Streams Boost", "total_conversions": 1003, "total_impressions": 833521, "cost_per_conversion": 1.36}, {"platform": "YouTube", "objective": "awareness", "artist_name": "Slipknot", "total_spend": 10431.05, "total_clicks": 17374, "campaign_name": "Crimson Ravens — Pre-Save Drive", "total_conversions": 908, "total_impressions": 803023, "cost_per_conversion": 11.49}, {"platform": "Spotify Ad Studio", "objective": "streams", "artist_name": "System of a Down", "total_spend": 1970.40, "total_clicks": 15117, "campaign_name": "Broken Wolves — Release Campaign", "total_conversions": 746, "total_impressions": 780273, "cost_per_conversion": 2.64}, {"platform": "Meta", "objective": "followers", "artist_name": "Tool", "total_spend": 2002.32, "total_clicks": 14375, "campaign_name": "Solar Youth — Awareness Push", "total_conversions": 976, "total_impressions": 738557, "cost_per_conversion": 2.05}, {"platform": "Google", "objective": "awareness", "artist_name": "Opeth", "total_spend": 1007.85, "total_clicks": 10113, "campaign_name": "Sunken Wolves — Follower Growth", "total_conversions": 1105, "total_impressions": 386947, "cost_per_conversion": 0.91}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Lamb of God", "total_spend": 1265.34, "total_clicks": 11319, "campaign_name": "Velvet Saints — Release Campaign", "total_conversions": 1083, "total_impressions": 547803, "cost_per_conversion": 1.17}, {"platform": "TikTok", "objective": "awareness", "artist_name": "Trivium", "total_spend": 2552.55, "total_clicks": 14805, "campaign_name": "Solar Phantoms — Streams Boost", "total_conversions": 739, "total_impressions": 764224, "cost_per_conversion": 3.45}, {"platform": "YouTube", "objective": "followers", "artist_name": "Bring Me the Horizon", "total_spend": 1732.85, "total_clicks": 16823, "campaign_name": "Glass Rebels — Pre-Save Drive", "total_conversions": 1126, "total_impressions": 538193, "cost_per_conversion": 1.54}, {"platform": "YouTube", "objective": "followers", "artist_name": "Rammstein", "total_spend": 1731.90, "total_clicks": 7127, "campaign_name": "Iron Riot — Pre-Save Drive", "total_conversions": 1252, "total_impressions": 739594, "cost_per_conversion": 1.38}, {"platform": "Spotify Ad Studio", "objective": "pre-save", "artist_name": "Nightwish", "total_spend": 2560.80, "total_clicks": 14379, "campaign_name": "Sacred Horizon — Release Campaign", "total_conversions": 1000, "total_impressions": 613759, "cost_per_conversion": 2.56}, {"platform": "Meta", "objective": "awareness", "artist_name": "Within Temptation", "total_spend": 9706.27, "total_clicks": 11044, "campaign_name": "Midnight Foxes — Awareness Push", "total_conversions": 1125, "total_impressions": 824555, "cost_per_conversion": 8.63}, {"platform": "Google", "objective": "followers", "artist_name": "Ghost", "total_spend": 2390.24, "total_clicks": 18701, "campaign_name": "Wild Horizon — Follower Growth", "total_conversions": 1468, "total_impressions": 976757, "cost_per_conversion": 1.63}, {"platform": "Spotify Ad Studio", "objective": "awareness", "artist_name": "Meshuggah", "total_spend": 681.84, "total_clicks": 4336, "campaign_name": "Iron Bones — Release Campaign", "total_conversions": 296, "total_impressions": 157974, "cost_per_conversion": 2.30}, {"platform": "YouTube", "objective": "awareness", "artist_name": "Exodus", "total_spend": 1190.42, "total_clicks": 14131, "campaign_name": "Golden Shadows — Pre-Save Drive", "total_conversions": 1141, "total_impressions": 873422, "cost_per_conversion": 1.04}, {"platform": "Spotify Ad Studio", "objective": "streams", "artist_name": "Cannibal Corpse", "total_spend": 2446.14, "total_clicks": 13523, "campaign_name": "Broken Wolves — Release Campaign", "total_conversions": 1099, "total_impressions": 589756, "cost_per_conversion": 2.23}, {"platform": "Meta", "objective": "followers", "artist_name": "Cannibal Corpse", "total_spend": 2140.39, "total_clicks": 18130, "campaign_name": "Hollow Echoes — Awareness Push", "total_conversions": 1009, "total_impressions": 839332, "cost_per_conversion": 2.12}, {"platform": "Google", "objective": "awareness", "artist_name": "Emperor", "total_spend": 2290.26, "total_clicks": 14184, "campaign_name": "Sunken Wolves — Follower Growth", "total_conversions": 958, "total_impressions": 613839, "cost_per_conversion": 2.39}, {"platform": "Google", "objective": "awareness", "artist_name": "Mayhem", "total_spend": 5134.86, "total_clicks": 14230, "campaign_name": "Glass Hearts — Follower Growth", "total_conversions": 915, "total_impressions": 739953, "cost_per_conversion": 5.61}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Immortal", "total_spend": 1227.87, "total_clicks": 17644, "campaign_name": "Crimson Vultures — Release Campaign", "total_conversions": 682, "total_impressions": 628599, "cost_per_conversion": 1.80}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Amon Amarth", "total_spend": 1761.27, "total_clicks": 11850, "campaign_name": "Velvet Saints — Release Campaign", "total_conversions": 1325, "total_impressions": 785203, "cost_per_conversion": 1.33}, {"platform": "TikTok", "objective": "awareness", "artist_name": "Arch Enemy", "total_spend": 2193.94, "total_clicks": 20063, "campaign_name": "Solar Phantoms — Streams Boost", "total_conversions": 1310, "total_impressions": 743980, "cost_per_conversion": 1.67}, {"platform": "Google", "objective": "followers", "artist_name": "Helloween", "total_spend": 2346.96, "total_clicks": 13719, "campaign_name": "Golden Roses — Follower Growth", "total_conversions": 1133, "total_impressions": 603741, "cost_per_conversion": 2.07}, {"platform": "Meta", "objective": "streams", "artist_name": "Korn", "total_spend": 2719.85, "total_clicks": 16462, "campaign_name": "Paper Shadows — Awareness Push", "total_conversions": 1215, "total_impressions": 1033022, "cost_per_conversion": 2.24}, {"platform": "Google", "objective": "pre-save", "artist_name": "Disturbed", "total_spend": 2456.28, "total_clicks": 10897, "campaign_name": "Electric Echoes — Follower Growth", "total_conversions": 855, "total_impressions": 801780, "cost_per_conversion": 2.87}, {"platform": "Spotify Ad Studio", "objective": "streams", "artist_name": "Volbeat", "total_spend": 2159.58, "total_clicks": 11397, "campaign_name": "Broken Wolves — Release Campaign", "total_conversions": 1005, "total_impressions": 449483, "cost_per_conversion": 2.15}, {"platform": "Google", "objective": "awareness", "artist_name": "Motorhead", "total_spend": 1856.82, "total_clicks": 18204, "campaign_name": "Sunken Wolves — Follower Growth", "total_conversions": 1306, "total_impressions": 965538, "cost_per_conversion": 1.42}, {"platform": "Google", "objective": "awareness", "artist_name": "Venom", "total_spend": 11947.62, "total_clicks": 19063, "campaign_name": "Glass Hearts — Follower Growth", "total_conversions": 845, "total_impressions": 996434, "cost_per_conversion": 14.14}, {"platform": "TikTok", "objective": "awareness", "artist_name": "Type O Negative", "total_spend": 1171.87, "total_clicks": 14303, "campaign_name": "Solar Phantoms — Streams Boost", "total_conversions": 1375, "total_impressions": 719440, "cost_per_conversion": 0.85}, {"platform": "Google", "objective": "streams", "artist_name": "Parkway Drive", "total_spend": 975.18, "total_clicks": 6973, "campaign_name": "Static Tides — Follower Growth", "total_conversions": 988, "total_impressions": 720917, "cost_per_conversion": 0.99}, {"platform": "YouTube", "objective": "followers", "artist_name": "Parkway Drive", "total_spend": 1101.31, "total_clicks": 17924, "campaign_name": "Glass Rebels — Pre-Save Drive", "total_conversions": 630, "total_impressions": 660000, "cost_per_conversion": 1.75}, {"platform": "Spotify Ad Studio", "objective": "pre-save", "artist_name": "Bullet for My Valentine", "total_spend": 2402.10, "total_clicks": 15721, "campaign_name": "Sacred Horizon — Release Campaign", "total_conversions": 1119, "total_impressions": 570914, "cost_per_conversion": 2.15}, {"platform": "TikTok", "objective": "streams", "artist_name": "All That Remains", "total_spend": 1700.25, "total_clicks": 8236, "campaign_name": "Neon Bones — Streams Boost", "total_conversions": 385, "total_impressions": 630518, "cost_per_conversion": 4.42}, {"platform": "Google", "objective": "followers", "artist_name": "All That Remains", "total_spend": 2016.84, "total_clicks": 17831, "campaign_name": "Wild Horizon — Follower Growth", "total_conversions": 943, "total_impressions": 830289, "cost_per_conversion": 2.14}, {"platform": "Spotify Ad Studio", "objective": "awareness", "artist_name": "Static-X", "total_spend": 1170.06, "total_clicks": 418, "campaign_name": "Hollow Vibes — Release Campaign", "total_conversions": 106, "total_impressions": 76055, "cost_per_conversion": 11.04}, {"platform": "TikTok", "objective": "followers", "artist_name": "Mudvayne", "total_spend": 865.02, "total_clicks": 11954, "campaign_name": "Midnight Ghosts — Streams Boost", "total_conversions": 1082, "total_impressions": 656109, "cost_per_conversion": 0.80}, {"platform": "TikTok", "objective": "followers", "artist_name": "Godsmack", "total_spend": 991.14, "total_clicks": 15613, "campaign_name": "Sunken Sirens — Streams Boost", "total_conversions": 809, "total_impressions": 564959, "cost_per_conversion": 1.23}, {"platform": "Google", "objective": "pre-save", "artist_name": "Alice in Chains", "total_spend": 1027.98, "total_clicks": 13968, "campaign_name": "Electric Echoes — Follower Growth", "total_conversions": 662, "total_impressions": 710707, "cost_per_conversion": 1.55}, {"platform": "TikTok", "objective": "pre-save", "artist_name": "Overkill", "total_spend": 1103.10, "total_clicks": 7300, "campaign_name": "Amber Vultures — Streams Boost", "total_conversions": 763, "total_impressions": 850504, "cost_per_conversion": 1.45}, {"platform": "Google", "objective": "awareness", "artist_name": "Kreator", "total_spend": 7594.92, "total_clicks": 15054, "campaign_name": "Glass Hearts — Follower Growth", "total_conversions": 1069, "total_impressions": 650943, "cost_per_conversion": 7.10}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Destruction", "total_spend": 1829.03, "total_clicks": 15787, "campaign_name": "Crimson Vultures — Release Campaign", "total_conversions": 913, "total_impressions": 803048, "cost_per_conversion": 2.00}, {"platform": "TikTok", "objective": "awareness", "artist_name": "Marduk", "total_spend": 13394.82, "total_clicks": 13562, "campaign_name": "Wild Waves — Streams Boost", "total_conversions": 913, "total_impressions": 570094, "cost_per_conversion": 14.67}, {"platform": "Spotify Ad Studio", "objective": "pre-save", "artist_name": "Paradise Lost", "total_spend": 1400.10, "total_clicks": 14929, "campaign_name": "Sacred Horizon — Release Campaign", "total_conversions": 574, "total_impressions": 680440, "cost_per_conversion": 2.44}, {"platform": "Meta", "objective": "awareness", "artist_name": "Paradise Lost", "total_spend": 1300.04, "total_clicks": 13571, "campaign_name": "Velvet Tides — Awareness Push", "total_conversions": 497, "total_impressions": 479835, "cost_per_conversion": 2.62}, {"platform": "TikTok", "objective": "streams", "artist_name": "Katatonia", "total_spend": 2199.54, "total_clicks": 12283, "campaign_name": "Neon Bones — Streams Boost", "total_conversions": 802, "total_impressions": 676717, "cost_per_conversion": 2.74}, {"platform": "Google", "objective": "followers", "artist_name": "Katatonia", "total_spend": 2297.89, "total_clicks": 8753, "campaign_name": "Wild Horizon — Follower Growth", "total_conversions": 867, "total_impressions": 944576, "cost_per_conversion": 2.65}, {"platform": "Google", "objective": "followers", "artist_name": "Anathema", "total_spend": 2556.05, "total_clicks": 17904, "campaign_name": "Golden Roses — Follower Growth", "total_conversions": 867, "total_impressions": 610755, "cost_per_conversion": 2.95}, {"platform": "YouTube", "objective": "pre-save", "artist_name": "Nile", "total_spend": 1360.68, "total_clicks": 17941, "campaign_name": "Lonely Ghosts — Pre-Save Drive", "total_conversions": 994, "total_impressions": 462560, "cost_per_conversion": 1.37}, {"platform": "Spotify Ad Studio", "objective": "awareness", "artist_name": "Nile", "total_spend": 1292.32, "total_clicks": 11451, "campaign_name": "Iron Bones — Release Campaign", "total_conversions": 1286, "total_impressions": 889182, "cost_per_conversion": 1.00}, {"platform": "Meta", "objective": "streams", "artist_name": "Obituary", "total_spend": 889.18, "total_clicks": 4196, "campaign_name": "Paper Shadows — Awareness Push", "total_conversions": 428, "total_impressions": 240884, "cost_per_conversion": 2.08}, {"platform": "Spotify Ad Studio", "objective": "streams", "artist_name": "Job for a Cowboy", "total_spend": 1450.50, "total_clicks": 13719, "campaign_name": "Broken Wolves — Release Campaign", "total_conversions": 813, "total_impressions": 602050, "cost_per_conversion": 1.78}, {"platform": "Google", "objective": "awareness", "artist_name": "Bad Omens", "total_spend": 316.68, "total_clicks": 4722, "campaign_name": "Sunken Wolves — Follower Growth", "total_conversions": 299, "total_impressions": 186204, "cost_per_conversion": 1.06}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Ice Nine Kills", "total_spend": 2107.28, "total_clicks": 13706, "campaign_name": "Crimson Vultures — Release Campaign", "total_conversions": 1345, "total_impressions": 746373, "cost_per_conversion": 1.57}, {"platform": "Spotify Ad Studio", "objective": "followers", "artist_name": "Spiritbox", "total_spend": 2592.72, "total_clicks": 8893, "campaign_name": "Velvet Saints — Release Campaign", "total_conversions": 1261, "total_impressions": 510381, "cost_per_conversion": 2.06}, {"platform": "Meta", "objective": "pre-save", "artist_name": "Sleep Token", "total_spend": 1131.90, "total_clicks": 15976, "campaign_name": "Silver Rebels — Awareness Push", "total_conversions": 896, "total_impressions": 634618, "cost_per_conversion": 1.26}, {"platform": "Spotify Ad Studio", "objective": "pre-save", "artist_name": "Delain", "total_spend": 1811.70, "total_clicks": 10926, "campaign_name": "Sacred Horizon — Release Campaign", "total_conversions": 515, "total_impressions": 632063, "cost_per_conversion": 3.52}];
 
-const ARTISTAS_DEMO = [{"artist_id":1,"nombre":"Metallica"},{"artist_id":2,"nombre":"Slayer"},{"artist_id":3,"nombre":"Ghost"}];
-const PREMIOS_DEMO = [{"artist_id":1,"premio":"Grammy"},{"artist_id":2,"premio":"Grammy"}];
-
-const TABLES = { artist_monthly: ARTIST_MONTHLY, campaign_roi: CAMPAIGN_ROI, artistas_demo: ARTISTAS_DEMO, premios_demo: PREMIOS_DEMO };
+const TABLES = { artist_monthly: ARTIST_MONTHLY, campaign_roi: CAMPAIGN_ROI };
 const SCHEMA = {
   artist_monthly: ['artist_name','artist_type','label_name','month_date','territory_streams'],
-  campaign_roi: ['campaign_name','artist_name','platform','objective','total_spend','total_impressions','total_clicks','total_conversions','cost_per_conversion'],
-  artistas_demo: ['artist_id','nombre'],
-  premios_demo: ['artist_id','premio']
+  campaign_roi: ['campaign_name','artist_name','platform','objective','total_spend','total_impressions','total_clicks','total_conversions','cost_per_conversion']
 };
 
 /* ============================================================
-   MOTOR SQL — parser y ejecutor propios (sin librerías externas)
-   Cubre el subconjunto de hoy: SELECT / WHERE / AND-OR / LIKE /
-   GROUP BY / HAVING / ORDER BY / LIMIT. Sin JOIN ni subqueries
-   en el panel — esas se practican en vivo contra MySQL real.
+   MOTOR SQL — mismo motor de la clase pasada (SELECT/WHERE/AND-OR/
+   LIKE/GROUP BY/HAVING/ORDER BY/LIMIT + INNER/LEFT/RIGHT JOIN).
    ============================================================ */
-
 function SqlError(message){ this.message = message; this.name = 'SqlError'; }
 SqlError.prototype = Object.create(Error.prototype);
 
@@ -1249,17 +1093,79 @@ function mountExercise(id, opts){
   }
 }
 
+
+
+/* ============================================================
+   UI — monta cada ejercicio en su contenedor
+   ============================================================ */
+function renderTable(el, rows){
+  if (!rows.length){
+    el.innerHTML = '<p class="ex-empty">0 filas — la consulta corrió bien, pero no hay resultados con esos criterios.</p>';
+    return;
+  }
+  const cols = Object.keys(rows[0]);
+  const shown = rows.slice(0, 15);
+  let html = '<div class="ex-table-wrap"><table class="ex-table"><thead><tr>';
+  cols.forEach(function(c){ html += '<th>' + c + '</th>'; });
+  html += '</tr></thead><tbody>';
+  shown.forEach(function(r){
+    html += '<tr>';
+    cols.forEach(function(c){
+      let v = r[c];
+      if (typeof v === 'boolean') v = v ? '1' : '0';
+      html += '<td>' + (v === null || v === undefined ? '<span class="ex-null">NULL</span>' : String(v)) + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<p class="ex-rowcount">' + rows.length + ' fila' + (rows.length === 1 ? '' : 's') + (rows.length > 15 ? ' (mostrando las primeras 15)' : '') + '</p>';
+  el.innerHTML = html;
+}
+
+function mountExercise(id, opts){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const input = el.querySelector('.ex-input');
+  const output = el.querySelector('.ex-output');
+  const feedback = el.querySelector('.ex-feedback');
+  const runBtn = el.querySelector('.ex-run');
+  const solBtn = el.querySelector('.ex-sol-toggle');
+  const solBox = el.querySelector('.ex-solution');
+  runBtn.addEventListener('click', function(){
+    output.innerHTML = '';
+    feedback.className = 'ex-feedback';
+    feedback.textContent = '';
+    let parsed;
+    try {
+      parsed = runSql(input.value);
+    } catch (e) {
+      feedback.className = 'ex-feedback ex-err';
+      feedback.textContent = e && e.message ? e.message : ('Error inesperado: ' + e);
+      return;
+    }
+    renderTable(output, parsed.rows);
+    if (opts.check){
+      const verdict = opts.check(parsed.rows, parsed.ast);
+      feedback.className = 'ex-feedback ' + (verdict.ok ? 'ex-ok' : 'ex-warn');
+      feedback.textContent = verdict.message;
+    } else {
+      feedback.className = 'ex-feedback ex-ok';
+      feedback.textContent = 'La consulta corrió sin errores.';
+    }
+  });
+  if (solBtn && solBox){
+    solBtn.addEventListener('click', function(){
+      const hidden = solBox.style.display === 'none' || !solBox.style.display;
+      solBox.style.display = hidden ? 'block' : 'none';
+      solBtn.textContent = hidden ? 'Ocultar solución' : 'Ver solución';
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function(){
-  mountExercise('exj1', { check: checkByReference('SELECT a.nombre, p.premio FROM artistas_demo a JOIN premios_demo p ON p.artist_id = a.artist_id', false) });
-  mountExercise('exj2', { check: checkByReference('SELECT a.nombre, p.premio FROM artistas_demo a LEFT JOIN premios_demo p ON p.artist_id = a.artist_id', false) });
-  mountExercise('exj3', { check: checkByReference('SELECT a.nombre FROM artistas_demo a LEFT JOIN premios_demo p ON p.artist_id = a.artist_id WHERE p.premio IS NULL', false) });
-  mountExercise('exj4', { check: checkByReference('SELECT a.nombre, p.premio FROM premios_demo p RIGHT JOIN artistas_demo a ON p.artist_id = a.artist_id', false) });
-  mountExercise('ex1', { check: checkByReference('SELECT artist_name, SUM(territory_streams) AS total_streams FROM artist_monthly GROUP BY artist_name ORDER BY total_streams DESC LIMIT 5', true) });
-  mountExercise('ex2', { check: checkByReference("SELECT month_date, territory_streams FROM artist_monthly WHERE artist_name = 'Metallica' ORDER BY month_date", true) });
-  mountExercise('ex3', { check: checkByReference('SELECT month_date, SUM(territory_streams) AS total FROM artist_monthly GROUP BY month_date ORDER BY month_date', true) });
-  mountExercise('ex4', { check: checkByReference('SELECT platform, SUM(total_conversions) AS conversions FROM campaign_roi GROUP BY platform ORDER BY conversions DESC', true) });
-  mountExercise('ex5', { check: checkByReference('SELECT campaign_name, platform, cost_per_conversion FROM campaign_roi ORDER BY cost_per_conversion DESC LIMIT 5', true) });
-  mountExercise('ex6', { check: checkByReference('SELECT campaign_name, platform, cost_per_conversion FROM campaign_roi WHERE total_conversions > 50 ORDER BY cost_per_conversion ASC LIMIT 5', true) });
+  mountExercise('exs1', { check: checkByReference('SELECT artist_name, SUM(territory_streams) AS total_streams FROM artist_monthly GROUP BY artist_name ORDER BY total_streams DESC LIMIT 5', true) });
+  mountExercise('exs2', { check: checkByReference('SELECT platform, SUM(total_conversions) AS conversions FROM campaign_roi GROUP BY platform ORDER BY conversions DESC', true) });
+  mountExercise('exs3', { check: checkByReference("SELECT cm.artist_name, cm.platform, cm.cost_per_conversion, am.territory_streams FROM campaign_roi cm JOIN artist_monthly am ON am.artist_name = cm.artist_name WHERE am.month_date = '2026-08-01' ORDER BY cm.cost_per_conversion ASC LIMIT 5", true) });
 });
 </script>
 <script src="shared-chrome.js"></script>

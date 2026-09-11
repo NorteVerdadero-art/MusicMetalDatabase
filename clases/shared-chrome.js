@@ -14,7 +14,7 @@
     { href: 'clase7_dashboards_sheets_1.html', label: 'Dashboards en Sheets' },
     { href: 'clase_pipeline_sql_mysql.html', label: 'El Pipeline de Datos: MySQL' },
     { href: 'clase_modelado_dashboard_insights.html', label: 'Modelado, Dashboard e Insights' },
-    { href: '', label: 'Storytelling y Comunicación', next: true }
+    { href: 'clase_storytelling_comunicacion.html', label: 'Storytelling y Comunicación' }
   ];
   var REPASO = [
     { href: 'repaso_clases1-3_1.html', label: 'Repaso Clases 1–3' }
