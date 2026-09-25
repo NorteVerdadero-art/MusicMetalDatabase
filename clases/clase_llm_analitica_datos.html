@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>LLMs para Analítica de Datos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-chrome.css?v=4">
+<style>
+
+:root{
+  --ink:#1a1a2e; --teal:#00897B; --gold:#D4A017; --red:#C62828;
+  --gray:#6B7280; --pu:#6B21A8; --sh:#0F9D58; --bl:#1565C0;
+  --bg:#ffffff; --bg-soft:#f7f7fb; --border:#e5e5ec;
+}
+@media (prefers-color-scheme: dark){ :root{ color-scheme:light; } }
+*{box-sizing:border-box;}
+html{color-scheme:light;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'DM Sans',system-ui,sans-serif; line-height:1.6; font-size:16px;
+}
+h1,h2,h3,h4{font-family:'Playfair Display',serif; color:var(--ink); margin:0 0 .5em;}
+code, .mono, .ex-input, .ex-table, .compare-table td.sql-col{font-family:'DM Mono',monospace;}
+p{margin:0 0 1em;}
+a{color:var(--teal);}
+
+.hero{padding:52px 40px 36px; border-bottom:1px solid var(--border);}
+.hero .kicker{color:var(--teal); font-weight:600; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; margin-bottom:10px;}
+.hero h1{font-size:2.3rem; max-width:820px;}
+.hero .sub{font-size:1.1rem; color:var(--gray); max-width:760px;}
+
+section{padding:36px 40px; border-bottom:1px solid var(--border);}
+.block-tag{
+  display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:#fff; background:var(--teal); padding:4px 10px; border-radius:999px; margin-bottom:12px;
+}
+.block-tag.fase{background:var(--pu);}
+section h2{font-size:1.5rem;}
+
+.hook, .ibox, .wbox, .read-box{
+  border-radius:10px; padding:16px 18px; margin:16px 0; border-left:4px solid;
+}
+.hook{background:#f4f4f8; border-color:var(--gray);}
+.ibox{background:#fdf6e3; border-color:var(--gold);}
+.wbox{background:#fdecea; border-color:var(--red);}
+.read-box{background:#eaf2fb; border-color:var(--bl);}
+.hook p, .ibox p, .wbox p, .read-box p{margin:0 0 .6em;}
+.hook p:last-child, .ibox p:last-child, .wbox p:last-child, .read-box p:last-child{margin-bottom:0;}
+.box-label{font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; display:block;}
+.ibox .box-label{color:#8a6a10;}
+.wbox .box-label{color:var(--red);}
+.read-box .box-label{color:var(--bl);}
+.read-box-item{display:grid; grid-template-columns:170px 1fr; gap:4px 12px; margin:6px 0;}
+.read-box-val{font-weight:700; color:var(--bl);}
+.read-box-txt{color:var(--ink);}
+
+.compare-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.92rem;}
+.compare-table th, .compare-table td{border:1px solid var(--border); padding:9px 12px; text-align:left; vertical-align:top;}
+.compare-table th{background:var(--bg-soft); font-weight:700;}
+.compare-table td.sql-col{color:var(--bl);}
+.compare-table td.bad{color:var(--red);}
+.compare-table td.good{color:var(--sh);}
+
+.write-box{border:1px solid var(--border); border-radius:12px; margin:18px 0; overflow:hidden;}
+.write-head{background:var(--bg-soft); padding:10px 16px; border-bottom:1px solid var(--border); font-weight:600; font-size:.92rem;}
+.write-body{padding:16px;}
+.write-input{
+  width:100%; min-height:54px; border:1px dashed var(--border); border-radius:8px; padding:10px 12px;
+  font-size:.92rem; resize:vertical; background:#fbfbfd; color:var(--ink); font-family:'DM Sans',sans-serif;
+}
+.write-input + .write-input{margin-top:10px;}
+.write-label{font-size:.78rem; color:var(--gray); margin:0 0 4px; text-transform:uppercase; letter-spacing:.03em;}
+
+.machine-callout{
+  border:1px solid var(--teal); border-radius:10px; padding:16px 18px; margin:18px 0; background:#f2faf9;
+}
+.machine-callout .box-label{color:var(--teal); display:flex; align-items:center; gap:6px;}
+.machine-callout code{display:block; background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin:8px 0; font-size:.86rem; color:var(--bl); overflow-x:auto; white-space:pre;}
+.machine-callout ol{margin:0; padding-left:1.2em;}
+.machine-callout li{margin-bottom:6px;}
+
+.steps{counter-reset:step; margin:16px 0;}
+.step{display:flex; gap:12px; margin-bottom:14px;}
+.step::before{
+  counter-increment:step; content:counter(step); flex-shrink:0; width:26px; height:26px; border-radius:50%;
+  background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700;
+}
+.step-body{padding-top:2px;}
+
+.summary-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
+.summary-table th, .summary-table td{border:1px solid var(--border); padding:10px 12px; text-align:left;}
+.summary-table th{background:var(--bg-soft);}
+
+.closing{padding:36px 40px; background:var(--bg-soft);}
+footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px solid var(--border);}
+
+.demo-pair{display:flex; gap:20px; flex-wrap:wrap; margin:16px 0;}
+.demo-card{flex:1; min-width:240px; border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--bg-soft); text-align:center;}
+.demo-card .demo-label{font-size:.76rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin-bottom:10px;}
+.digit-grid{font-family:'DM Mono',monospace; font-size:1.3rem; letter-spacing:.35em; line-height:2; color:var(--ink);}
+.digit-hot{color:var(--red); font-weight:700;}
+.svg-card svg{width:100%; height:auto; display:block;}
+.svg-card .svg-title{font-size:.82rem; font-weight:600; margin:10px 0 2px;}
+
+/* Modo oscuro — estas cajas usan fondo hex fijo, no var(), así que
+   shared-chrome.css no las alcanza. Se sobreescriben aquí. */
+html[data-theme="dark"] .hook{background:#1b1b26;}
+html[data-theme="dark"] .ibox{background:#2b2410;}
+html[data-theme="dark"] .ibox .box-label{color:#E8B93D;}
+html[data-theme="dark"] .wbox{background:#2e1518;}
+html[data-theme="dark"] .read-box{background:#14232f;}
+html[data-theme="dark"] .machine-callout{background:#0d2b28;}
+html[data-theme="dark"] .machine-callout code{background:#14141c;}
+html[data-theme="dark"] .write-input{background:#1b1b26;}
+html[data-theme="dark"] .svg-card line{stroke:#2e2e3c;}
+html[data-theme="dark"] .svg-card text{fill:#9CA3AF;}
+html[data-theme="dark"] .svg-card polyline{stroke:#EDEDF3;}
+
+.cube-widget{border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; background:var(--bg-soft);}
+.cube-widget + .cube-widget{margin-top:28px;}
+.cube-widget-title{font-family:'Playfair Display',serif; font-size:1.15rem; margin:0 0 4px;}
+.cube-widget-sub{font-size:.84rem; color:var(--gray); margin:0 0 14px;}
+
+.cube-breadcrumb{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.cube-chip{
+  font-family:'DM Sans',sans-serif; font-size:.78rem; border:1px solid var(--border); background:var(--bg);
+  color:var(--ink); padding:5px 10px; border-radius:999px; cursor:pointer;
+}
+.cube-chip-reset{background:var(--ink); color:#fff; border-color:var(--ink); font-weight:600;}
+
+.cube-measure-toggle{display:flex; gap:8px; margin-bottom:14px;}
+.cube-mbtn{
+  font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:600; border:1px solid var(--border);
+  background:var(--bg); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer;
+}
+.cube-mbtn-active{background:var(--teal); color:#fff; border-color:var(--teal);}
+
+.cube-kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:18px;}
+.cube-kpi-item{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px;}
+.cube-kpi-label{font-size:.72rem; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin-bottom:4px;}
+.cube-kpi-val{font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--ink);}
+
+.cube-bar{cursor:pointer;}
+.cube-bar rect{transition:opacity .1s ease;}
+.cube-bar:hover rect{opacity:.8;}
+
+.cube-cards{display:flex; gap:10px; flex-wrap:wrap;}
+.cube-toggle-card{
+  flex:1; min-width:130px; text-align:left; font-family:'DM Sans',sans-serif; cursor:pointer;
+  background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px;
+}
+.cube-toggle-card:hover{border-color:var(--teal);}
+.cube-toggle-active{background:var(--pu); border-color:var(--pu);}
+.cube-toggle-active .cube-kpi-label, .cube-toggle-active .cube-kpi-val{color:#fff;}
+
+/* Grid 2x2 compacto — cada tile con scroll interno, así el dashboard
+   no empuja el resto de la página hacia abajo. */
+.cube-dashboard-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.cube-tile{
+  background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+}
+.cube-tile-title{
+  font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--gray);
+  margin-bottom:6px;
+}
+.cube-tile svg{width:100%; height:auto; max-height:150px; display:block;}
+.cube-tile .cube-kpis{grid-template-columns:1fr 1fr; gap:6px; margin-bottom:0;}
+.cube-tile .cube-kpi-item{padding:7px 9px;}
+.cube-tile .cube-kpi-label{font-size:.65rem;}
+.cube-tile .cube-kpi-val{font-size:1rem;}
+.cube-tile .cube-cards{gap:6px;}
+.cube-tile .cube-toggle-card{padding:7px 9px; min-width:90px;}
+.cube-tile-span2{grid-column:span 2;}
+
+.q-list{margin:14px 0;}
+.q-card{border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; background:var(--bg);}
+.q-header{
+  width:100%; display:flex; align-items:center; gap:12px; padding:14px 16px; background:none; border:none;
+  text-align:left; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.92rem; color:var(--ink);
+}
+.q-num{font-family:'Playfair Display',serif; color:var(--pu); font-size:1rem; flex-shrink:0; width:22px;}
+.q-text{flex:1;}
+.q-caret{color:var(--gray); transition:transform .15s ease; flex-shrink:0;}
+.q-card-open .q-caret{transform:rotate(180deg);}
+.q-card-open .q-header{background:var(--bg-soft);}
+.q-panel{padding:16px; border-top:1px solid var(--border); background:var(--bg-soft);}
+.qa-headline{font-size:.98rem; font-weight:600; color:var(--ink); margin:0 0 14px;}
+.cube-chart-wrap{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px;}
+.cube-chart-wrap svg{width:100%; height:auto; max-height:160px; display:block;}
+.qa-pie-row{display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
+.qa-pie-wrap{width:140px; flex-shrink:0; padding:8px;}
+.qa-pie-wrap svg{width:100%; height:auto; max-height:140px; display:block;}
+.pie-legend{flex:1; min-width:160px; font-size:.8rem;}
+.pie-legend-item{display:flex; align-items:center; gap:8px; margin-bottom:6px; color:var(--ink);}
+.pie-swatch{width:11px; height:11px; border-radius:3px; flex-shrink:0; display:inline-block;}
+.qa-gauge-wrap{max-width:280px; padding:8px 8px 0;}
+.qa-gauge-wrap svg{width:100%; height:auto; max-height:120px; display:block;}
+
+.page-tabs{
+  position:sticky; top:0; z-index:100; display:flex; gap:6px; overflow-x:auto;
+  padding:12px 40px; background:var(--bg); border-bottom:1px solid var(--border);
+}
+.page-tab{
+  flex-shrink:0; font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:600; padding:8px 14px;
+  border-radius:999px; border:1px solid var(--border); background:var(--bg-soft); color:var(--gray);
+  cursor:pointer; white-space:nowrap;
+}
+.page-tab:hover{border-color:var(--teal);}
+.page-tab-active{background:var(--pu); color:#fff; border-color:var(--pu);}
+.page-hidden{display:none !important;}
+
+
+/* ---------- componentes propios de esta clase ---------- */
+.sem-item{border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; background:var(--bg);}
+.sem-text{margin:0 0 8px; font-size:.92rem;}
+.sem-btns{display:flex; gap:8px; flex-wrap:wrap;}
+.sem-btn{font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:600; padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--bg-soft); color:var(--ink); cursor:pointer;}
+.sem-btn[data-a="verde"]{border-color:var(--sh);}
+.sem-btn[data-a="amarillo"]{border-color:var(--gold);}
+.sem-btn[data-a="rojo"]{border-color:var(--red);}
+.sem-item.sem-done .sem-btn{opacity:.45; cursor:default;}
+.sem-item.sem-done .sem-btn.sem-picked{opacity:1;}
+.sem-fb{margin:8px 0 0; font-size:.84rem; display:none;}
+.sem-item.sem-done .sem-fb{display:block;}
+.sem-ok{color:var(--sh);} .sem-bad{color:var(--red);}
+.sem-score{font-weight:600; margin:14px 0 0;}
+
+.flow-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0;}
+.flow-col{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg-soft);}
+.flow-col h4{margin:0 0 8px; font-size:1rem;}
+.flow-col ol{margin:0; padding-left:1.2em; font-size:.9rem;}
+.flow-col li{margin-bottom:4px;}
+.flow-steps{display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 10px;}
+.flow-step-btn{font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid var(--border); background:var(--bg-soft); color:var(--gray); cursor:pointer;}
+.flow-step-active{background:var(--pu); color:#fff; border-color:var(--pu);}
+.flow-panel{border:1px solid var(--border); border-radius:10px; padding:16px 18px; background:var(--bg-soft);}
+.flow-panel h4{margin:0 0 6px;}
+.flow-panel .flow-ex{margin:10px 0 0; padding:10px 12px; border-left:3px solid var(--teal); background:var(--bg); font-size:.86rem; white-space:pre-wrap; font-family:'DM Mono',monospace;}
+
+.pb-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+.pb-form{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg-soft);}
+.pb-field{margin-bottom:12px;}
+.pb-field label.pb-lab{display:block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--gray); margin-bottom:4px;}
+.pb-field select{width:100%; font-family:'DM Sans',sans-serif; font-size:.86rem; padding:7px 9px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--ink);}
+.pb-checks label{display:block; font-size:.84rem; margin-bottom:3px; cursor:pointer;}
+.pb-out-wrap{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg);}
+.pb-out{white-space:pre-wrap; font-family:'DM Mono',monospace; font-size:.76rem; line-height:1.5; max-height:330px; overflow-y:auto; margin:0;}
+.pb-meter{display:flex; gap:14px; align-items:center; margin-bottom:10px;}
+.pb-meter svg{width:120px; height:auto; max-height:80px; flex-shrink:0;}
+.pb-msg{font-size:.86rem; margin:0;}
+.pb-missing{font-size:.8rem; color:var(--gray); margin:8px 0 0;}
+
+.tech-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;}
+.tech-card{border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--bg-soft);}
+.tech-card h4{margin:0 0 6px; font-size:.98rem;}
+.tech-card p{font-size:.86rem; margin:0 0 8px;}
+.tech-card code.blk{display:block; white-space:pre-wrap; font-size:.74rem; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--bl);}
+.cmp-bars{margin:12px 0;}
+.cmp-row{display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:.82rem;}
+.cmp-lab{width:150px; flex-shrink:0;}
+.cmp-track{flex:1; background:var(--border); border-radius:6px; height:20px; position:relative;}
+.cmp-fill{height:100%; border-radius:6px;}
+.cmp-val{width:120px; flex-shrink:0; font-family:'DM Mono',monospace; font-size:.76rem;}
+
+.hunt{border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin:16px 0; background:var(--bg-soft);}
+.hunt h4{margin:0 0 4px;}
+.hunt-sub{font-size:.84rem; color:var(--gray); margin:0 0 12px;}
+.hunt-code{display:flex; flex-direction:column; gap:4px; margin-bottom:12px;}
+.hunt-line{text-align:left; font-family:'DM Mono',monospace; font-size:.78rem; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink); cursor:pointer; white-space:pre-wrap;}
+.hunt-line:hover{border-color:var(--teal);}
+.hunt-sel{border-color:var(--pu); background:var(--bg-soft); box-shadow:inset 3px 0 0 var(--pu);}
+.hunt-ok{border-color:var(--sh) !important; box-shadow:inset 3px 0 0 var(--sh);}
+.hunt-miss{border-color:var(--red) !important; box-shadow:inset 3px 0 0 var(--red);}
+.hunt-fp{border-color:var(--gold) !important; box-shadow:inset 3px 0 0 var(--gold);}
+.hunt-why{display:none; font-family:'DM Sans',sans-serif; font-size:.8rem; margin-top:4px; white-space:normal;}
+.hunt-revealed .hunt-why{display:block;}
+.hunt-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.hunt-btn{font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; padding:8px 16px; border-radius:8px; border:none; background:var(--teal); color:#fff; cursor:pointer;}
+.hunt-btn-ghost{background:var(--bg); color:var(--gray); border:1px solid var(--border);}
+.hunt-res{font-size:.86rem; font-weight:600;}
+.hunt-chart{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; margin-bottom:12px;}
+.hunt-chart svg{width:100%; height:auto; max-height:220px; display:block;}
+.hunt-chips{display:flex; flex-direction:column; gap:4px; margin-bottom:12px;}
+
+.sel-tabs{display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 10px;}
+.sel-panel{display:grid; grid-template-columns:1.1fr 1fr; gap:16px; border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:var(--bg-soft);}
+.sel-panel h4{margin:0 0 6px;}
+.sel-panel p{font-size:.86rem; margin:0 0 8px;}
+.sel-prompt{white-space:pre-wrap; font-family:'DM Mono',monospace; font-size:.74rem; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px;}
+.sel-preview{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;}
+.sel-preview svg{width:100%; height:auto; max-height:190px; display:block;}
+.sel-legend{font-size:.76rem; align-self:stretch;}
+
+@media (max-width:900px){
+  .flow-cols,.pb-grid,.tech-grid,.sel-panel{grid-template-columns:1fr;}
+}
+html[data-theme="dark"] .flow-col, html[data-theme="dark"] .flow-panel, html[data-theme="dark"] .pb-form,
+html[data-theme="dark"] .tech-card, html[data-theme="dark"] .hunt, html[data-theme="dark"] .sel-panel{background:#1b1b26;}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="kicker">Curso de Analítica de Datos: Industria Musical</div>
+  <h1>LLMs para Analítica de Datos</h1>
+  <p class="sub">Ya sabes extraer, modelar y comunicar. Hoy sumas un LLM al proceso sin regalarle el criterio: qué compartirle, cómo pedirle y cómo comprobar lo que responde.</p>
+  <div class="hook">
+    <span class="box-label">Contexto</span>
+    <p>Un LLM escribe un query o una gráfica en segundos. Lo que tarda es saber si el resultado está bien. La clase gira alrededor de ese punto: darle buen contexto, pedir con estructura y verificar siempre contra tu propia base.</p>
+    <p>Todos los ejemplos de hoy salen de MusicWorks. Los números de cada demo están verificados contra la base real.</p>
+    <p>Esta clase supone que ya viste la de Subconsultas y Agregaciones: los errores que vas a cazar (promedio de razones, JOIN que duplica, NOT IN con NULL) se explican ahí.</p>
+  </div>
+</div>
+
+<nav class="page-tabs" id="page-tabs">
+  <button type="button" class="page-tab" data-page="bloque-01">1 · Privacidad</button>
+  <button type="button" class="page-tab" data-page="bloque-02">2 · Flujo real</button>
+  <button type="button" class="page-tab" data-page="bloque-03">3 · Cómo pedir</button>
+  <button type="button" class="page-tab" data-page="bloque-04">4 · Verificar</button>
+  <button type="button" class="page-tab" data-page="bloque-05">5 · Caza el error</button>
+  <button type="button" class="page-tab" data-page="bloque-06">6 · Gráficas</button>
+  <button type="button" class="page-tab" data-page="bloque-07">7 · Conectar la base</button>
+  <button type="button" class="page-tab" data-page="cierre">Cierre</button>
+</nav>
+
+<section id="bloque-01">
+  <span class="block-tag fase">Bloque 1 · Privacidad</span>
+  <h2>Antes de pegar nada: qué se comparte y qué se queda fuera</h2>
+  <div class="read-box">
+    <span class="box-label">Cómo leer esto</span>
+    <div class="read-box-item"><span class="read-box-val">Verde</span> <span class="read-box-txt">se puede pegar tal cual.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Amarillo</span> <span class="read-box-txt">pégalo solo después de anonimizar, redondear o tapar nombres.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Rojo</span> <span class="read-box-txt">no se pega, ni resumido con nombres.</span></div>
+  </div>
+  <p>Ejercicio rápido: clasifica cada elemento. Al elegir, aparece la razón.</p>
+  <div id="sem-list"></div>
+  <p class="sem-score" id="sem-score"></p>
+  <div class="ibox">
+    <span class="box-label">La regla de la muestra</span>
+    <p>Un LLM necesita el esquema (tablas y columnas) y entre 5 y 20 filas de ejemplo para entender tu base. La tabla completa sobra. Con esa muestra ya puede escribir el query; el query lo corres tú, contra los datos completos, en tu máquina.</p>
+  </div>
+  <div class="wbox">
+    <span class="box-label">Revisa tu herramienta</span>
+    <p>Antes de usar un LLM con datos de trabajo, revisa la configuración de privacidad de tu cuenta y lo que dice la política de tu plan sobre el uso de tus conversaciones. Cambia de una herramienta a otra y de un plan a otro.</p>
+  </div>
+</section>
+
+<section id="bloque-02">
+  <span class="block-tag fase">Bloque 2 · El flujo de trabajo real</span>
+  <h2>Lo que todos creen que pasa y lo que pasa de verdad</h2>
+  <div class="flow-cols">
+    <div class="flow-col">
+      <h4>El flujo que todos imaginan</h4>
+      <ol>
+        <li>Escribo mi pregunta.</li>
+        <li>El LLM me da el query.</li>
+        <li>Lo copio y lo presento.</li>
+      </ol>
+      <p style="font-size:.84rem; margin:10px 0 0;">Rápido, y con un riesgo alto: nadie comprobó nada.</p>
+    </div>
+    <div class="flow-col">
+      <h4>El flujo que funciona</h4>
+      <ol>
+        <li>Preparo el contexto.</li>
+        <li>Pido un borrador.</li>
+        <li>Lo verifico contra mi base.</li>
+        <li>Devuelvo el error o el resultado y corrijo.</li>
+        <li>Guardo el prompt y el query validados.</li>
+      </ol>
+      <p style="font-size:.84rem; margin:10px 0 0;">El tiempo se reparte distinto: menos escribir, más comprobar.</p>
+    </div>
+  </div>
+  <p>Recorre cada paso del flujo real. Cada uno trae un ejemplo de este mismo curso.</p>
+  <div class="flow-steps" id="flow-steps"></div>
+  <div class="flow-panel" id="flow-panel"></div>
+  <div class="wbox">
+    <span class="box-label">Dónde el LLM falla con más frecuencia</span>
+    <p>Sumas y promedios largos hechos de memoria. Columnas o tablas que nunca vio. Cifras sin fuente. Causalidad ("subió porque..."). En todos esos casos, calcula con SQL y usa el LLM para redactar y estructurar.</p>
+  </div>
+</section>
+
+<section id="bloque-03">
+  <span class="block-tag fase">Bloque 3 · Qué y cómo pedir</span>
+  <h2>Un prompt para datos tiene partes, y cada una evita un error distinto</h2>
+  <p>Arma el prompt activando sus partes. A la derecha ves el texto que enviarías y qué tan completo está. Prueba las tres preguntas de negocio.</p>
+  <div class="pb-grid">
+    <div class="pb-form">
+      <div class="pb-field">
+        <label class="pb-lab" for="pb-q">Pregunta de negocio</label>
+        <select id="pb-q"></select>
+      </div>
+      <div class="pb-field pb-checks">
+        <label class="pb-lab">Contexto</label>
+        <label><input type="checkbox" id="pb-ctx"> Contexto de negocio y motor de base de datos</label>
+      </div>
+      <div class="pb-field pb-checks" id="pb-schema">
+        <label class="pb-lab">Esquema (tablas que verá el LLM)</label>
+      </div>
+      <div class="pb-field pb-checks">
+        <label class="pb-lab">Grano y métrica</label>
+        <label><input type="checkbox" id="pb-grain"> Definir una fila por qué y cómo se calcula la métrica</label>
+      </div>
+      <div class="pb-field">
+        <label class="pb-lab" for="pb-fmt">Formato de respuesta</label>
+        <select id="pb-fmt">
+          <option value="">Sin especificar</option>
+          <option value="Solo el query, sin explicación.">Solo el query</option>
+          <option value="El query y una línea de explicación por cada JOIN.">Query y explicación por JOIN</option>
+          <option value="El query y una lista de los supuestos que hiciste.">Query y supuestos</option>
+        </select>
+      </div>
+      <div class="pb-field pb-checks" id="pb-rules">
+        <label class="pb-lab">Restricciones</label>
+      </div>
+      <div class="pb-field pb-checks">
+        <label class="pb-lab">Verificación</label>
+        <label><input type="checkbox" id="pb-verify"> Pedir un segundo query que reconcilie el total</label>
+      </div>
+    </div>
+    <div class="pb-out-wrap">
+      <div class="pb-meter">
+        <svg id="pb-gauge"></svg>
+        <p class="pb-msg" id="pb-msg"></p>
+      </div>
+      <pre class="pb-out" id="pb-out"></pre>
+      <p class="pb-missing" id="pb-missing"></p>
+    </div>
+  </div>
+  <div class="ibox">
+    <span class="box-label">Qué se rompe cuando falta cada parte</span>
+    <p><strong>Sin esquema</strong>, inventa nombres de columna. <strong>Sin grano</strong>, mezcla niveles y duplica filas. <strong>Sin definición de la métrica</strong>, promedia razones en vez de dividir totales. <strong>Sin restricciones</strong>, devuelve <code>SELECT *</code> o sintaxis de otro motor. <strong>Sin verificación</strong>, no tienes cómo saber si el total cuadra.</p>
+  </div>
+  <div class="ibox">
+    <span class="box-label">Dos hábitos que ayudan mucho</span>
+    <p>Pedirle que <strong>haga preguntas antes de responder</strong> cuando falte información. Y cambiar <strong>una sola cosa por mensaje</strong> al iterar, así sabes qué produjo cada mejora o cada error.</p>
+  </div>
+</section>
+
+<section id="bloque-04">
+  <span class="block-tag fase">Bloque 4 · Verificar</span>
+  <h2>Que un query se ejecute sin error no garantiza que el resultado sea correcto</h2>
+  <p>El LLM no ve tu base. Puede escribir algo que ejecuta sin error y da un número equivocado. Cuatro comprobaciones te cubren casi todo.</p>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <h4>1 · Reconciliar totales</h4>
+      <p>El total de tu resultado debe coincidir con el total de la tabla base.</p>
+      <code class="blk">SELECT SUM(streams) FROM streaming_weekly;
+-- 2,154,997,804  (el cubo de streaming suma lo mismo)</code>
+    </div>
+    <div class="tech-card">
+      <h4>2 · Contar filas</h4>
+      <p>Si esperas una fila por combinación, cuenta las combinaciones posibles.</p>
+      <code class="blk">-- género × tipo × DSP
+-- 15 × 2 × 7 = 210 filas esperadas</code>
+    </div>
+    <div class="tech-card">
+      <h4>3 · Revisión puntual</h4>
+      <p>Toma una fila del resultado y calcúlala aparte, con un query mínimo.</p>
+      <code class="blk">SELECT SUM(sw.streams) FROM streaming_weekly sw
+JOIN tracks t ON t.track_id=sw.track_id
+JOIN releases r ON r.release_id=t.release_id
+JOIN artists a ON a.artist_id=r.artist_id
+JOIN genres g ON g.genre_id=a.genre_id
+JOIN dsps d ON d.dsp_id=sw.dsp_id
+WHERE g.genre_name='Doom Metal'
+  AND a.artist_type='independent'
+  AND d.dsp_name='Spotify';
+-- 66,806,556</code>
+    </div>
+    <div class="tech-card">
+      <h4>4 · Vigilar el grano</h4>
+      <p>Un JOIN a una tabla con varias filas por llave multiplica tus totales. Es el error más silencioso.</p>
+      <code class="blk">-- correcto
+SELECT SUM(streams) FROM streaming_weekly;
+-- con JOIN a playlist_placements
+SELECT SUM(sw.streams) FROM streaming_weekly sw
+JOIN playlist_placements pp ON pp.track_id=sw.track_id;</code>
+    </div>
+  </div>
+
+  <div class="cube-widget-title" style="margin-top:22px;">Lo que hace un JOIN duplicado, con números reales</div>
+  <div class="cmp-bars" id="cmp-fanout"></div>
+  <div class="cmp-bars" id="cmp-cpc"></div>
+  <div class="ibox">
+    <span class="box-label">El promedio de razones</span>
+    <p>Promediar el <code>cost_per_conversion</code> de cada campaña da $2.92. Dividir el gasto total entre las conversiones totales da $2.68. Las campañas grandes deben pesar más que las chicas, y el promedio simple las trata igual. Cuando pidas una razón, define el numerador y el denominador en el prompt.</p>
+  </div>
+
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Cuando el query falla, el error también es información</span>
+    <p>Un query armado sin la tabla de DSPs devolvió esto al ejecutarse:</p>
+    <code>Error Code: 1054. Unknown column 'd.dsp_name' in 'field list'</code>
+    <p>Pegar el error completo al LLM funciona mejor que describirlo. La corrección fue agregar <code>JOIN dsps d ON d.dsp_id = sw.dsp_id</code>, y el resultado se comprobó con las técnicas 1 y 2: 210 filas y el mismo total.</p>
+  </div>
+</section>
+
+<section id="bloque-05">
+  <span class="block-tag fase">Bloque 5 · Caza el error</span>
+  <h2>Encuentra las fallas que un LLM dejó en su respuesta</h2>
+  <p>Cada ejercicio tiene tres fallas plantadas y algunas líneas correctas. Marca lo que crees que está mal y pulsa Revisar. Marcar una línea correcta cuenta como falsa alarma.</p>
+
+  <div class="hunt" id="hunt-sql">
+    <h4>Parte A · Un query</h4>
+    <p class="hunt-sub">Pregunta: "¿Cuántos streams generó cada DSP en lo que va de 2026?"</p>
+    <div class="hunt-code" id="hunt-sql-lines"></div>
+    <div class="hunt-actions">
+      <button type="button" class="hunt-btn" id="hunt-sql-check">Revisar</button>
+      <button type="button" class="hunt-btn hunt-btn-ghost" id="hunt-sql-reset">Reiniciar</button>
+      <span class="hunt-res" id="hunt-sql-res"></span>
+    </div>
+  </div>
+
+  <div class="hunt" id="hunt-chart">
+    <h4>Parte B · Una gráfica</h4>
+    <p class="hunt-sub">Pregunta: "¿Qué DSP paga mejor por cada 1,000 streams?"</p>
+    <div class="hunt-chart"><svg id="hunt-chart-svg"></svg></div>
+    <div class="hunt-chips" id="hunt-chart-items"></div>
+    <div class="hunt-actions">
+      <button type="button" class="hunt-btn" id="hunt-chart-check">Revisar</button>
+      <button type="button" class="hunt-btn hunt-btn-ghost" id="hunt-chart-reset">Reiniciar</button>
+      <span class="hunt-res" id="hunt-chart-res"></span>
+    </div>
+  </div>
+</section>
+
+<section id="bloque-06">
+  <span class="block-tag fase">Bloque 6 · Gráficas con un LLM</span>
+  <h2>Cada pregunta pide un tipo de gráfica distinto</h2>
+  <p>Un LLM puede devolver un archivo HTML con la gráfica lista, sin instalar nada. Lo que decide la calidad es lo que tú le pides: los datos reales, el tipo de gráfica y el mensaje. Elige un tipo de pregunta para ver el prompt, el error típico y el resultado esperado.</p>
+  <div class="sel-tabs" id="sel-tabs"></div>
+  <div class="sel-panel" id="sel-panel"></div>
+
+  <div class="read-box">
+    <span class="box-label">Cómo pedir el archivo</span>
+    <div class="read-box-item"><span class="read-box-val">Datos</span> <span class="read-box-txt">pega la tabla real de tu resultado. Describirla de memoria produce números inventados.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Formato</span> <span class="read-box-txt">un solo archivo .html con SVG, sin librerías externas, que abra con doble clic.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Mensaje</span> <span class="read-box-txt">dile la conclusión que debe mostrar el título.</span></div>
+    <div class="read-box-item"><span class="read-box-val">Estilo</span> <span class="read-box-txt">un color de resalte, eje desde cero en barras, sin decoración.</span></div>
+  </div>
+
+  <div class="ibox">
+    <span class="box-label">Lista de revisión antes de presentar</span>
+    <p>1) Cada número de la gráfica está en tu tabla. 2) No hay filas o categorías que tu tabla no tiene. 3) El eje de barras empieza en cero. 4) El orden ayuda a leer. 5) El título coincide con lo que muestran los datos.</p>
+  </div>
+
+  <table class="compare-table">
+    <thead><tr><th>Un archivo generado con LLM</th><th>Power BI, Tableau o Looker</th></tr></thead>
+    <tbody>
+      <tr><td class="good">Reporte puntual, para una reunión o un envío.</td><td>Dashboard que otras personas abren cada semana.</td></tr>
+      <tr><td class="good">Sin instalación ni licencia.</td><td>Conexión en vivo a la base, con actualización automática.</td></tr>
+      <tr><td class="good">Tú controlas cada detalle del diseño.</td><td>Permisos y filtros por usuario, historial y gobierno de datos.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="bloque-07">
+  <span class="block-tag fase">Bloque 7 · Conectar la base</span>
+  <h2>Pegar datos o dejar que el LLM consulte tu base</h2>
+  <p>Existen herramientas que le dan al LLM acceso directo a tu base para que ejecute sus propios queries. Así se construyeron estas clases: el LLM escribe el query, lo corre contra MusicWorks, ve el resultado y corrige. Es más rápido y exige más cuidado.</p>
+  <table class="compare-table">
+    <thead><tr><th></th><th>Pegar esquema y muestra</th><th>LLM conectado a la base</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Velocidad</strong></td><td>Cada ciclo lo corres tú.</td><td class="good">El LLM ejecuta, ve el error y corrige solo.</td></tr>
+      <tr><td><strong>Exposición de datos</strong></td><td class="good">Solo lo que pegas.</td><td>Todo lo que el usuario de la base pueda leer.</td></tr>
+      <tr><td><strong>Riesgo de una acción errónea</strong></td><td class="good">Ninguno: tú ejecutas.</td><td>Depende de los permisos que le des.</td></tr>
+      <tr><td><strong>Verificación</strong></td><td>Manual, en tu cliente.</td><td>Sigue siendo necesaria: ejecutar un query no lo valida.</td></tr>
+    </tbody>
+  </table>
+  <div class="wbox">
+    <span class="box-label">Condiciones mínimas</span>
+    <p>Un usuario de solo lectura, limitado a la base de práctica. Ninguna contraseña dentro del prompt ni en archivos compartidos. Revisar cada query antes de aprobar su ejecución y pedir <code>LIMIT</code> mientras exploras.</p>
+  </div>
+  <div class="machine-callout">
+    <span class="box-label">🖥️ Un usuario de solo lectura en MySQL</span>
+    <code>CREATE USER 'analista_ro'@'localhost' IDENTIFIED BY 'cambia-esta-clave';
+GRANT SELECT ON musicworks.* TO 'analista_ro'@'localhost';</code>
+    <p>Con este usuario, la herramienta puede consultar y no puede modificar ni borrar nada.</p>
+  </div>
+</section>
+
+<div class="closing" id="cierre">
+  <h2>Cierre de hoy</h2>
+  <table class="summary-table">
+    <thead><tr><th>Paso</th><th>Qué haces</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Privacidad</td><td>Compartes esquema y muestra, anonimizas lo amarillo y dejas fuera lo rojo.</td></tr>
+      <tr><td>2 · Contexto</td><td>Esquema, grano y definición de la métrica antes de la pregunta.</td></tr>
+      <tr><td>3 · Borrador</td><td>Pides con formato, restricciones y una consulta de reconciliación.</td></tr>
+      <tr><td>4 · Verificación</td><td>Totales, conteo de filas, revisión puntual y vigilancia del grano.</td></tr>
+      <tr><td>5 · Corrección</td><td>Devuelves el error o el resultado al LLM, con un cambio por mensaje.</td></tr>
+      <tr><td>6 · Registro</td><td>Guardas el prompt y el query validados para reutilizarlos.</td></tr>
+    </tbody>
+  </table>
+  <div class="ibox">
+    <span class="box-label">Lo que te llevas</span>
+    <p>El LLM acelera la escritura. La responsabilidad del número sigue siendo tuya, y por eso el paso que más tiempo merece es comprobarlo.</p>
+  </div>
+</div>
+
+<footer>
+  Curso de Analítica de Datos: Industria Musical · Base de práctica: MusicWorks (simulada) · Nombres de artistas reales, métricas 100% ilustrativas.
+</footer>
+
+<script>
+'use strict';
+
+const RATES = [{"dsp": "Tidal", "rate": 12.50}, {"dsp": "Apple Music", "rate": 8.00}, {"dsp": "Deezer", "rate": 4.50}, {"dsp": "Amazon Music", "rate": 4.20}, {"dsp": "Spotify", "rate": 4.00}, {"dsp": "SoundCloud", "rate": 2.50}, {"dsp": "YouTube Music", "rate": 2.10}];
+const GENRE_REV = [{"genre": "Symphonic Metal", "revenue": 1168456}, {"genre": "Groove Metal", "revenue": 887118}, {"genre": "Sludge Metal", "revenue": 775470}, {"genre": "Heavy Metal", "revenue": 739151}, {"genre": "Power Metal", "revenue": 732350}, {"genre": "Thrash Metal", "revenue": 726566}, {"genre": "Death Metal", "revenue": 682521}, {"genre": "Industrial Metal", "revenue": 608361}, {"genre": "Metalcore", "revenue": 563430}, {"genre": "Black Metal", "revenue": 563224}, {"genre": "Doom Metal", "revenue": 532604}, {"genre": "Deathcore", "revenue": 527934}, {"genre": "Progressive Metal", "revenue": 511124}, {"genre": "Nu Metal", "revenue": 461757}, {"genre": "Folk Metal", "revenue": 382917}];
+const TREND = [{"month": "2024-09-01", "streams": 195558037}, {"month": "2024-10-01", "streams": 193018188}, {"month": "2024-11-01", "streams": 189575392}, {"month": "2024-12-01", "streams": 189056721}, {"month": "2025-01-01", "streams": 189683979}, {"month": "2025-02-01", "streams": 187474283}, {"month": "2025-03-01", "streams": 188769528}, {"month": "2025-04-01", "streams": 190829121}, {"month": "2025-05-01", "streams": 194523461}, {"month": "2025-06-01", "streams": 194993554}, {"month": "2025-07-01", "streams": 195232010}, {"month": "2025-08-01", "streams": 195535731}, {"month": "2025-09-01", "streams": 193091415}, {"month": "2025-10-01", "streams": 192779150}, {"month": "2025-11-01", "streams": 189495571}, {"month": "2025-12-01", "streams": 184044767}, {"month": "2026-01-01", "streams": 182574881}, {"month": "2026-02-01", "streams": 183633171}, {"month": "2026-03-01", "streams": 185412201}, {"month": "2026-04-01", "streams": 190275352}, {"month": "2026-05-01", "streams": 191465204}, {"month": "2026-06-01", "streams": 193936898}, {"month": "2026-07-01", "streams": 191682949}, {"month": "2026-08-01", "streams": 186570406}];
+const CAMP = [{"cpc": 2.21, "spend": 14121.33, "platform": "Google", "objective": "followers", "conversions": 6403}, {"cpc": 1.84, "spend": 3764.40, "platform": "YouTube", "objective": "pre-save", "conversions": 2045}, {"cpc": 1.43, "spend": 4199.75, "platform": "Spotify Ad Studio", "objective": "awareness", "conversions": 2939}, {"cpc": 1.81, "spend": 5436.38, "platform": "Meta", "objective": "streams", "conversions": 2997}, {"cpc": 1.11, "spend": 3215.82, "platform": "TikTok", "objective": "followers", "conversions": 2894}, {"cpc": 5.67, "spend": 11621.47, "platform": "YouTube", "objective": "awareness", "conversions": 2049}, {"cpc": 2.19, "spend": 8026.62, "platform": "Spotify Ad Studio", "objective": "streams", "conversions": 3663}, {"cpc": 2.09, "spend": 4142.71, "platform": "Meta", "objective": "followers", "conversions": 1985}, {"cpc": 4.64, "spend": 30149.01, "platform": "Google", "objective": "awareness", "conversions": 6497}, {"cpc": 1.63, "spend": 10783.51, "platform": "Spotify Ad Studio", "objective": "followers", "conversions": 6609}, {"cpc": 4.45, "spend": 19313.18, "platform": "TikTok", "objective": "awareness", "conversions": 4337}, {"cpc": 1.52, "spend": 4566.06, "platform": "YouTube", "objective": "followers", "conversions": 3008}, {"cpc": 2.55, "spend": 8174.70, "platform": "Spotify Ad Studio", "objective": "pre-save", "conversions": 3208}, {"cpc": 6.79, "spend": 11006.31, "platform": "Meta", "objective": "awareness", "conversions": 1622}, {"cpc": 2.30, "spend": 3484.26, "platform": "Google", "objective": "pre-save", "conversions": 1517}, {"cpc": 0.99, "spend": 975.18, "platform": "Google", "objective": "streams", "conversions": 988}, {"cpc": 3.29, "spend": 3899.79, "platform": "TikTok", "objective": "streams", "conversions": 1187}, {"cpc": 1.45, "spend": 1103.10, "platform": "TikTok", "objective": "pre-save", "conversions": 763}, {"cpc": 1.26, "spend": 1131.90, "platform": "Meta", "objective": "pre-save", "conversions": 896}];
+
+function polarToCartesian(cx, cy, r, angleDeg){
+  var a = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+function arcPath(cx, cy, r, startAngle, endAngle){
+  var start = polarToCartesian(cx, cy, r, endAngle);
+  var end = polarToCartesian(cx, cy, r, startAngle);
+  var largeArc = (endAngle - startAngle) <= 180 ? 0 : 1;
+  return ['M', cx, cy, 'L', start.x.toFixed(2), start.y.toFixed(2), 'A', r, r, 0, largeArc, 0, end.x.toFixed(2), end.y.toFixed(2), 'Z'].join(' ');
+}
+
+var PIE_COLORS = ['var(--teal)', 'var(--pu)', 'var(--gold)', 'var(--bl)', 'var(--sh)', 'var(--gray)'];
+
+/* entries: [[label, val], ...] — top N + resto agrupado si hay más */
+function renderPie(svgEl, entries, fmt, maxSlices){
+  maxSlices = maxSlices || 5;
+  var top = entries.slice(0, maxSlices);
+  var restVal = entries.slice(maxSlices).reduce(function(a, e){ return a + e[1]; }, 0);
+  var slices = restVal > 0 ? top.concat([['Otros', restVal]]) : top;
+  var total = slices.reduce(function(a, s){ return a + s[1]; }, 0) || 1;
+  var cx = 70, cy = 70, r = 60;
+  var angle = 0;
+  var parts = [];
+  var legend = [];
+  slices.forEach(function(s, i){
+    var frac = s[1] / total;
+    var sweep = frac * 360;
+    var color = PIE_COLORS[i % PIE_COLORS.length];
+    if (sweep > 0.01){
+      parts.push('<path d="' + arcPath(cx, cy, r, angle, angle + sweep) + '" fill="' + color + '"><title>' + s[0] + ': ' + fmt(s[1]) + '</title></path>');
+    }
+    legend.push('<div class="pie-legend-item"><span class="pie-swatch" style="background:' + color + '"></span>' + s[0] + ' — ' + Math.round(frac*100) + '%</div>');
+    angle += sweep;
+  });
+  svgEl.setAttribute('viewBox', '0 0 140 140');
+  svgEl.innerHTML = parts.join('');
+  return { legendHtml: legend.join('') };
+}
+
+/* pct: 0-100 */
+function renderGauge(svgEl, pct, colorVar){
+  pct = Math.max(0, Math.min(100, pct));
+  var cx = 100, cy = 90, r = 75;
+  var bg = arcPath(cx, cy, r, -90, 90);
+  var fillEnd = -90 + (pct/100)*180;
+  var fg = arcPath(cx, cy, r, -90, fillEnd);
+  svgEl.setAttribute('viewBox', '0 0 200 110');
+  svgEl.innerHTML =
+    '<path d="' + bg + '" fill="var(--border)"/>' +
+    '<path d="' + fg + '" fill="' + (colorVar || 'var(--teal)') + '"/>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="42" fill="var(--bg)"/>' +
+    '<text x="' + cx + '" y="' + (cy + 6) + '" font-size="22" font-weight="700" text-anchor="middle" fill="var(--ink)">' + Math.round(pct) + '%</text>';
+}
+
+/* points: [{x,y,label}], plots x vs y */
+function renderScatter(svgEl, points, opts){
+  opts = opts || {};
+  var W = 400, H = 220, pad = 30;
+  var xs = points.map(function(p){ return p.x; });
+  var ys = points.map(function(p){ return p.y; });
+  var xMin = Math.min.apply(null, xs), xMax = Math.max.apply(null, xs);
+  var yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
+  if (xMin === xMax) xMax = xMin + 1;
+  if (yMin === yMax) yMax = yMin + 1;
+  function sx(x){ return pad + (x - xMin) / (xMax - xMin) * (W - 2*pad); }
+  function sy(y){ return H - pad - (y - yMin) / (yMax - yMin) * (H - 2*pad); }
+  var parts = [];
+  parts.push('<line x1="' + pad + '" y1="' + (H-pad) + '" x2="' + (W-pad) + '" y2="' + (H-pad) + '" stroke="var(--border)"/>');
+  parts.push('<line x1="' + pad + '" y1="' + pad + '" x2="' + pad + '" y2="' + (H-pad) + '" stroke="var(--border)"/>');
+  points.forEach(function(p){
+    var cls = p.highlight ? 'var(--pu)' : 'var(--teal)';
+    var rad = p.highlight ? 5 : 3;
+    parts.push('<circle cx="' + sx(p.x).toFixed(1) + '" cy="' + sy(p.y).toFixed(1) + '" r="' + rad + '" fill="' + cls + '" fill-opacity="' + (p.highlight?1:0.65) + '"><title>' + p.label + '</title></circle>');
+  });
+  svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svgEl.innerHTML = parts.join('');
+}
+
+/* entries: [[label, val], ...] en orden temporal */
+function renderTimeline(svgEl, entries, fmt){
+  var W = 400, H = 150, pad = 28;
+  var vals = entries.map(function(e){ return e[1]; });
+  var vMin = Math.min.apply(null, vals), vMax = Math.max.apply(null, vals);
+  if (vMin === vMax) vMax = vMin + 1;
+  var n = entries.length;
+  function sx(i){ return pad + i / (n - 1) * (W - 2*pad); }
+  function sy(v){ return H - pad - (v - vMin) / (vMax - vMin) * (H - 2*pad); }
+  var pts = entries.map(function(e, i){ return sx(i).toFixed(1) + ',' + sy(e[1]).toFixed(1); }).join(' ');
+  var parts = [];
+  parts.push('<line x1="' + pad + '" y1="' + (H-pad) + '" x2="' + (W-pad) + '" y2="' + (H-pad) + '" stroke="var(--border)"/>');
+  parts.push('<polyline points="' + pts + '" fill="none" stroke="var(--teal)" stroke-width="2"/>');
+  parts.push('<text x="' + pad + '" y="' + (H-pad+14) + '" font-size="8" fill="var(--gray)">' + entries[0][0] + '</text>');
+  parts.push('<text x="' + (W-pad) + '" y="' + (H-pad+14) + '" font-size="8" text-anchor="end" fill="var(--gray)">' + entries[n-1][0] + '</text>');
+  parts.push('<text x="' + pad + '" y="' + (pad-6) + '" font-size="8" fill="var(--gray)">' + fmt(vMax) + '</text>');
+  parts.push('<text x="' + pad + '" y="' + (H-pad-4) + '" font-size="8" fill="var(--gray)">' + fmt(vMin) + '</text>');
+  svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svgEl.innerHTML = parts.join('');
+}
+
+function renderMiniBar(svgEl, entries, fmt){
+  var barH = 15, gap = 6, labelW = 145, chartW = 400;
+  var max = entries.length ? Math.max.apply(null, entries.map(function(e){ return e[1]; })) : 1;
+  var parts = [];
+  entries.forEach(function(pair, i){
+    var label = pair[0], val = pair[1];
+    var y = i * (barH + gap);
+    var w = Math.max(2, (val / max) * (chartW - labelW - 60));
+    parts.push('<text x="0" y="' + (y + barH/2 + 3.5) + '" font-size="9" fill="var(--ink)">' + label + '</text>');
+    parts.push('<rect x="' + labelW + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + barH + '" fill="var(--teal)" rx="3"/>');
+    parts.push('<text x="' + (labelW + w + 5) + '" y="' + (y + barH/2 + 3.5) + '" font-size="8.5" fill="var(--gray)">' + fmt(val) + '</text>');
+  });
+  var totalH = Math.max(1, entries.length) * (barH + gap);
+  svgEl.setAttribute('viewBox', '0 0 ' + chartW + ' ' + totalH);
+  svgEl.innerHTML = parts.join('');
+}
+
+
+function fmtInt(v){ return Math.round(v).toLocaleString('es-MX'); }
+
+/* ---------- semáforo ---------- */
+const SEM_ITEMS = [
+  { t: 'El esquema: nombres de tablas y columnas de tu base.', a: 'verde', why: 'No contiene datos de nadie, solo estructura.' },
+  { t: '10 filas de muestra con datos simulados, como los de MusicWorks.', a: 'verde', why: 'Son datos de práctica; no hay nada que proteger.' },
+  { t: 'Streams por género de la base de práctica.', a: 'verde', why: 'Resultado agregado de datos simulados.' },
+  { t: 'Ingresos exactos por artista de tu sello real.', a: 'amarillo', why: 'Cambia los nombres por "Artista A, B, C" y redondea antes de pegar.' },
+  { t: 'Captura de un dashboard de un cliente con cifras reales.', a: 'amarillo', why: 'Tapa nombres y cifras, o rehaz la captura con datos de práctica.' },
+  { t: 'El contrato o el anticipo firmado con un artista.', a: 'rojo', why: 'Es confidencial por naturaleza; ni pegado ni resumido con nombres.' },
+  { t: 'Una lista de correos de fans o de clientes.', a: 'rojo', why: 'Son datos personales de terceros.' },
+  { t: 'El usuario y la contraseña de la base de datos.', a: 'rojo', why: 'Nunca en un prompt. Usa un usuario de solo lectura, sin credenciales en el texto.' }
+];
+function mountSemaforo(){
+  var list = document.getElementById('sem-list');
+  var score = document.getElementById('sem-score');
+  if (!list) return;
+  var answered = 0, hits = 0;
+  list.innerHTML = SEM_ITEMS.map(function(it, i){
+    return '<div class="sem-item" data-i="' + i + '"><p class="sem-text">' + it.t + '</p><div class="sem-btns">' +
+      ['verde','amarillo','rojo'].map(function(a){ return '<button type="button" class="sem-btn" data-a="' + a + '">' + a.charAt(0).toUpperCase() + a.slice(1) + '</button>'; }).join('') +
+      '</div><p class="sem-fb"></p></div>';
+  }).join('');
+  function paint(){ score.textContent = 'Aciertos: ' + hits + ' de ' + answered + ' respondidas (' + SEM_ITEMS.length + ' en total).'; }
+  paint();
+  list.addEventListener('click', function(ev){
+    var btn = ev.target.closest ? ev.target.closest('.sem-btn') : null;
+    if (!btn) return;
+    var item = btn.closest('.sem-item');
+    if (item.classList.contains('sem-done')) return;
+    var it = SEM_ITEMS[+item.getAttribute('data-i')];
+    var pick = btn.getAttribute('data-a');
+    item.classList.add('sem-done');
+    btn.classList.add('sem-picked');
+    answered++;
+    var ok = pick === it.a;
+    if (ok) hits++;
+    var fb = item.querySelector('.sem-fb');
+    fb.className = 'sem-fb ' + (ok ? 'sem-ok' : 'sem-bad');
+    fb.textContent = (ok ? 'Correcto. ' : 'Era ' + it.a + '. ') + it.why;
+    paint();
+  });
+}
+
+/* ---------- flujo ---------- */
+const FLOW = [
+  { t: '1 · Contexto', h: 'Antes de preguntar, reúnes lo que el LLM no puede ver: el esquema, cómo se relacionan las tablas y qué significa cada métrica.',
+    ex: 'streaming_weekly(track_id, dsp_id, week_id, streams, revenue)\ndsps(dsp_id, dsp_name, ...)\ncalendar_week(week_id, week_start_date, iso_year, ...)' },
+  { t: '2 · Borrador', h: 'Pides el query con la estructura del Bloque 3. Lo que recibes es un borrador, no una respuesta.',
+    ex: 'Pregunta: streams por DSP en 2026.\nEl LLM devuelve un query que parece razonable.' },
+  { t: '3 · Verificar', h: 'Ejecutas el query en tu cliente y aplicas las comprobaciones del Bloque 4.',
+    ex: 'Error Code: 1054. Unknown column \'d.dsp_name\' in \'field list\'\n(al query del cubo de streaming le faltaba un JOIN)' },
+  { t: '4 · Corregir', h: 'Le devuelves el error o el resultado tal cual, con un solo cambio por mensaje, y repites la verificación.',
+    ex: 'Se agregó: JOIN dsps d ON d.dsp_id = sw.dsp_id\nComprobación: 210 filas y el mismo total de streams.' },
+  { t: '5 · Registrar', h: 'Guardas el prompt y el query validados. La próxima vez arrancas desde ahí, no desde cero.',
+    ex: 'Biblioteca de prompts: explorar, limpiar, cruzar, graficar.\nCada uno con su query ya comprobado.' }
+];
+function mountFlow(){
+  var steps = document.getElementById('flow-steps');
+  var panel = document.getElementById('flow-panel');
+  if (!steps) return;
+  steps.innerHTML = FLOW.map(function(s, i){ return '<button type="button" class="flow-step-btn" data-i="' + i + '">' + s.t + '</button>'; }).join('');
+  function show(i){
+    var s = FLOW[i];
+    Array.prototype.forEach.call(steps.querySelectorAll('.flow-step-btn'), function(b, j){ b.classList.toggle('flow-step-active', j === i); });
+    panel.innerHTML = '<h4>' + s.t + '</h4><p style="margin:0;">' + s.h + '</p><div class="flow-ex">' + s.ex + '</div>';
+  }
+  steps.addEventListener('click', function(ev){
+    var b = ev.target.closest ? ev.target.closest('.flow-step-btn') : null;
+    if (b) show(+b.getAttribute('data-i'));
+  });
+  show(0);
+}
+
+/* ---------- constructor de prompt ---------- */
+const PB_SCHEMA = {
+  streaming_weekly: 'streaming_weekly(track_id, dsp_id, week_id, streams, revenue)  -- llave: track_id + dsp_id + week_id',
+  dsps: 'dsps(dsp_id, dsp_name, platform_type, avg_payout_per_stream, reach_share)',
+  calendar_week: 'calendar_week(week_id, week_start_date, week_end_date, iso_year, iso_week)',
+  tracks: 'tracks(track_id, release_id, track_title, track_number, duration_sec, isrc, is_explicit)',
+  releases: 'releases(release_id, artist_id, label_id, release_title, release_type, release_date)',
+  artists: 'artists(artist_id, artist_name, label_id, genre_id, artist_type, home_country, debut_year, monthly_listeners_baseline)',
+  genres: 'genres(genre_id, genre_name)',
+  vw_campaign_roi: 'vw_campaign_roi(campaign_id, campaign_name, artist_name, platform, objective, total_spend, total_impressions, total_clicks, total_conversions, cost_per_conversion)  -- una fila por campaña, ya agregada, sin fecha'
+};
+const PB_QUESTIONS = [
+  { t: '¿Cuántos streams generó cada DSP en lo que va de 2026?', need: ['streaming_weekly','dsps','calendar_week'],
+    grain: 'Una fila por DSP. Streams = SUM(streaming_weekly.streams). El año sale de calendar_week.iso_year; week_id no es el año.' },
+  { t: '¿Cuál es el costo por conversión de cada plataforma de campañas?', need: ['vw_campaign_roi'],
+    grain: 'Una fila por plataforma. Costo por conversión = SUM(total_spend) / SUM(total_conversions); no promedies cost_per_conversion.' },
+  { t: '¿Qué género domina entre los artistas independientes?', need: ['streaming_weekly','tracks','releases','artists','genres'],
+    grain: "Una fila por género. Streams = SUM(streaming_weekly.streams). Independiente es artists.artist_type = 'independent'." }
+];
+const PB_RULES = [
+  'No uses SELECT *.',
+  'Comenta cada JOIN con una línea.',
+  'Si falta información, pregúntame antes de responder.',
+  'Usa la sintaxis de MySQL 8.'
+];
+function mountPromptBuilder(){
+  var qSel = document.getElementById('pb-q');
+  if (!qSel) return;
+  var schemaBox = document.getElementById('pb-schema');
+  var rulesBox = document.getElementById('pb-rules');
+  var ctx = document.getElementById('pb-ctx'), grain = document.getElementById('pb-grain');
+  var fmt = document.getElementById('pb-fmt'), verify = document.getElementById('pb-verify');
+  var out = document.getElementById('pb-out'), msg = document.getElementById('pb-msg');
+  var missingEl = document.getElementById('pb-missing'), gauge = document.getElementById('pb-gauge');
+  qSel.innerHTML = PB_QUESTIONS.map(function(q, i){ return '<option value="' + i + '">' + q.t + '</option>'; }).join('');
+  Object.keys(PB_SCHEMA).forEach(function(k){
+    schemaBox.insertAdjacentHTML('beforeend', '<label><input type="checkbox" class="pb-sch" value="' + k + '"> ' + k + '</label>');
+  });
+  PB_RULES.forEach(function(r, i){
+    rulesBox.insertAdjacentHTML('beforeend', '<label><input type="checkbox" class="pb-rule" value="' + i + '"> ' + r + '</label>');
+  });
+  function update(){
+    var q = PB_QUESTIONS[+qSel.value];
+    var chosen = Array.prototype.filter.call(schemaBox.querySelectorAll('.pb-sch'), function(c){ return c.checked; }).map(function(c){ return c.value; });
+    var rules = Array.prototype.filter.call(rulesBox.querySelectorAll('.pb-rule'), function(c){ return c.checked; }).map(function(c){ return PB_RULES[+c.value]; });
+    var missing = q.need.filter(function(n){ return chosen.indexOf(n) === -1; });
+    var parts = [];
+    if (ctx.checked) parts.push('[Contexto]\nTrabajo en un sello discográfico de metal. La base es MusicWorks (simulada), en MySQL 8.');
+    if (chosen.length) parts.push('[Esquema]\n' + chosen.map(function(n){ return PB_SCHEMA[n]; }).join('\n'));
+    parts.push('[Pregunta]\n' + q.t);
+    if (grain.checked) parts.push('[Grano y métrica]\n' + q.grain);
+    if (fmt.value) parts.push('[Formato de respuesta]\n' + fmt.value);
+    if (rules.length) parts.push('[Restricciones]\n' + rules.map(function(r){ return '- ' + r; }).join('\n'));
+    if (verify.checked) parts.push('[Verificación]\nAdemás del query, dame un segundo query que reconcilie el total con la tabla base.');
+    out.textContent = parts.join('\n\n');
+    var flags = [ctx.checked, missing.length === 0 && chosen.length > 0, grain.checked, !!fmt.value, rules.length > 0, verify.checked];
+    var active = 1 + flags.filter(Boolean).length;
+    var pct = active / 7 * 100;
+    renderGauge(gauge, pct, pct >= 85 ? 'var(--sh)' : (pct >= 45 ? 'var(--gold)' : 'var(--red)'));
+    msg.textContent = pct >= 85 ? 'Prompt completo: el LLM tiene lo necesario y tú tienes cómo comprobar.'
+      : (pct >= 45 ? 'Va bien, pero todavía deja huecos que el LLM va a llenar por su cuenta.' : 'Muy escueto: el LLM va a adivinar columnas, grano y métrica.');
+    var hints = [];
+    if (missing.length) hints.push('Falta en el esquema: ' + missing.join(', ') + '.');
+    if (!ctx.checked) hints.push('Sin contexto de negocio ni motor de base de datos.');
+    if (!grain.checked) hints.push('Sin grano ni definición de la métrica.');
+    missingEl.textContent = hints.join(' ');
+  }
+  [qSel, ctx, grain, fmt, verify].forEach(function(el){ el.addEventListener('change', update); });
+  schemaBox.addEventListener('change', update);
+  rulesBox.addEventListener('change', update);
+  update();
+}
+
+/* ---------- caza el error ---------- */
+function mountHunt(cfg){
+  var box = document.getElementById(cfg.container);
+  var checkBtn = document.getElementById(cfg.check), resetBtn = document.getElementById(cfg.reset), res = document.getElementById(cfg.res);
+  var wrap = document.getElementById(cfg.wrap);
+  wrap.innerHTML = cfg.items.map(function(it, i){
+    return '<button type="button" class="hunt-line" data-i="' + i + '">' + it.label + '<span class="hunt-why"></span></button>';
+  }).join('');
+  var sel = {};
+  wrap.addEventListener('click', function(ev){
+    if (box.classList.contains('hunt-revealed')) return;
+    var b = ev.target.closest ? ev.target.closest('.hunt-line') : null;
+    if (!b) return;
+    var i = b.getAttribute('data-i');
+    sel[i] = !sel[i];
+    b.classList.toggle('hunt-sel', !!sel[i]);
+  });
+  checkBtn.addEventListener('click', function(){
+    var found = 0, missed = 0, fps = 0, total = 0;
+    Array.prototype.forEach.call(wrap.querySelectorAll('.hunt-line'), function(b, i){
+      var it = cfg.items[i], picked = !!sel[i];
+      b.classList.remove('hunt-sel');
+      var why = b.querySelector('.hunt-why');
+      if (it.flaw){ total++; if (picked){ found++; b.classList.add('hunt-ok'); why.textContent = 'Falla encontrada. ' + it.why; } else { missed++; b.classList.add('hunt-miss'); why.textContent = 'Falla que se te pasó. ' + it.why; } }
+      else if (picked){ fps++; b.classList.add('hunt-fp'); why.textContent = 'Falsa alarma. ' + it.why; }
+    });
+    box.classList.add('hunt-revealed');
+    res.textContent = 'Fallas encontradas: ' + found + ' de ' + total + '. Falsas alarmas: ' + fps + '.';
+  });
+  resetBtn.addEventListener('click', function(){
+    sel = {};
+    box.classList.remove('hunt-revealed');
+    Array.prototype.forEach.call(wrap.querySelectorAll('.hunt-line'), function(b){
+      b.classList.remove('hunt-sel','hunt-ok','hunt-miss','hunt-fp');
+      b.querySelector('.hunt-why').textContent = '';
+    });
+    res.textContent = '';
+  });
+}
+const HUNT_SQL = [
+  { label: 'SELECT d.dsp_name, SUM(sw.revenue) AS streams_2026', flaw: true, why: 'Suma revenue pero la columna se llama streams_2026. El número sale en dólares con nombre de streams.' },
+  { label: 'FROM streaming_weekly sw', flaw: false, why: 'Es la tabla correcta para streams por semana.' },
+  { label: 'JOIN dsps d ON d.dsp_id = sw.dsp_id', flaw: false, why: 'Trae el nombre del DSP con la llave correcta.' },
+  { label: 'JOIN playlist_placements pp ON pp.track_id = sw.track_id', flaw: true, why: 'Un track puede estar en muchas playlists: cada fila de streaming se repite por cada una. Con esta línea el total global sube de 2,154,997,804 a 2,398,704,097.' },
+  { label: 'WHERE sw.week_id > 50', flaw: true, why: 'week_id es un número de semana del calendario, no el año. 2026 empieza en week_id 71; para filtrar por año se une calendar_week y se usa iso_year = 2026.' },
+  { label: 'GROUP BY d.dsp_name', flaw: false, why: 'Una fila por DSP, que es lo que pide la pregunta.' },
+  { label: 'ORDER BY streams_2026 DESC;', flaw: false, why: 'Ordenar de mayor a menor es válido.' }
+];
+const HUNT_CHART = [
+  { label: 'Título: "Apple Music paga el triple que Spotify"', flaw: true, why: 'Apple Music paga $8.00 y Spotify $4.00 por cada 1,000 streams: el doble.' },
+  { label: 'Eje vertical: empieza en 2', flaw: true, why: 'Un eje de barras que no empieza en cero exagera las diferencias. YouTube Music parece casi nada frente a Tidal.' },
+  { label: 'Orden de las barras: alfabético', flaw: true, why: 'Para comparar, ordena de mayor a menor. El orden alfabético esconde el ranking.' },
+  { label: 'Valor escrito encima de cada barra', flaw: false, why: 'Ayuda a leer el número exacto.' },
+  { label: 'Unidad en el subtítulo: USD por cada 1,000 streams', flaw: false, why: 'Dice qué se mide y en qué unidad.' }
+];
+function renderFlawedChart(svg){
+  var data = RATES.slice().sort(function(a,b){ return a.dsp < b.dsp ? -1 : 1; });
+  var W = 400, H = 230, padL = 34, padB = 42, top = 42, min = 2, max = 13;
+  var plotH = H - top - padB, bw = (W - padL - 10) / data.length;
+  var p = [];
+  p.push('<text x="' + padL + '" y="16" font-size="11" font-weight="700" fill="var(--ink)">Apple Music paga el triple que Spotify</text>');
+  p.push('<text x="' + padL + '" y="30" font-size="8" fill="var(--gray)">USD por cada 1,000 streams</text>');
+  [2,5,8,11].forEach(function(t){
+    var y = top + plotH - (t - min) / (max - min) * plotH;
+    p.push('<line x1="' + padL + '" y1="' + y + '" x2="' + (W-6) + '" y2="' + y + '" stroke="var(--border)"/>');
+    p.push('<text x="' + (padL-4) + '" y="' + (y+3) + '" font-size="7" text-anchor="end" fill="var(--gray)">' + t + '</text>');
+  });
+  data.forEach(function(d, i){
+    var h = (d.rate - min) / (max - min) * plotH, x = padL + i * bw + 5, y = top + plotH - h;
+    p.push('<rect x="' + x + '" y="' + y + '" width="' + (bw-10) + '" height="' + h + '" fill="var(--teal)" rx="2"/>');
+    p.push('<text x="' + (x + (bw-10)/2) + '" y="' + (y-3) + '" font-size="7.5" text-anchor="middle" fill="var(--ink)">$' + d.rate.toFixed(2) + '</text>');
+    p.push('<text x="' + (x + (bw-10)/2) + '" y="' + (H-padB+12) + '" font-size="7" text-anchor="middle" fill="var(--gray)">' + d.dsp + '</text>');
+  });
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.innerHTML = p.join('');
+}
+
+/* ---------- selector de gráficas ---------- */
+const SEL_TYPES = [
+  { k: 'Comparar categorías', tipo: 'Barras horizontales, ordenadas',
+    uso: 'Cuando quieres ver qué categoría gana y por cuánto.',
+    prompt: 'Con esta tabla (dsp, usd_por_mil_streams) genera un archivo HTML autocontenido con barras horizontales ordenadas de mayor a menor, valor al final de cada barra, eje desde cero y el título como conclusión: "Tidal paga 6 veces más que YouTube Music por cada 1,000 streams". Sin librerías externas.\n\n[pega aquí tu tabla real]',
+    err: 'Ordena alfabéticamente o acorta el eje para que las barras se vean más dramáticas.', draw: 'bar' },
+  { k: 'Composición de un total', tipo: 'Dona con máximo 5 rebanadas y "Otros"',
+    uso: 'Cuando la pregunta es cómo se reparte un total entre partes.',
+    prompt: 'Con esta tabla (genero, revenue) genera un archivo HTML con una dona: las 5 mayores rebanadas y el resto agrupado como "Otros", porcentaje en la leyenda, un color por rebanada. Verifica que los porcentajes sumen 100.\n\n[pega aquí tu tabla real]',
+    err: 'Dibuja las 15 categorías como rebanadas o deja porcentajes que no suman 100.', draw: 'pie' },
+  { k: 'Tendencia en el tiempo', tipo: 'Línea',
+    uso: 'Cuando la pregunta es cómo cambia algo mes a mes.',
+    prompt: 'Con esta serie mensual (mes, streams) genera una línea simple, sin decoración, con el mes mínimo y el máximo marcados y el título como conclusión. No interpoles meses faltantes.\n\n[pega aquí tu serie real]',
+    err: 'Inventa un mes que falta o suaviza la línea para que parezca una tendencia.', draw: 'timeline' },
+  { k: 'Relación entre dos medidas', tipo: 'Dispersión',
+    uso: 'Cuando quieres saber si dos medidas se mueven juntas o encontrar casos atípicos.',
+    prompt: 'Con esta tabla (plataforma, objetivo, spend, conversiones) genera una dispersión: spend en X, conversiones en Y, un punto por combinación y un punto resaltado para la más eficiente. No dibujes línea de tendencia salvo que te la pida.\n\n[pega aquí tu tabla real]',
+    err: 'Agrega una línea de tendencia y afirma una correlación que los datos no sostienen.', draw: 'scatter' },
+  { k: 'Una meta o una proporción', tipo: 'Medidor o tarjeta KPI',
+    uso: 'Cuando el mensaje es un solo porcentaje contra un total claro.',
+    prompt: 'Genera un medidor con este dato: los artistas independientes generan el 85% de los streams del catálogo (1,821,586,859 de 2,154,997,804). Muestra el porcentaje grande y el numerador y denominador debajo.\n\n[verifica el 85% con tu tabla]',
+    err: 'Muestra un porcentaje sin decir de qué total sale.', draw: 'gauge' }
+];
+function drawSelPreview(kind, svg, legendEl){
+  legendEl.innerHTML = '';
+  if (kind === 'bar'){
+    var entries = RATES.map(function(r){ return [r.dsp, r.rate]; });
+    renderMiniBar(svg, entries, function(v){ return '$' + v.toFixed(2); });
+  } else if (kind === 'pie'){
+    var entries2 = GENRE_REV.map(function(g){ return [g.genre, g.revenue]; });
+    var out = renderPie(svg, entries2, fmtInt, 5);
+    legendEl.innerHTML = out.legendHtml;
+  } else if (kind === 'timeline'){
+    renderTimeline(svg, TREND.map(function(m){ return [m.month.slice(0,7), m.streams]; }), fmtInt);
+  } else if (kind === 'scatter'){
+    var best = CAMP.filter(function(r){ return r.conversions >= 500; }).sort(function(a,b){ return a.cpc - b.cpc; })[0];
+    renderScatter(svg, CAMP.map(function(r){ return { x: r.spend, y: r.conversions, label: r.platform + ' / ' + r.objective, highlight: r === best }; }));
+  } else if (kind === 'gauge'){
+    renderGauge(svg, 100 * 1821586859 / 2154997804, 'var(--pu)');
+  }
+}
+function mountSelector(){
+  var tabs = document.getElementById('sel-tabs'), panel = document.getElementById('sel-panel');
+  if (!tabs) return;
+  tabs.innerHTML = SEL_TYPES.map(function(s, i){ return '<button type="button" class="flow-step-btn" data-i="' + i + '">' + s.k + '</button>'; }).join('');
+  function show(i){
+    var s = SEL_TYPES[i];
+    Array.prototype.forEach.call(tabs.querySelectorAll('.flow-step-btn'), function(b, j){ b.classList.toggle('flow-step-active', j === i); });
+    panel.innerHTML = '<div><h4>' + s.tipo + '</h4><p>' + s.uso + '</p><div class="cube-chart-title">Prompt de ejemplo</div><div class="sel-prompt"></div>' +
+      '<p style="margin-top:10px;"><strong>Error típico del LLM:</strong> ' + s.err + '</p></div>' +
+      '<div class="sel-preview"><svg></svg><div class="sel-legend"></div></div>';
+    panel.querySelector('.sel-prompt').textContent = s.prompt;
+    drawSelPreview(s.draw, panel.querySelector('svg'), panel.querySelector('.sel-legend'));
+  }
+  tabs.addEventListener('click', function(ev){
+    var b = ev.target.closest ? ev.target.closest('.flow-step-btn') : null;
+    if (b) show(+b.getAttribute('data-i'));
+  });
+  show(0);
+}
+
+/* ---------- comparaciones del bloque 4 ---------- */
+function mountCompare(id, title, rows){
+  var el = document.getElementById(id);
+  if (!el) return;
+  var max = Math.max.apply(null, rows.map(function(r){ return r.v; }));
+  el.innerHTML = '<div style="font-size:.78rem; color:var(--gray); margin-bottom:6px;">' + title + '</div>' + rows.map(function(r){
+    return '<div class="cmp-row"><div class="cmp-lab">' + r.l + '</div><div class="cmp-track"><div class="cmp-fill" style="width:' + (r.v / max * 100).toFixed(1) + '%; background:' + r.c + ';"></div></div><div class="cmp-val">' + r.t + '</div></div>';
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var pageTabs = document.getElementById('page-tabs');
+  if (pageTabs){
+    var tabBtns = Array.prototype.slice.call(pageTabs.querySelectorAll('.page-tab'));
+    var pageIds = tabBtns.map(function(b){ return b.getAttribute('data-page'); });
+    var pages = pageIds.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+    var showPage = function(id){
+      pages.forEach(function(p){ p.classList.toggle('page-hidden', p.id !== id); });
+      tabBtns.forEach(function(b){ b.classList.toggle('page-tab-active', b.getAttribute('data-page') === id); });
+      window.scrollTo(0, 0);
+    };
+    pageTabs.addEventListener('click', function(ev){
+      var btn = ev.target.closest ? ev.target.closest('.page-tab') : null;
+      if (btn) showPage(btn.getAttribute('data-page'));
+    });
+    if (pageIds.length) showPage(pageIds[0]);
+  }
+  mountSemaforo();
+  mountFlow();
+  mountPromptBuilder();
+  mountCompare('cmp-fanout', 'Streams totales del catálogo', [
+    { l: 'Query correcto', v: 2154997804, t: '2,154,997,804', c: 'var(--teal)' },
+    { l: 'Con JOIN duplicado', v: 2398704097, t: '2,398,704,097 (+11.3%)', c: 'var(--red)' }
+  ]);
+  mountCompare('cmp-cpc', 'Costo por conversión de todas las campañas', [
+    { l: 'Gasto total ÷ conversiones', v: 2.68, t: '$2.68', c: 'var(--teal)' },
+    { l: 'Promedio de las razones', v: 2.92, t: '$2.92 (+8.8%)', c: 'var(--red)' }
+  ]);
+  mountHunt({ container: 'hunt-sql', wrap: 'hunt-sql-lines', check: 'hunt-sql-check', reset: 'hunt-sql-reset', res: 'hunt-sql-res', items: HUNT_SQL });
+  mountHunt({ container: 'hunt-chart', wrap: 'hunt-chart-items', check: 'hunt-chart-check', reset: 'hunt-chart-reset', res: 'hunt-chart-res', items: HUNT_CHART });
+  var hc = document.getElementById('hunt-chart-svg');
+  if (hc) renderFlawedChart(hc);
+  mountSelector();
+});
+</script>
+<script src="shared-chrome.js?v=4"></script>
+</body>
+</html>

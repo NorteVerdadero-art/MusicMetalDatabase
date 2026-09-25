@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared-chrome.css">
+<link rel="stylesheet" href="shared-chrome.css?v=4">
 <style>
 :root{
   --ink:#1a1a2e; --teal:#00897B; --gold:#D4A017; --red:#C62828;
@@ -134,6 +134,22 @@ section h2{font-size:1.5rem;}
 
 .closing{padding:36px 40px; background:var(--bg-soft);}
 footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px solid var(--border);}
+
+/* Modo oscuro — estas cajas usan fondo hex fijo, no var(), así que
+   shared-chrome.css no las alcanza. Se sobreescriben aquí. */
+html[data-theme="dark"] .hook{background:#1b1b26;}
+html[data-theme="dark"] .ibox{background:#2b2410;}
+html[data-theme="dark"] .ibox .box-label{color:#E8B93D;}
+html[data-theme="dark"] .wbox{background:#2e1518;}
+html[data-theme="dark"] .read-box{background:#14232f;}
+html[data-theme="dark"] .machine-callout{background:#0d2b28;}
+html[data-theme="dark"] .machine-callout code{background:#14141c;}
+html[data-theme="dark"] .write-input, html[data-theme="dark"] .ex-input{background:#1b1b26;}
+html[data-theme="dark"] .ex-solution{background:#1b1b26;}
+html[data-theme="dark"] .ex-sol-toggle{background:#1b1b26; color:#9CA3AF;}
+html[data-theme="dark"] .ex-feedback.ex-ok{background:#0f2a1c; color:#3FDB9B;}
+html[data-theme="dark"] .ex-feedback.ex-warn{background:#2b2410; color:#E8B93D;}
+html[data-theme="dark"] .ex-feedback.ex-err{background:#2e1518;}
 </style>
 </head>
 <body>
@@ -1223,6 +1239,6 @@ document.addEventListener('DOMContentLoaded', function(){
   mountExercise('ex14', { check: checkByReference("SELECT t.track_title, r.release_title, ar.artist_name FROM tracks t JOIN releases r ON t.release_id = r.release_id JOIN artists ar ON r.artist_id = ar.artist_id WHERE ar.artist_type = 'mainstream'", false) });
 });
 </script>
-<script src="shared-chrome.js"></script>
+<script src="shared-chrome.js?v=4"></script>
 </body>
 </html>

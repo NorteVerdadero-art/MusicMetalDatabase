@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared-chrome.css">
+<link rel="stylesheet" href="shared-chrome.css?v=4">
 <style>
 :root{
   --ink:#1a1a2e; --teal:#00897B; --gold:#D4A017; --red:#C62828;
@@ -133,6 +133,22 @@ section h2{font-size:1.5rem;}
 
 .closing{padding:36px 40px; background:var(--bg-soft);}
 footer{padding:24px 40px; color:var(--gray); font-size:.82rem; border-top:1px solid var(--border);}
+
+/* Modo oscuro — estas cajas usan fondo hex fijo, no var(), así que
+   shared-chrome.css no las alcanza. Se sobreescriben aquí. */
+html[data-theme="dark"] .hook{background:#1b1b26;}
+html[data-theme="dark"] .ibox{background:#2b2410;}
+html[data-theme="dark"] .ibox .box-label{color:#E8B93D;}
+html[data-theme="dark"] .wbox{background:#2e1518;}
+html[data-theme="dark"] .read-box{background:#14232f;}
+html[data-theme="dark"] .machine-callout{background:#0d2b28;}
+html[data-theme="dark"] .machine-callout code{background:#14141c;}
+html[data-theme="dark"] .write-input, html[data-theme="dark"] .ex-input{background:#1b1b26;}
+html[data-theme="dark"] .ex-solution{background:#1b1b26;}
+html[data-theme="dark"] .ex-sol-toggle{background:#1b1b26; color:#9CA3AF;}
+html[data-theme="dark"] .ex-feedback.ex-ok{background:#0f2a1c; color:#3FDB9B;}
+html[data-theme="dark"] .ex-feedback.ex-warn{background:#2b2410; color:#E8B93D;}
+html[data-theme="dark"] .ex-feedback.ex-err{background:#2e1518;}
 </style>
 </head>
 <body>
@@ -299,7 +315,7 @@ LEFT JOIN campaigns c ON c.release_id = r.release_id;</code>
   <h2>Antes de escribir SQL: la pregunta de negocio</h2>
   <div class="ibox">
     <span class="box-label">El error más caro del análisis de datos</span>
-    <p>No es un JOIN mal escrito — es empezar a extraer sin tener clara la pregunta. Extracción no es "traer todo lo que hay", es decidir <strong>qué pregunta respondemos</strong> y <strong>qué 2-3 métricas</strong> nos dan esa respuesta, antes de tocar el teclado.</p>
+    <p>El error más caro está en empezar a extraer sin tener clara la pregunta, mucho antes de que aparezca un JOIN mal escrito. Extracción es decidir <strong>qué pregunta respondemos</strong> y <strong>qué 2-3 métricas</strong> nos dan esa respuesta, antes de tocar el teclado — "traer todo lo que hay" no cuenta.</p>
   </div>
 
   <table class="compare-table">
@@ -1262,6 +1278,6 @@ document.addEventListener('DOMContentLoaded', function(){
   mountExercise('ex6', { check: checkByReference('SELECT campaign_name, platform, cost_per_conversion FROM campaign_roi WHERE total_conversions > 50 ORDER BY cost_per_conversion ASC LIMIT 5', true) });
 });
 </script>
-<script src="shared-chrome.js"></script>
+<script src="shared-chrome.js?v=4"></script>
 </body>
 </html>

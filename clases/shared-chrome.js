@@ -14,7 +14,9 @@
     { href: 'clase7_dashboards_sheets_1.html', label: 'Dashboards en Sheets' },
     { href: 'clase_pipeline_sql_mysql.html', label: 'El Pipeline de Datos: MySQL' },
     { href: 'clase_modelado_dashboard_insights.html', label: 'Modelado, Dashboard e Insights' },
-    { href: 'clase_storytelling_comunicacion.html', label: 'Storytelling y Comunicación' }
+    { href: 'clase_storytelling_comunicacion.html', label: 'Storytelling y Comunicación' },
+    { href: 'clase_sql_subconsultas_agregaciones.html', label: 'Subconsultas y Agregaciones' },
+    { href: 'clase_llm_analitica_datos.html', label: 'LLMs para Analítica de Datos' }
   ];
   var REPASO = [
     { href: 'repaso_clases1-3_1.html', label: 'Repaso Clases 1–3' }
